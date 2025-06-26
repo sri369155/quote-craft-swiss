@@ -11,63 +11,160 @@ export type Database = {
     Tables: {
       customers: {
         Row: {
-          created_at: string
-          id: number
+          address: string | null
+          created_at: string | null
+          email: string | null
+          id: string
+          name: string
+          phone: string | null
+          updated_at: string | null
+          user_id: string
         }
         Insert: {
-          created_at?: string
-          id?: number
+          address?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          updated_at?: string | null
+          user_id: string
         }
         Update: {
-          created_at?: string
-          id?: number
+          address?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
       profiles: {
         Row: {
-          created_at: string
-          id: number
+          company_name: string | null
+          created_at: string | null
+          email: string
+          full_name: string | null
+          id: string
+          updated_at: string | null
         }
         Insert: {
-          created_at?: string
-          id?: number
+          company_name?: string | null
+          created_at?: string | null
+          email: string
+          full_name?: string | null
+          id: string
+          updated_at?: string | null
         }
         Update: {
-          created_at?: string
-          id?: number
+          company_name?: string | null
+          created_at?: string | null
+          email?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
       quotation_items: {
         Row: {
-          created_at: string
-          id: number
+          created_at: string | null
+          description: string
+          id: string
+          line_total: number
+          quantity: number
+          quotation_id: string
+          unit_price: number
         }
         Insert: {
-          created_at?: string
-          id?: number
+          created_at?: string | null
+          description: string
+          id?: string
+          line_total?: number
+          quantity?: number
+          quotation_id: string
+          unit_price?: number
         }
         Update: {
-          created_at?: string
-          id?: number
+          created_at?: string | null
+          description?: string
+          id?: string
+          line_total?: number
+          quantity?: number
+          quotation_id?: string
+          unit_price?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "quotation_items_quotation_id_fkey"
+            columns: ["quotation_id"]
+            isOneToOne: false
+            referencedRelation: "quotations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       quotations: {
         Row: {
-          created_at: string
-          id: number
+          created_at: string | null
+          customer_id: string
+          description: string | null
+          id: string
+          quotation_number: string
+          status: string | null
+          subtotal: number
+          tax_amount: number
+          tax_rate: number
+          title: string
+          total_amount: number
+          updated_at: string | null
+          user_id: string
+          valid_until: string | null
         }
         Insert: {
-          created_at?: string
-          id?: number
+          created_at?: string | null
+          customer_id: string
+          description?: string | null
+          id?: string
+          quotation_number: string
+          status?: string | null
+          subtotal?: number
+          tax_amount?: number
+          tax_rate?: number
+          title: string
+          total_amount?: number
+          updated_at?: string | null
+          user_id: string
+          valid_until?: string | null
         }
         Update: {
-          created_at?: string
-          id?: number
+          created_at?: string | null
+          customer_id?: string
+          description?: string | null
+          id?: string
+          quotation_number?: string
+          status?: string | null
+          subtotal?: number
+          tax_amount?: number
+          tax_rate?: number
+          title?: string
+          total_amount?: number
+          updated_at?: string | null
+          user_id?: string
+          valid_until?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "quotations_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

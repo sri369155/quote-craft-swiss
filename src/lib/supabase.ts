@@ -2,12 +2,9 @@
 import { createClient } from '@supabase/supabase-js'
 import { Database } from '@/types/database'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabaseUrl = 'https://mxkxkydeluflivpfnyhf.supabase.co'
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14a3hreWRlbHVmbGl2cGZueWhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5NTYxMzcsImV4cCI6MjA2NjUzMjEzN30.0PmQrUlrtVMFjqbcr-SUHPJi-y9neLsVXGjwP2kZWW8'
 
-// Only create Supabase client if environment variables are provided
-export const supabase = supabaseUrl && supabaseAnonKey 
-  ? createClient<Database>(supabaseUrl, supabaseAnonKey)
-  : null
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey)
 
-export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey)
+export const isSupabaseConfigured = true

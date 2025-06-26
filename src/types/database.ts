@@ -83,10 +83,10 @@ export interface Database {
           title: string
           description?: string | null
           status?: 'draft' | 'sent' | 'accepted' | 'rejected'
-          subtotal: number
-          tax_rate: number
-          tax_amount: number
-          total_amount: number
+          subtotal?: number
+          tax_rate?: number
+          tax_amount?: number
+          total_amount?: number
           valid_until?: string | null
           created_at?: string
           updated_at?: string
@@ -121,9 +121,9 @@ export interface Database {
           id?: string
           quotation_id: string
           description: string
-          quantity: number
-          unit_price: number
-          line_total: number
+          quantity?: number
+          unit_price?: number
+          line_total?: number
           created_at?: string
         }
         Update: {
