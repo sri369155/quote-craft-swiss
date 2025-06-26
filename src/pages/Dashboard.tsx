@@ -7,10 +7,12 @@ import { Plus, FileText, Users, TrendingUp, LogOut } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { Quotation } from '@/types/database'
 import { useToast } from '@/hooks/use-toast'
+import { useNavigate } from 'react-router-dom'
 
 export default function Dashboard() {
   const { user, profile, signOut } = useAuth()
   const { toast } = useToast()
+  const navigate = useNavigate()
   const [quotations, setQuotations] = useState<Quotation[]>([])
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState({
@@ -119,11 +121,27 @@ export default function Dashboard() {
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="container-app">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <FileText className="w-4 h-4 text-primary-foreground" />
+            <div className="flex items-center space-x-8">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                  <FileText className="w-4 h-4 text-primary-foreground" />
+                </div>
+                <span className="font-semibold text-lg tracking-tight">InvoiceGen</span>
               </div>
-              <span className="font-semibold text-lg tracking-tight">InvoiceGen</span>
+              
+              <nav className="hidden md:flex items-center space-x-1">
+                <Button variant="ghost" className="h-9 px-4 text-sm font-medium" onClick={() => navigate('/dashboard')}>
+                  Dashboard
+                </Button>
+                <Button variant="ghost" className="h-9 px-4 text-sm font-medium" onClick={() => navigate('/quotations')}>
+                  <FileText className="w-4 h-4 mr-2" />
+                  Quotations
+                </Button>
+                <Button variant="ghost" className="h-9 px-4 text-sm font-medium" onClick={() => navigate('/customers')}>
+                  <Users className="w-4 h-4 mr-2" />
+                  Customers
+                </Button>
+              </nav>
             </div>
             
             <div className="flex items-center space-x-4">
@@ -183,6 +201,33 @@ export default function Dashboard() {
           </Card>
         </div>
 
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/quotations')}>
+            <CardContent className="p-6 text-center">
+              <FileText className="w-12 h-12 text-primary mx-auto mb-4" />
+              <h3 className="font-semibold mb-2">Create Quotation</h3>
+              <p className="text-sm text-muted-foreground">Generate professional quotations for your clients</p>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/customers')}>
+            <CardContent className="p-6 text-center">
+              <Users className="w-12 h-12 text-primary mx-auto mb-4" />
+              <h3 className="font-semibold mb-2">Manage Customers</h3>
+              <p className="text-sm text-muted-foreground">Add and organize your customer information</p>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <CardContent className="p-6 text-center">
+              <TrendingUp className="w-12 h-12 text-primary mx-auto mb-4" />
+              <h3 className="font-semibold mb-2">View Reports</h3>
+              <p className="text-sm text-muted-foreground">Analyze your quotation performance</p>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Recent Quotations */}
         <Card>
           <CardHeader>
@@ -193,7 +238,7 @@ export default function Dashboard() {
                   Your latest quotations and their status
                 </CardDescription>
               </div>
-              <Button className="btn-primary">
+              <Button className="btn-primary" onClick={() => navigate('/quotations')}>
                 <Plus className="w-4 h-4 mr-2" />
                 New Quotation
               </Button>
@@ -207,7 +252,7 @@ export default function Dashboard() {
                 <p className="text-muted-foreground mb-4">
                   Create your first quotation to get started
                 </p>
-                <Button className="btn-primary">
+                <Button className="btn-primary" onClick={() => navigate('/quotations')}>
                   <Plus className="w-4 h-4 mr-2" />
                   Create Quotation
                 </Button>
@@ -225,8 +270,8 @@ export default function Dashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {quotations.map((quotation) => (
-                      <tr key={quotation.id} className="border-b hover:bg-muted/50 cursor-pointer">
+                    {quotations.slice(0, 5).map((quotation) => (
+                      <tr key={quotation.id} className="border-b hover:bg-muted/50 cursor-pointer" onClick={() => navigate('/quotations')}>
                         <td className="py-3 px-2 font-mono text-sm">{quotation.quotation_number}</td>
                         <td className="py-3 px-2 font-medium">{quotation.title}</td>
                         <td className="py-3 px-2">{formatCurrency(quotation.total_amount)}</td>
@@ -240,6 +285,13 @@ export default function Dashboard() {
                     ))}
                   </tbody>
                 </table>
+                {quotations.length > 5 && (
+                  <div className="text-center pt-4">
+                    <Button variant="outline" onClick={() => navigate('/quotations')}>
+                      View All Quotations
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
           </CardContent>
