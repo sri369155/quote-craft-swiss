@@ -1,56 +1,16 @@
 
-import { Menu, FileText, History, User } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
 
 const Header = () => {
-  const navigate = useNavigate();
-
   return (
-    <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
-      <div className="container-app">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center space-x-8">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <FileText className="w-4 h-4 text-primary-foreground" />
-              </div>
-              <span className="font-semibold text-lg tracking-tight">InvoiceGen</span>
-            </div>
-            
-            <nav className="hidden md:flex items-center space-x-1">
-              <Button variant="ghost" className="h-9 px-4 text-sm font-medium">
-                Features
-              </Button>
-              <Button variant="ghost" className="h-9 px-4 text-sm font-medium">
-                <History className="w-4 h-4 mr-2" />
-                Demo
-              </Button>
-            </nav>
+    <header className="bg-white shadow-sm border-b">
+      <div className="container-app py-4">
+        <nav className="flex items-center justify-between">
+          <div className="text-xl font-bold">QuoteCraft</div>
+          <div className="flex items-center space-x-6">
+            <a href="/auth" className="btn-primary">Sign In</a>
           </div>
-
-          <div className="flex items-center space-x-3">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="hidden sm:inline-flex"
-              onClick={() => navigate('/auth')}
-            >
-              <User className="w-4 h-4 mr-2" />
-              Login
-            </Button>
-            <Button 
-              size="sm" 
-              className="btn-primary"
-              onClick={() => navigate('/auth')}
-            >
-              Get Started
-            </Button>
-            <Button variant="ghost" size="sm" className="md:hidden">
-              <Menu className="w-5 h-5" />
-            </Button>
-          </div>
-        </div>
+        </nav>
       </div>
     </header>
   );
