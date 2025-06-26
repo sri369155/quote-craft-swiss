@@ -1,6 +1,6 @@
 
 import { useState, useEffect, createContext, useContext } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase, isSupabaseConfigured } from '@/lib/supabase'
 import { User } from '@supabase/supabase-js'
 import { Profile } from '@/types/database'
 
@@ -22,6 +22,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // If Supabase is not configured, just set loading to false
+    if (!isSupabaseConfigured || !supabase) {
+      setLoading(false)
+      return
+    }
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
@@ -48,6 +54,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const loadProfile = async (userId: string) => {
+    if (!supabase) return
+    
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -69,6 +77,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signUp = async (email: string, password: string, fullName: string, companyName?: string) => {
+    if (!supabase) throw new Error('Supabase not configured')
+    
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -96,6 +106,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signIn = async (email: string, password: string) => {
+    if (!supabase) throw new Error('Supabase not configured')
+    
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -106,11 +118,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signOut = async () => {
+    if (!supabase) throw new Error('Supabase not configured')
+    
     const { error } = await supabase.auth.signOut()
     if (error) throw error
   }
 
   const updateProfile = async (updates: Partial<Profile>) => {
+    if (!supabase) throw new Error('Supabase not configured')
     if (!user) throw new Error('No user logged in')
 
     const { error } = await supabase
