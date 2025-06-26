@@ -1,17 +1,18 @@
-
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/hooks/useAuth'
+import { usePDFExport } from '@/hooks/usePDFExport'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Plus, FileText, Eye, Edit, Trash2, Download } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
-import { Quotation } from '@/types/database'
+import { Quotation, Customer, QuotationItem } from '@/types/database'
 import { useToast } from '@/hooks/use-toast'
 import QuotationBuilder from '@/components/quotations/QuotationBuilder'
 
 export default function Quotations() {
   const { user } = useAuth()
   const { toast } = useToast()
+  const { exportToPDF, loading: pdfLoading } = usePDFExport()
   const [quotations, setQuotations] = useState<Quotation[]>([])
   const [loading, setLoading] = useState(true)
   const [showBuilder, setShowBuilder] = useState(false)
@@ -90,6 +91,43 @@ export default function Quotations() {
       toast({
         title: 'Error deleting quotation',
         description: error.message,
+        variant: 'destructive',
+      })
+    }
+  }
+
+  const handleExportPDF = async (quotationId: string) => {
+    try {
+      // Fetch quotation with customer and items
+      const { data: quotation, error: quotationError } = await supabase
+        .from('quotations')
+        .select('*')
+        .eq('id', quotationId)
+        .single()
+
+      if (quotationError) throw quotationError
+
+      const { data: customer, error: customerError } = await supabase
+        .from('customers')
+        .select('*')
+        .eq('id', quotation.customer_id)
+        .single()
+
+      if (customerError) throw customerError
+
+      const { data: items, error: itemsError } = await supabase
+        .from('quotation_items')
+        .select('*')
+        .eq('quotation_id', quotationId)
+        .order('created_at')
+
+      if (itemsError) throw itemsError
+
+      await exportToPDF(quotation, customer, items || [])
+    } catch (error: any) {
+      toast({
+        title: 'Export Error',
+        description: error.message || 'Failed to export PDF. Please try again.',
         variant: 'destructive',
       })
     }
@@ -249,12 +287,10 @@ export default function Quotations() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => toast({
-                            title: 'PDF Export',
-                            description: 'PDF export feature will be implemented next.',
-                          })}
+                          onClick={() => handleExportPDF(quotation.id)}
+                          disabled={pdfLoading}
                         >
-                          <Download className="w-4 h-4" />
+                          <Download className={`w-4 h-4 ${pdfLoading ? 'animate-spin' : ''}`} />
                         </Button>
                       </div>
                       <Button
