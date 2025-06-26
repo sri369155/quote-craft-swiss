@@ -3,7 +3,7 @@ import React from 'react';
 
 const Header = () => {
   return (
-    <header className="bg-white shadow-sm border-b">
+    <header className="bg-green-100 shadow-sm border-b">
       <div className="container-app py-4">
         <nav className="flex items-center justify-between">
           <div className="text-xl font-bold">QuoteCraft</div>
