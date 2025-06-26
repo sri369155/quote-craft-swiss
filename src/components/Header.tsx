@@ -1,8 +1,11 @@
 
 import { Menu, FileText, History, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const Header = () => {
+  const navigate = useNavigate();
+
   return (
     <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
       <div className="container-app">
@@ -17,21 +20,30 @@ const Header = () => {
             
             <nav className="hidden md:flex items-center space-x-1">
               <Button variant="ghost" className="h-9 px-4 text-sm font-medium">
-                Dashboard
+                Features
               </Button>
               <Button variant="ghost" className="h-9 px-4 text-sm font-medium">
                 <History className="w-4 h-4 mr-2" />
-                History
+                Demo
               </Button>
             </nav>
           </div>
 
           <div className="flex items-center space-x-3">
-            <Button variant="outline" size="sm" className="hidden sm:inline-flex">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="hidden sm:inline-flex"
+              onClick={() => navigate('/auth')}
+            >
               <User className="w-4 h-4 mr-2" />
               Login
             </Button>
-            <Button size="sm" className="btn-primary">
+            <Button 
+              size="sm" 
+              className="btn-primary"
+              onClick={() => navigate('/auth')}
+            >
               Get Started
             </Button>
             <Button variant="ghost" size="sm" className="md:hidden">

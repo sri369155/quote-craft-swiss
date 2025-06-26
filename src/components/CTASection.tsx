@@ -1,6 +1,7 @@
 
 import { ArrowDown, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const benefits = [
   'Professional templates ready to use',
@@ -12,6 +13,8 @@ const benefits = [
 ];
 
 const CTASection = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="py-24">
       <div className="container-app">
@@ -34,7 +37,11 @@ const CTASection = () => {
             </div>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button size="lg" className="btn-primary h-12 px-8 text-base">
+              <Button 
+                size="lg" 
+                className="btn-primary h-12 px-8 text-base"
+                onClick={() => navigate('/auth')}
+              >
                 Start Free Trial
                 <ArrowDown className="w-4 h-4 ml-2" />
               </Button>

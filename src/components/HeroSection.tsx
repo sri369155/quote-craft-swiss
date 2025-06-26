@@ -1,8 +1,11 @@
 
 import { ArrowDown, Sparkles, Shield, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const HeroSection = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="relative py-24 lg:py-32 overflow-hidden">
       <div className="container-app">
@@ -23,7 +26,11 @@ const HeroSection = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-            <Button size="lg" className="btn-primary h-12 px-8 text-base">
+            <Button 
+              size="lg" 
+              className="btn-primary h-12 px-8 text-base"
+              onClick={() => navigate('/auth')}
+            >
               Start Creating
               <ArrowDown className="w-4 h-4 ml-2" />
             </Button>
