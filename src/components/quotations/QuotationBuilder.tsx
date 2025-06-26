@@ -1,6 +1,6 @@
-
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/hooks/useAuth'
+import { useOpenAI } from '@/hooks/useOpenAI'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -32,6 +32,7 @@ interface QuotationBuilderProps {
 export default function QuotationBuilder({ quotationId, onSave, onCancel }: QuotationBuilderProps) {
   const { user } = useAuth()
   const { toast } = useToast()
+  const { autofillItem, loading: aiLoading } = useOpenAI()
   
   const [customers, setCustomers] = useState<Customer[]>([])
   const [loading, setLoading] = useState(false)
@@ -171,18 +172,14 @@ export default function QuotationBuilder({ quotationId, onSave, onCancel }: Quot
       return
     }
 
-    try {
-      // This is a placeholder for OpenAI integration
-      // You'll need to set up the OpenAI API key in Supabase secrets
+    const result = await autofillItem(item.description)
+    if (result) {
+      updateItem(itemIndex, 'quantity', result.quantity)
+      updateItem(itemIndex, 'unit_price', result.unit_price)
+      
       toast({
-        title: 'AI Autofill',
-        description: 'AI autofill feature will be implemented with OpenAI integration.',
-      })
-    } catch (error: any) {
-      toast({
-        title: 'AI autofill error',
-        description: error.message,
-        variant: 'destructive',
+        title: 'AI Autofill Complete',
+        description: `Suggested ${result.quantity} units at ₹${result.unit_price} each`,
       })
     }
   }
@@ -473,9 +470,10 @@ export default function QuotationBuilder({ quotationId, onSave, onCancel }: Quot
                               variant="outline"
                               size="sm"
                               onClick={() => useAIAutofill(index)}
+                              disabled={aiLoading}
                               title="AI Autofill"
                             >
-                              <Sparkles className="w-4 h-4" />
+                              <Sparkles className={`w-4 h-4 ${aiLoading ? 'animate-spin' : ''}`} />
                             </Button>
                           </div>
                         </TableCell>
