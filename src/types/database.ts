@@ -1,4 +1,3 @@
-
 export interface Database {
   public: {
     Tables: {
@@ -8,6 +7,9 @@ export interface Database {
           email: string
           full_name: string | null
           company_name: string | null
+          header_image_url: string | null
+          footer_image_url: string | null
+          signature_image_url: string | null
           created_at: string
           updated_at: string
         }
@@ -16,6 +18,9 @@ export interface Database {
           email: string
           full_name?: string | null
           company_name?: string | null
+          header_image_url?: string | null
+          footer_image_url?: string | null
+          signature_image_url?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -24,6 +29,10 @@ export interface Database {
           email?: string
           full_name?: string | null
           company_name?: string | null
+          header_image_url?: string | null
+          footer_image_url?: string | null
+          signature_image_url?: string | null
+          created_at?: string
           updated_at?: string
         }
       }
@@ -55,6 +64,7 @@ export interface Database {
           email?: string | null
           phone?: string | null
           address?: string | null
+          created_at?: string
           updated_at?: string
         }
       }
@@ -104,6 +114,7 @@ export interface Database {
           tax_amount?: number
           total_amount?: number
           valid_until?: string | null
+          created_at?: string
           updated_at?: string
         }
       }
@@ -133,6 +144,7 @@ export interface Database {
           quantity?: number
           unit_price?: number
           line_total?: number
+          created_at?: string
         }
       }
     }

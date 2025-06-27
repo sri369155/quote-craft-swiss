@@ -1,16 +1,17 @@
+
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { usePDFExport } from '@/hooks/usePDFExport'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Plus, FileText, Eye, Edit, Trash2, Download } from 'lucide-react'
+import { Plus, FileText, Eye, Edit, Trash2, Download, Settings } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { Quotation, Customer, QuotationItem } from '@/types/database'
 import { useToast } from '@/hooks/use-toast'
 import QuotationBuilder from '@/components/quotations/QuotationBuilder'
 
 export default function Quotations() {
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const { toast } = useToast()
   const { exportToPDF, loading: pdfLoading } = usePDFExport()
   const [quotations, setQuotations] = useState<Quotation[]>([])
@@ -123,7 +124,7 @@ export default function Quotations() {
 
       if (itemsError) throw itemsError
 
-      await exportToPDF(quotation, customer, items || [])
+      await exportToPDF(quotation, customer, items || [], profile || undefined)
     } catch (error: any) {
       toast({
         title: 'Export Error',
@@ -208,6 +209,14 @@ export default function Quotations() {
               </div>
               <span className="font-semibold text-lg tracking-tight">InvoiceGen</span>
             </div>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => window.location.href = '/profile-settings'}
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              Customize PDF
+            </Button>
           </div>
         </div>
       </header>
