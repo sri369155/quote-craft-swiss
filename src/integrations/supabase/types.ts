@@ -47,24 +47,33 @@ export type Database = {
           company_name: string | null
           created_at: string | null
           email: string
+          footer_image_url: string | null
           full_name: string | null
+          header_image_url: string | null
           id: string
+          signature_image_url: string | null
           updated_at: string | null
         }
         Insert: {
           company_name?: string | null
           created_at?: string | null
           email: string
+          footer_image_url?: string | null
           full_name?: string | null
+          header_image_url?: string | null
           id: string
+          signature_image_url?: string | null
           updated_at?: string | null
         }
         Update: {
           company_name?: string | null
           created_at?: string | null
           email?: string
+          footer_image_url?: string | null
           full_name?: string | null
+          header_image_url?: string | null
           id?: string
+          signature_image_url?: string | null
           updated_at?: string | null
         }
         Relationships: []
