@@ -32,14 +32,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const timeoutId = setTimeout(() => {
       console.log('Auth loading timeout reached')
       setLoading(false)
-    }, 5000)
+    }, 3000)
 
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      clearTimeout(timeoutId)
       setUser(session?.user ?? null)
       if (session?.user) {
         loadProfile(session.user.id)
       }
+      setLoading(false)
+    }).catch(() => {
+      clearTimeout(timeoutId)
       setLoading(false)
     })
 
