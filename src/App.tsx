@@ -10,6 +10,7 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Quotations from "./pages/Quotations";
 import Customers from "./pages/Customers";
+import ProfileSettings from "./pages/ProfileSettings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -73,6 +74,11 @@ const App = () => (
             <Route path="/customers" element={
               <ProtectedRoute>
                 <Customers />
+              </ProtectedRoute>
+            } />
+            <Route path="/profile-settings" element={
+              <ProtectedRoute>
+                <ProfileSettings />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
