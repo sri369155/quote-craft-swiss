@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const HeroSection = () => {
   return (
@@ -13,7 +14,7 @@ const HeroSection = () => {
           Streamline your business workflow with our intuitive platform.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <a href="/auth" className="btn-primary">Get Started</a>
+          <Link to="/auth" className="btn-primary">Get Started</Link>
           <a href="#features" className="btn-outline">Learn More</a>
         </div>
       </div>

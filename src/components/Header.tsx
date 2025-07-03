@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Header = () => {
   return (
@@ -8,7 +9,7 @@ const Header = () => {
         <nav className="flex items-center justify-between">
           <div className="text-xl font-bold">QuoteCraft</div>
           <div className="flex items-center space-x-6">
-            <a href="/auth" className="btn-primary">Sign In</a>
+            <Link to="/auth" className="btn-primary">Sign In</Link>
           </div>
         </nav>
       </div>
