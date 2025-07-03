@@ -26,16 +26,27 @@ export function useOpenAI() {
 
     setLoading(true)
     try {
+      console.log('Calling OpenAI autofill with description:', description)
+      
       const { data, error } = await supabase.functions.invoke('openai-autofill', {
         body: { description }
       })
 
+      console.log('Supabase function response:', { data, error })
+
       if (error) {
-        throw error
+        console.error('Supabase function error:', error)
+        throw new Error(error.message || 'Failed to call AI service')
       }
 
+      if (!data) {
+        throw new Error('No data received from AI service')
+      }
+
+      console.log('AI autofill successful:', data)
       return data
     } catch (error: any) {
+      console.error('AI autofill error:', error)
       toast({
         title: 'AI autofill error',
         description: error.message || 'Failed to get AI suggestions. Please check if OpenAI API key is configured.',

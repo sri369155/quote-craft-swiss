@@ -13,7 +13,10 @@ serve(async (req) => {
   }
 
   try {
+    console.log('OpenAI autofill function called')
+    
     const { description } = await req.json()
+    console.log('Description received:', description)
 
     if (!description) {
       return new Response(
@@ -25,13 +28,9 @@ serve(async (req) => {
       )
     }
 
-    // Get OpenAI API key from secrets
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-    )
-
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY')
+    console.log('OpenAI API key exists:', !!openaiApiKey)
+    
     if (!openaiApiKey) {
       return new Response(
         JSON.stringify({ error: 'OpenAI API key not configured' }),
@@ -61,6 +60,8 @@ Respond only with valid JSON in this format:
   "reasoning": "brief explanation"
 }`
 
+    console.log('Making request to OpenAI API')
+    
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -68,7 +69,7 @@ Respond only with valid JSON in this format:
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4',
+        model: 'gpt-4o-mini',
         messages: [
           {
             role: 'system',
@@ -84,11 +85,17 @@ Respond only with valid JSON in this format:
       }),
     })
 
+    console.log('OpenAI API response status:', response.status)
+
     if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.status}`)
+      const errorText = await response.text()
+      console.error('OpenAI API error:', errorText)
+      throw new Error(`OpenAI API error: ${response.status} - ${errorText}`)
     }
 
     const openaiResult = await response.json()
+    console.log('OpenAI response:', openaiResult)
+    
     const content = openaiResult.choices[0]?.message?.content
 
     if (!content) {
@@ -96,15 +103,25 @@ Respond only with valid JSON in this format:
     }
 
     // Parse the JSON response
-    const suggestion = JSON.parse(content)
+    let suggestion
+    try {
+      suggestion = JSON.parse(content)
+    } catch (parseError) {
+      console.error('Failed to parse OpenAI response:', content)
+      throw new Error('Invalid JSON response from OpenAI')
+    }
+    
+    const result = {
+      description,
+      quantity: suggestion.quantity || 1,
+      unit_price: suggestion.unit_price || 0,
+      reasoning: suggestion.reasoning || 'AI suggestion'
+    }
+    
+    console.log('Returning result:', result)
     
     return new Response(
-      JSON.stringify({
-        description,
-        quantity: suggestion.quantity,
-        unit_price: suggestion.unit_price,
-        reasoning: suggestion.reasoning
-      }),
+      JSON.stringify(result),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
@@ -113,7 +130,7 @@ Respond only with valid JSON in this format:
   } catch (error) {
     console.error('Error in openai-autofill function:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error.message || 'Internal server error' }),
       { 
         status: 500, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
