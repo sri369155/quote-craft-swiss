@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const CTASection = () => {
   return (
@@ -11,9 +12,9 @@ const CTASection = () => {
         <p className="text-xl mb-8 opacity-90">
           Join thousands of businesses already using QuoteCraft.
         </p>
-        <a href="/auth" className="bg-white text-primary hover:bg-gray-100 btn-swiss h-12 px-8 text-lg">
+        <Link to="/auth" className="bg-white text-primary hover:bg-gray-100 btn-swiss h-12 px-8 text-lg">
           Start Free Trial
-        </a>
+        </Link>
       </div>
     </section>
   );
