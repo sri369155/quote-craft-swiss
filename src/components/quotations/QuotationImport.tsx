@@ -20,18 +20,26 @@ export function QuotationImport({ onImportSuccess }: { onImportSuccess?: () => v
   }
 
   const parseWordDocument = async (file: File): Promise<string> => {
-    const arrayBuffer = await file.arrayBuffer()
-    const result = await mammoth.extractRawText({ arrayBuffer })
-    return result.value
+    try {
+      const arrayBuffer = await file.arrayBuffer()
+      const result = await mammoth.extractRawText({ arrayBuffer })
+      return result.value
+    } catch (error) {
+      console.error('Word document parsing error:', error)
+      throw new Error('Failed to parse Word document')
+    }
   }
 
   const parsePDFDocument = async (file: File): Promise<string> => {
-    // For PDF parsing, we'll use a simple text extraction
-    // In a production app, you might want to use a more sophisticated PDF parser
-    const arrayBuffer = await file.arrayBuffer()
-    const pdf = await import('pdf-parse')
-    const data = await pdf.default(arrayBuffer)
-    return data.text
+    try {
+      const arrayBuffer = await file.arrayBuffer()
+      const pdf = await import('pdf-parse')
+      const data = await pdf.default(arrayBuffer)
+      return data.text
+    } catch (error) {
+      console.error('PDF parsing error:', error)
+      throw new Error('Failed to parse PDF file')
+    }
   }
 
   const extractQuotationData = (text: string) => {
@@ -180,37 +188,62 @@ export function QuotationImport({ onImportSuccess }: { onImportSuccess?: () => v
       return
     }
 
+    if (!user) {
+      toast({
+        title: 'Authentication required',
+        description: 'Please log in to import files.',
+        variant: 'destructive'
+      })
+      return
+    }
+
     setIsImporting(true)
     let successCount = 0
     let errorCount = 0
 
     try {
+      // Process files with timeout protection
+      const processFile = async (file: File, index: number) => {
+        return Promise.race([
+          (async () => {
+            let text = ''
+            
+            if (file.type.includes('word') || file.name.endsWith('.docx')) {
+              text = await parseWordDocument(file)
+            } else if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
+              text = await parsePDFDocument(file)
+            } else {
+              throw new Error(`Unsupported file type: ${file.type}`)
+            }
+            
+            if (!text.trim()) {
+              throw new Error('No text content found in file')
+            }
+            
+            const quotationData = extractQuotationData(text)
+            const customer = await createCustomer(`Imported Customer ${index + 1}`)
+            await saveQuotationToDatabase(quotationData, customer.id)
+          })(),
+          new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('File processing timeout')), 30000)
+          )
+        ])
+      }
+
       for (let i = 0; i < files.length; i++) {
         const file = files[i]
         
         try {
-          let text = ''
-          
-          if (file.type.includes('word') || file.name.endsWith('.docx')) {
-            text = await parseWordDocument(file)
-          } else if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
-            text = await parsePDFDocument(file)
-          } else {
-            throw new Error('Unsupported file type')
-          }
-          
-          const quotationData = extractQuotationData(text)
-          
-          // Create a customer for this import
-          const customer = await createCustomer(`Imported Customer ${i + 1}`)
-          
-          // Save to database
-          await saveQuotationToDatabase(quotationData, customer.id)
-          
+          await processFile(file, i)
           successCount++
-        } catch (error) {
+        } catch (error: any) {
           console.error(`Error processing file ${file.name}:`, error)
           errorCount++
+          toast({
+            title: `Failed to process ${file.name}`,
+            description: error.message,
+            variant: 'destructive'
+          })
         }
       }
       
@@ -231,9 +264,10 @@ export function QuotationImport({ onImportSuccess }: { onImportSuccess?: () => v
       }
       
     } catch (error: any) {
+      console.error('Import failed:', error)
       toast({
         title: 'Import failed',
-        description: error.message,
+        description: error.message || 'An unexpected error occurred',
         variant: 'destructive'
       })
     } finally {
