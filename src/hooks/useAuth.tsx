@@ -1,8 +1,10 @@
 
 import { useState, useEffect, createContext, useContext } from 'react'
-import { supabase, isSupabaseConfigured } from '@/lib/supabase'
+import { supabase } from '@/integrations/supabase/client'
 import { User } from '@supabase/supabase-js'
 import { Profile } from '@/types/database'
+
+const isSupabaseConfigured = true
 
 interface AuthContext {
   user: User | null

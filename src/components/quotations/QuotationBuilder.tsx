@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Plus, Trash2, Save, FileText, Sparkles, Users } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
+import { supabase } from '@/integrations/supabase/client'
 import { useToast } from '@/hooks/use-toast'
 import { Customer, Quotation, QuotationItem } from '@/types/database'
 import CustomerForm from './CustomerForm'
@@ -117,7 +117,7 @@ export default function QuotationBuilder({ quotationId, onSave, onCancel }: Quot
       setDescription(quotation.description || '')
       setTaxRate(quotation.tax_rate)
       setValidUntil(quotation.valid_until || '')
-      setStatus(quotation.status)
+      setStatus(quotation.status as 'draft' | 'sent' | 'accepted' | 'rejected')
       
       setItems(quotationItems.map(item => ({
         id: item.id,
@@ -266,7 +266,7 @@ export default function QuotationBuilder({ quotationId, onSave, onCancel }: Quot
           .single()
 
         if (error) throw error
-        savedQuotation = data
+        savedQuotation = data as Quotation
 
         // Delete existing items and insert new ones
         await supabase
@@ -285,7 +285,7 @@ export default function QuotationBuilder({ quotationId, onSave, onCancel }: Quot
           .single()
 
         if (error) throw error
-        savedQuotation = data
+        savedQuotation = data as Quotation
       }
 
       // Insert quotation items

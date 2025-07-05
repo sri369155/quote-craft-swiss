@@ -6,7 +6,7 @@ import { usePDFExport } from '@/hooks/usePDFExport'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Plus, FileText, Eye, Edit, Trash2, Download, Settings } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
+import { supabase } from '@/integrations/supabase/client'
 import { Quotation, Customer, QuotationItem } from '@/types/database'
 import { useToast } from '@/hooks/use-toast'
 import QuotationBuilder from '@/components/quotations/QuotationBuilder'
@@ -36,7 +36,7 @@ export default function Quotations() {
         .order('created_at', { ascending: false })
 
       if (error) throw error
-      setQuotations(data || [])
+      setQuotations((data as Quotation[]) || [])
     } catch (error: any) {
       toast({
         title: 'Error loading quotations',
@@ -126,7 +126,7 @@ export default function Quotations() {
 
       if (itemsError) throw itemsError
 
-      await exportToPDF(quotation, customer, items || [], profile || undefined)
+      await exportToPDF(quotation as Quotation, customer, items || [], profile || undefined)
     } catch (error: any) {
       toast({
         title: 'Export Error',

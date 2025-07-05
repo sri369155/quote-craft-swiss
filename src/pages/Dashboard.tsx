@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Plus, FileText, Users, TrendingUp, LogOut } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
+import { supabase } from '@/integrations/supabase/client'
 import { Quotation } from '@/types/database'
 import { useToast } from '@/hooks/use-toast'
 import { useNavigate } from 'react-router-dom'
@@ -37,7 +37,7 @@ export default function Dashboard() {
 
       if (error) throw error
 
-      setQuotations(data || [])
+      setQuotations((data as Quotation[]) || [])
       
       // Calculate stats
       const total = data?.length || 0
