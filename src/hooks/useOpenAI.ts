@@ -26,16 +26,11 @@ export function useOpenAI() {
 
     setLoading(true)
     try {
-      console.log('Calling bulk OpenAI autofill with description:', bulkDescription)
-      
       const { data, error } = await supabase.functions.invoke('openai-autofill', {
         body: { bulk_description: bulkDescription }
       })
 
-      console.log('Supabase function response:', { data, error })
-
       if (error) {
-        console.error('Supabase function error:', error)
         throw new Error(error.message || 'Failed to call AI service')
       }
 
@@ -43,7 +38,6 @@ export function useOpenAI() {
         throw new Error('No data received from AI service')
       }
 
-      console.log('Bulk AI autofill successful:', data)
       return data
     } catch (error: any) {
       console.error('Bulk AI autofill error:', error)
@@ -70,16 +64,11 @@ export function useOpenAI() {
 
     setLoading(true)
     try {
-      console.log('Calling OpenAI autofill with description:', description)
-      
       const { data, error } = await supabase.functions.invoke('openai-autofill', {
         body: { description }
       })
 
-      console.log('Supabase function response:', { data, error })
-
       if (error) {
-        console.error('Supabase function error:', error)
         throw new Error(error.message || 'Failed to call AI service')
       }
 
@@ -87,7 +76,6 @@ export function useOpenAI() {
         throw new Error('No data received from AI service')
       }
 
-      console.log('AI autofill successful:', data)
       return data
     } catch (error: any) {
       console.error('AI autofill error:', error)
