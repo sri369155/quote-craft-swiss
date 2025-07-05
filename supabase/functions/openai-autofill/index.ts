@@ -31,8 +31,10 @@ serve(async (req) => {
 
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY')
     console.log('OpenAI API key exists:', !!openaiApiKey)
+    console.log('OpenAI API key length:', openaiApiKey ? openaiApiKey.length : 0)
     
     if (!openaiApiKey) {
+      console.error('OpenAI API key not configured')
       return new Response(
         JSON.stringify({ error: 'OpenAI API key not configured' }),
         { 
@@ -95,7 +97,7 @@ Respond only with valid JSON in this format:
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4.1-2025-04-14',
         messages: [
           {
             role: 'system',
@@ -106,7 +108,7 @@ Respond only with valid JSON in this format:
             content: prompt
           }
         ],
-        max_tokens: 200,
+        max_tokens: 500,
         temperature: 0.3,
       }),
     })
@@ -115,8 +117,18 @@ Respond only with valid JSON in this format:
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error('OpenAI API error:', errorText)
-      throw new Error(`OpenAI API error: ${response.status} - ${errorText}`)
+      console.error('OpenAI API error:', response.status, errorText)
+      console.error('Request headers:', Object.fromEntries(response.headers.entries()))
+      return new Response(
+        JSON.stringify({ 
+          error: `OpenAI API error: ${response.status}`,
+          details: errorText 
+        }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
     }
 
     const openaiResult = await response.json()
