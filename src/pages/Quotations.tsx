@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { usePDFExport } from '@/hooks/usePDFExport'
 import { Button } from '@/components/ui/button'
@@ -11,6 +12,7 @@ import { useToast } from '@/hooks/use-toast'
 import QuotationBuilder from '@/components/quotations/QuotationBuilder'
 
 export default function Quotations() {
+  const navigate = useNavigate()
   const { user, profile } = useAuth()
   const { toast } = useToast()
   const { exportToPDF, loading: pdfLoading } = usePDFExport()
@@ -212,7 +214,7 @@ export default function Quotations() {
             <Button 
               variant="outline" 
               size="sm"
-              onClick={() => window.location.href = '/profile-settings'}
+              onClick={() => navigate('/profile-settings')}
             >
               <Settings className="w-4 h-4 mr-2" />
               Customize PDF

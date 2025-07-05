@@ -15,7 +15,12 @@ const HeroSection = () => {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link to="/auth" className="btn-primary">Get Started</Link>
-          <a href="#features" className="btn-outline">Learn More</a>
+          <button 
+            onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+            className="btn-outline"
+          >
+            Learn More
+          </button>
         </div>
       </div>
     </section>
