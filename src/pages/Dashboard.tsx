@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Plus, FileText, Users, TrendingUp, LogOut } from 'lucide-react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Plus, FileText, Users, TrendingUp, LogOut, Upload } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { Quotation } from '@/types/database'
 import { useToast } from '@/hooks/use-toast'
 import { useNavigate } from 'react-router-dom'
+import { QuotationImport } from '@/components/quotations/QuotationImport'
 
 export default function Dashboard() {
   const { user, profile, signOut } = useAuth()
@@ -237,10 +239,26 @@ export default function Dashboard() {
                   Your latest quotations and their status
                 </CardDescription>
               </div>
-              <Button className="btn-primary" onClick={() => navigate('/quotations')}>
-                <Plus className="w-4 h-4 mr-2" />
-                New Quotation
-              </Button>
+              <div className="flex gap-2">
+                <Button className="btn-primary" onClick={() => navigate('/quotations')}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  New Quotation
+                </Button>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline">
+                      <Upload className="w-4 h-4 mr-2" />
+                      Import
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-lg">
+                    <DialogHeader>
+                      <DialogTitle>Import Existing Quotations</DialogTitle>
+                    </DialogHeader>
+                    <QuotationImport onImportSuccess={loadQuotations} />
+                  </DialogContent>
+                </Dialog>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
