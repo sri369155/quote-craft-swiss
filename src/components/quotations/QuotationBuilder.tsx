@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { useOpenAI } from '@/hooks/useOpenAI'
 import { Button } from '@/components/ui/button'
@@ -51,10 +51,16 @@ export default function QuotationBuilder({ quotationId, onSave, onCancel }: Quot
   const [status, setStatus] = useState<'draft' | 'sent' | 'accepted' | 'rejected'>('draft')
   const [bulkAIText, setBulkAIText] = useState('')
 
-  // Calculations
-  const subtotal = items.reduce((sum, item) => sum + item.line_total, 0)
-  const taxAmount = (subtotal * taxRate) / 100
-  const totalAmount = subtotal + taxAmount
+  // Memoized calculations to prevent performance issues
+  const subtotal = useMemo(() => 
+    items.reduce((sum, item) => sum + item.line_total, 0), [items]
+  )
+  const taxAmount = useMemo(() => 
+    (subtotal * taxRate) / 100, [subtotal, taxRate]
+  )
+  const totalAmount = useMemo(() => 
+    subtotal + taxAmount, [subtotal, taxAmount]
+  )
 
   useEffect(() => {
     if (user) {
@@ -150,7 +156,7 @@ export default function QuotationBuilder({ quotationId, onSave, onCancel }: Quot
     }
   }
 
-  const updateItem = (index: number, field: keyof QuotationItemForm, value: string | number) => {
+  const updateItem = useCallback((index: number, field: keyof QuotationItemForm, value: string | number) => {
     const updatedItems = [...items]
     updatedItems[index] = { ...updatedItems[index], [field]: value }
     
@@ -160,7 +166,7 @@ export default function QuotationBuilder({ quotationId, onSave, onCancel }: Quot
     }
     
     setItems(updatedItems)
-  }
+  }, [items])
 
   const useBulkAIAutofill = async () => {
     if (!bulkAIText.trim()) {
