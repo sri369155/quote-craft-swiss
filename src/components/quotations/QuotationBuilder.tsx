@@ -157,16 +157,18 @@ export default function QuotationBuilder({ quotationId, onSave, onCancel }: Quot
   }
 
   const updateItem = useCallback((index: number, field: keyof QuotationItemForm, value: string | number) => {
-    const updatedItems = [...items]
-    updatedItems[index] = { ...updatedItems[index], [field]: value }
-    
-    // Recalculate line total if quantity or unit_price changed
-    if (field === 'quantity' || field === 'unit_price') {
-      updatedItems[index].line_total = updatedItems[index].quantity * updatedItems[index].unit_price
-    }
-    
-    setItems(updatedItems)
-  }, [items])
+    setItems(currentItems => {
+      const updatedItems = [...currentItems]
+      updatedItems[index] = { ...updatedItems[index], [field]: value }
+      
+      // Recalculate line total if quantity or unit_price changed
+      if (field === 'quantity' || field === 'unit_price') {
+        updatedItems[index].line_total = updatedItems[index].quantity * updatedItems[index].unit_price
+      }
+      
+      return updatedItems
+    })
+  }, [])
 
   const useBulkAIAutofill = async () => {
     if (!bulkAIText.trim()) {
