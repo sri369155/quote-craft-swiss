@@ -42,7 +42,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setLoading(false)
         }
       } catch (error) {
-        console.error('Error initializing auth:', error)
         if (mounted) {
           setLoading(false)
         }
@@ -83,7 +82,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .single()
 
       if (error && error.code !== 'PGRST116') {
-        console.error('Error loading profile:', error)
         return
       }
 
@@ -91,7 +89,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setProfile(data)
       }
     } catch (error) {
-      console.error('Error loading profile:', error)
+      // Silently handle profile loading errors
     }
   }
 
@@ -117,7 +115,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         })
 
       if (profileError) {
-        console.error('Error creating profile:', profileError)
+        // Profile creation error handled silently
       }
     }
 
