@@ -35,6 +35,7 @@ export function usePDFExport() {
       const pdf = new jsPDF()
       const pageWidth = pdf.internal.pageSize.getWidth()
       const pageHeight = pdf.internal.pageSize.getHeight()
+      const footerHeight = 30
       
       // Load custom images if available
       let headerImage: string | null = null
@@ -59,42 +60,8 @@ export function usePDFExport() {
       
       let yPosition = 0
       
-      // Header section
-      if (headerImage) {
-        // Use custom header image with proper aspect ratio
-        try {
-          const img = new Image()
-          img.onload = () => {
-            // Calculate proper dimensions maintaining aspect ratio
-            const aspectRatio = img.width / img.height
-            const maxHeight = 40
-            const maxWidth = pageWidth
-            let width = maxWidth
-            let height = width / aspectRatio
-            
-            if (height > maxHeight) {
-              height = maxHeight
-              width = height * aspectRatio
-            }
-            
-            // Center the image horizontally
-            const x = (pageWidth - width) / 2
-            pdf.addImage(headerImage, 'JPEG', x, 0, width, height)
-          }
-          
-          // For immediate processing, use a fixed size that usually works
-          pdf.addImage(headerImage, 'JPEG', 0, 0, pageWidth, 40)
-          yPosition = 50
-          console.log('Custom header image loaded successfully')
-        } catch (error) {
-          console.error('Error adding header image:', error)
-          // Fall back to default header
-          yPosition = renderDefaultHeader(pdf, pageWidth, userProfile)
-        }
-      } else {
-        // Default header
-        yPosition = renderDefaultHeader(pdf, pageWidth, userProfile)
-      }
+      // Header section - First page
+      yPosition = addHeaderToPage(pdf, pageWidth, headerImage, userProfile)
       
       // QUOTATION label
       pdf.setFillColor(0, 0, 0)
@@ -126,68 +93,122 @@ export function usePDFExport() {
       pdf.text(`Sub: ${quotation.title || 'Project quotation'}`, 15, yPosition)
       yPosition += 15
       
-      // Table rendering
-      yPosition = renderQuotationTable(pdf, pageWidth, yPosition, items, quotation)
+      // Table rendering with multi-page support
+      yPosition = renderMultiPageTable(
+        pdf, 
+        pageWidth, 
+        pageHeight,
+        yPosition, 
+        items, 
+        quotation,
+        headerImage,
+        footerImage,
+        userProfile
+      )
       
       // Terms & Conditions and Signature section
       const termsStartY = yPosition + 10
-      pdf.setFillColor(255, 255, 255)
-      pdf.rect(15, termsStartY, 80, 60, 'FD')
-      pdf.rect(95, termsStartY, 100, 60, 'FD')
       
-      // Terms & Conditions
-      pdf.setFont('helvetica', 'bold')
-      pdf.setFontSize(10)
-      pdf.setTextColor(blackColor)
-      pdf.text('Terms & Conditions', 17, termsStartY + 12)
-      
-      pdf.setFont('helvetica', 'normal')
-      pdf.setFontSize(9)
-      pdf.text('Completion: 90 Days', 17, termsStartY + 22)
-      pdf.text('GST: As indicated', 17, termsStartY + 30)
-      pdf.text('Transport: NA', 17, termsStartY + 38)
-      
-      // Signature section
-      pdf.text('With regards', 97, termsStartY + 12)
-      
-      // Company name in signature
-      pdf.setFont('helvetica', 'bold')
-      pdf.setFontSize(12)
-      pdf.setTextColor(100, 100, 255)
-      const companyName = userProfile?.company_name || 'BHAIRAVNEX'
-      pdf.text(`For ${companyName}`, 97, termsStartY + 25)
-      
-      // Add signature image if available
-      if (signatureImage) {
-        try {
-          pdf.addImage(signatureImage, 'JPEG', 97, termsStartY + 30, 80, 20)
-        } catch (error) {
-          console.error('Error adding signature image:', error)
+      // Check if we need a new page for the signature section
+      if (termsStartY + 70 > pageHeight - 30) {
+        // Add footer to current page
+        addFooterToPage(pdf, pageWidth, pageHeight, footerImage)
+        
+        // Add new page
+        pdf.addPage()
+        
+        // Add header to new page
+        yPosition = addHeaderToPage(pdf, pageWidth, headerImage, userProfile)
+        const newTermsStartY = yPosition + 10
+        
+        pdf.setFillColor(255, 255, 255)
+        pdf.rect(15, newTermsStartY, 80, 60, 'FD')
+        pdf.rect(95, newTermsStartY, 100, 60, 'FD')
+        
+        // Terms & Conditions
+        pdf.setFont('helvetica', 'bold')
+        pdf.setFontSize(10)
+        pdf.setTextColor(blackColor)
+        pdf.text('Terms & Conditions', 17, newTermsStartY + 12)
+        
+        pdf.setFont('helvetica', 'normal')
+        pdf.setFontSize(9)
+        pdf.text('Completion: 90 Days', 17, newTermsStartY + 22)
+        pdf.text('GST: As indicated', 17, newTermsStartY + 30)
+        pdf.text('Transport: NA', 17, newTermsStartY + 38)
+        
+        // Signature section
+        pdf.text('With regards', 97, newTermsStartY + 12)
+        
+        // Company name in signature
+        pdf.setFont('helvetica', 'bold')
+        pdf.setFontSize(12)
+        pdf.setTextColor(100, 100, 255)
+        const companyName = userProfile?.company_name || 'BHAIRAVNEX'
+        pdf.text(`For ${companyName}`, 97, newTermsStartY + 25)
+        
+        // Add signature image if available
+        if (signatureImage) {
+          try {
+            pdf.addImage(signatureImage, 'JPEG', 97, newTermsStartY + 30, 80, 20)
+          } catch (error) {
+            console.error('Error adding signature image:', error)
+          }
         }
+        
+        // Signature placeholder text
+        pdf.setFont('helvetica', 'normal')
+        pdf.setFontSize(10)
+        pdf.setTextColor(blackColor)
+        pdf.text('Managing Partner', 97, newTermsStartY + 55)
+        pdf.text('Authorised Signature', 97, newTermsStartY + 62)
+      } else {
+        // Keep original layout if it fits on current page
+        pdf.setFillColor(255, 255, 255)
+        pdf.rect(15, termsStartY, 80, 60, 'FD')
+        pdf.rect(95, termsStartY, 100, 60, 'FD')
+        
+        // Terms & Conditions
+        pdf.setFont('helvetica', 'bold')
+        pdf.setFontSize(10)
+        pdf.setTextColor(blackColor)
+        pdf.text('Terms & Conditions', 17, termsStartY + 12)
+        
+        pdf.setFont('helvetica', 'normal')
+        pdf.setFontSize(9)
+        pdf.text('Completion: 90 Days', 17, termsStartY + 22)
+        pdf.text('GST: As indicated', 17, termsStartY + 30)
+        pdf.text('Transport: NA', 17, termsStartY + 38)
+        
+        // Signature section
+        pdf.text('With regards', 97, termsStartY + 12)
+        
+        // Company name in signature
+        pdf.setFont('helvetica', 'bold')
+        pdf.setFontSize(12)
+        pdf.setTextColor(100, 100, 255)
+        const companyName = userProfile?.company_name || 'BHAIRAVNEX'
+        pdf.text(`For ${companyName}`, 97, termsStartY + 25)
+        
+        // Add signature image if available
+        if (signatureImage) {
+          try {
+            pdf.addImage(signatureImage, 'JPEG', 97, termsStartY + 30, 80, 20)
+          } catch (error) {
+            console.error('Error adding signature image:', error)
+          }
+        }
+        
+        // Signature placeholder text
+        pdf.setFont('helvetica', 'normal')
+        pdf.setFontSize(10)
+        pdf.setTextColor(blackColor)
+        pdf.text('Managing Partner', 97, termsStartY + 55)
+        pdf.text('Authorised Signature', 97, termsStartY + 62)
       }
-      
-      // Signature placeholder text
-      pdf.setFont('helvetica', 'normal')
-      pdf.setFontSize(10)
-      pdf.setTextColor(blackColor)
-      pdf.text('Managing Partner', 97, termsStartY + 55)
-      pdf.text('Authorised Signature', 97, termsStartY + 62)
       
       // Footer
-      const footerY = pageHeight - 30
-      if (footerImage) {
-        // Use custom footer image
-        try {
-          pdf.addImage(footerImage, 'JPEG', 0, footerY, pageWidth, 30)
-        } catch (error) {
-          console.error('Error adding footer image:', error)
-          // Fall back to default footer
-          renderDefaultFooter(pdf, pageWidth, footerY)
-        }
-      } else {
-        // Default footer
-        renderDefaultFooter(pdf, pageWidth, footerY)
-      }
+      addFooterToPage(pdf, pageWidth, pageHeight, footerImage)
       
       // Save the PDF
       pdf.save(`quotation-${quotation.quotation_number}.pdf`)
@@ -251,12 +272,51 @@ export function usePDFExport() {
     pdf.text('Email: bhairavnex@gmail.com', pageWidth - 15, footerY + 15, { align: 'right' })
   }
 
-  const renderQuotationTable = (pdf: jsPDF, pageWidth: number, startY: number, items: QuotationItem[], quotation: Quotation) => {
-    const tableStartY = startY
+  const addHeaderToPage = (pdf: jsPDF, pageWidth: number, headerImage: string | null, userProfile?: Profile) => {
+    if (headerImage) {
+      try {
+        pdf.addImage(headerImage, 'JPEG', 0, 0, pageWidth, 40)
+        return 50
+      } catch (error) {
+        console.error('Error adding header image:', error)
+        return renderDefaultHeader(pdf, pageWidth, userProfile)
+      }
+    } else {
+      return renderDefaultHeader(pdf, pageWidth, userProfile)
+    }
+  }
+
+  const addFooterToPage = (pdf: jsPDF, pageWidth: number, pageHeight: number, footerImage: string | null) => {
+    const footerY = pageHeight - 30
+    if (footerImage) {
+      try {
+        pdf.addImage(footerImage, 'JPEG', 0, footerY, pageWidth, 30)
+      } catch (error) {
+        console.error('Error adding footer image:', error)
+        renderDefaultFooter(pdf, pageWidth, footerY)
+      }
+    } else {
+      renderDefaultFooter(pdf, pageWidth, footerY)
+    }
+  }
+
+  const renderMultiPageTable = (
+    pdf: jsPDF, 
+    pageWidth: number, 
+    pageHeight: number,
+    startY: number, 
+    items: QuotationItem[], 
+    quotation: Quotation,
+    headerImage: string | null,
+    footerImage: string | null,
+    userProfile?: Profile
+  ) => {
     const pageMargin = 15
     const availableWidth = pageWidth - (pageMargin * 2)
+    const footerHeight = 30
+    const maxContentHeight = pageHeight - footerHeight - 20 // Leave space for footer and margin
     
-    // Dynamic column widths based on content
+    // Dynamic column widths
     const colWidths = [
       Math.floor(availableWidth * 0.45), // Description - 45%
       Math.floor(availableWidth * 0.10), // Qty - 10%
@@ -265,48 +325,62 @@ export function usePDFExport() {
       Math.floor(availableWidth * 0.10)  // Total - 10%
     ]
     
-    // Calculate column positions
     const colPositions = [pageMargin]
     for (let i = 1; i < colWidths.length; i++) {
       colPositions[i] = colPositions[i - 1] + colWidths[i - 1]
     }
     
-    // Table header background
-    pdf.setFillColor(240, 240, 240)
-    pdf.setDrawColor(0, 0, 0)
-    pdf.setLineWidth(0.5)
-    pdf.rect(pageMargin, tableStartY, availableWidth, 15, 'FD')
-    
-    // Table header text
-    pdf.setFont('helvetica', 'bold')
-    pdf.setFontSize(9)
-    pdf.setTextColor(0, 0, 0)
-    
     const headers = ['Description', 'Qty', 'Rate (₹)', 'GST Amount', 'Total (₹)']
-    headers.forEach((header, index) => {
-      const textWidth = pdf.getTextWidth(header)
-      const cellCenter = colPositions[index] + (colWidths[index] / 2)
-      pdf.text(header, cellCenter - (textWidth / 2), tableStartY + 10)
-    })
     
-    // Draw header borders
-    for (let i = 0; i < colPositions.length; i++) {
-      pdf.line(colPositions[i], tableStartY, colPositions[i], tableStartY + 15)
+    const renderTableHeader = (yPos: number) => {
+      pdf.setFillColor(240, 240, 240)
+      pdf.setDrawColor(0, 0, 0)
+      pdf.setLineWidth(0.5)
+      pdf.rect(pageMargin, yPos, availableWidth, 15, 'FD')
+      
+      pdf.setFont('helvetica', 'bold')
+      pdf.setFontSize(9)
+      pdf.setTextColor(0, 0, 0)
+      
+      headers.forEach((header, index) => {
+        const textWidth = pdf.getTextWidth(header)
+        const cellCenter = colPositions[index] + (colWidths[index] / 2)
+        pdf.text(header, cellCenter - (textWidth / 2), yPos + 10)
+      })
+      
+      // Draw header borders
+      for (let i = 0; i < colPositions.length; i++) {
+        pdf.line(colPositions[i], yPos, colPositions[i], yPos + 15)
+      }
+      pdf.line(colPositions[colPositions.length - 1] + colWidths[colWidths.length - 1], yPos, 
+               colPositions[colPositions.length - 1] + colWidths[colWidths.length - 1], yPos + 15)
+      
+      return yPos + 15
     }
-    pdf.line(colPositions[colPositions.length - 1] + colWidths[colWidths.length - 1], tableStartY, 
-             colPositions[colPositions.length - 1] + colWidths[colWidths.length - 1], tableStartY + 15)
     
-    let yPosition = tableStartY + 15
-    
-    // Table rows
-    pdf.setFont('helvetica', 'normal')
-    pdf.setFontSize(9)
-    
+    let yPosition = renderTableHeader(startY)
     let subtotalBeforeGST = 0
     let totalGSTAmount = 0
     
+    pdf.setFont('helvetica', 'normal')
+    pdf.setFontSize(9)
+    
     items.forEach((item, index) => {
       const rowHeight = Math.max(20, Math.ceil(pdf.splitTextToSize(item.description, colWidths[0] - 4).length * 5) + 10)
+      
+      // Check if we need a new page
+      if (yPosition + rowHeight + 50 > maxContentHeight) { // 50 extra for totals
+        // Add footer to current page
+        addFooterToPage(pdf, pageWidth, pageHeight, footerImage)
+        
+        // Add new page
+        pdf.addPage()
+        
+        // Add header to new page
+        const headerHeight = addHeaderToPage(pdf, pageWidth, headerImage, userProfile)
+        yPosition = renderTableHeader(headerHeight + 10)
+      }
+      
       const itemSubtotal = item.quantity * item.unit_price
       const gstAmount = (itemSubtotal * quotation.tax_rate) / 100
       const itemTotal = itemSubtotal + gstAmount
@@ -328,7 +402,7 @@ export function usePDFExport() {
                colPositions[colPositions.length - 1] + colWidths[colWidths.length - 1], yPosition + rowHeight)
       pdf.line(pageMargin, yPosition + rowHeight, pageMargin + availableWidth, yPosition + rowHeight)
       
-      // Cell content with proper alignment
+      // Cell content
       const descLines = pdf.splitTextToSize(item.description, colWidths[0] - 4)
       pdf.text(descLines, colPositions[0] + 2, yPosition + 8)
       
@@ -341,7 +415,7 @@ export function usePDFExport() {
       const priceWidth = pdf.getTextWidth(priceText)
       pdf.text(priceText, colPositions[2] + (colWidths[2] / 2) - (priceWidth / 2), yPosition + 12)
       
-      // GST Amount column - showing GST amount on first line, GST % on second line
+      // GST Amount column
       const gstText = `₹${gstAmount.toFixed(2)}`
       const gstWidth = pdf.getTextWidth(gstText)
       pdf.text(gstText, colPositions[3] + (colWidths[3] / 2) - (gstWidth / 2), yPosition + 8)
@@ -357,12 +431,19 @@ export function usePDFExport() {
       yPosition += rowHeight
     })
     
+    // Check if we need space for totals
+    if (yPosition + 60 > maxContentHeight) {
+      addFooterToPage(pdf, pageWidth, pageHeight, footerImage)
+      pdf.addPage()
+      const headerHeight = addHeaderToPage(pdf, pageWidth, headerImage, userProfile)
+      yPosition = headerHeight + 10
+    }
+    
     // Total GST row
     const totalRowHeight = 15
     pdf.setFillColor(240, 240, 240)
     pdf.rect(pageMargin, yPosition, availableWidth, totalRowHeight, 'F')
     
-    // Draw borders for total row
     for (let i = 0; i < colPositions.length; i++) {
       pdf.line(colPositions[i], yPosition, colPositions[i], yPosition + totalRowHeight)
     }
@@ -371,19 +452,17 @@ export function usePDFExport() {
     pdf.line(pageMargin, yPosition + totalRowHeight, pageMargin + availableWidth, yPosition + totalRowHeight)
     
     pdf.setFont('helvetica', 'bold')
-    // Center align "Total GST:" text in GST Amount column
     const totalGstText = 'Total GST:'
     const totalGstWidth = pdf.getTextWidth(totalGstText)
     pdf.text(totalGstText, colPositions[3] + (colWidths[3] / 2) - (totalGstWidth / 2), yPosition + 10)
     
-    // Center align total amount in Total column
     const totalAmountText = `₹${quotation.total_amount.toFixed(2)}`
     const totalAmountWidth = pdf.getTextWidth(totalAmountText)
     pdf.text(totalAmountText, colPositions[4] + (colWidths[4] / 2) - (totalAmountWidth / 2), yPosition + 10)
     
     yPosition += totalRowHeight + 10
     
-    // Grand total in words section with dynamic margins
+    // Grand total section
     const summaryBoxWidth = Math.floor(availableWidth * 0.65)
     const totalBoxWidth = availableWidth - summaryBoxWidth
     
@@ -394,9 +473,7 @@ export function usePDFExport() {
     pdf.setFont('helvetica', 'normal')
     pdf.setFontSize(8)
     pdf.text('Grand Total (in words):', pageMargin + 2, yPosition + 8)
-    // You would need to implement a number-to-words converter for dynamic amounts
-    const wordsText = 'As per calculation above'
-    pdf.text(wordsText, pageMargin + 2, yPosition + 15)
+    pdf.text('As per calculation above', pageMargin + 2, yPosition + 15)
     
     pdf.text('Rounded', pageMargin + summaryBoxWidth + 2, yPosition + 8)
     pdf.text('Total', pageMargin + summaryBoxWidth + 2, yPosition + 15)
