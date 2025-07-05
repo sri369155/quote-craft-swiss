@@ -8,11 +8,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Download, X } from 'lucide-react'
+import { Download, Printer } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { Quotation, Customer, QuotationItem } from '@/types/database'
 import { useToast } from '@/hooks/use-toast'
@@ -96,46 +92,14 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
     }
   }
 
-  const updateQuotationField = (field: keyof Quotation, value: any) => {
-    if (!quotation) return
-    setQuotation({ ...quotation, [field]: value })
-  }
-
-  const updateItemField = (index: number, field: keyof QuotationItem, value: any) => {
-    const updatedItems = [...items]
-    updatedItems[index] = { ...updatedItems[index], [field]: value }
-    
-    // Recalculate totals
-    const quantity = field === 'quantity' ? value : updatedItems[index].quantity
-    const unitPrice = field === 'unit_price' ? value : updatedItems[index].unit_price
-    updatedItems[index].line_total = quantity * unitPrice
-    
-    setItems(updatedItems)
-    
-    // Update quotation totals
-    const subtotal = updatedItems.reduce((sum, item) => sum + item.line_total, 0)
-    const taxAmount = (subtotal * (quotation?.tax_rate || 0)) / 100
-    const totalAmount = subtotal + taxAmount
-    
-    setQuotation(prev => prev ? {
-      ...prev,
-      subtotal,
-      tax_amount: taxAmount,
-      total_amount: totalAmount
-    } : null)
-  }
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-    }).format(amount)
+  const handlePrint = () => {
+    window.print()
   }
 
   if (loading) {
     return (
       <Dialog open={open} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-auto">
           <div className="flex items-center justify-center p-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           </div>
@@ -148,11 +112,18 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
-        <DialogHeader>
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-auto print:max-w-none print:h-auto print:overflow-visible">
+        <DialogHeader className="print:hidden">
           <div className="flex items-center justify-between">
-            <DialogTitle>Preview & Edit Quotation</DialogTitle>
+            <DialogTitle>Quotation Preview</DialogTitle>
             <div className="flex gap-2">
+              <Button
+                onClick={handlePrint}
+                variant="outline"
+              >
+                <Printer className="w-4 h-4 mr-2" />
+                Print
+              </Button>
               <Button
                 onClick={handleDownloadPreview}
                 disabled={pdfLoading}
@@ -165,124 +136,169 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
           </div>
         </DialogHeader>
 
-        <div className="space-y-6">
-          {/* Quotation Details */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Quotation Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="title">Title</Label>
-                  <Input
-                    id="title"
-                    value={quotation.title}
-                    onChange={(e) => updateQuotationField('title', e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="quotation_number">Quotation Number</Label>
-                  <Input
-                    id="quotation_number"
-                    value={quotation.quotation_number}
-                    onChange={(e) => updateQuotationField('quotation_number', e.target.value)}
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  value={quotation.description || ''}
-                  onChange={(e) => updateQuotationField('description', e.target.value)}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Customer Details */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Customer: {customer.name}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-sm text-muted-foreground">
-                {customer.email && <div>Email: {customer.email}</div>}
-                {customer.phone && <div>Phone: {customer.phone}</div>}
-                {customer.address && <div>Address: {customer.address}</div>}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Items */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Items</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {items.map((item, index) => (
-                  <div key={item.id} className="grid grid-cols-12 gap-4 p-4 border rounded-lg">
-                    <div className="col-span-6">
-                      <Label>Description</Label>
-                      <Textarea
-                        value={item.description}
-                        onChange={(e) => updateItemField(index, 'description', e.target.value)}
-                        className="min-h-[60px]"
-                      />
-                    </div>
-                    <div className="col-span-2">
-                      <Label>Quantity</Label>
-                      <Input
-                        type="number"
-                        value={item.quantity}
-                        onChange={(e) => updateItemField(index, 'quantity', parseFloat(e.target.value) || 0)}
-                      />
-                    </div>
-                    <div className="col-span-2">
-                      <Label>Unit Price</Label>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        value={item.unit_price}
-                        onChange={(e) => updateItemField(index, 'unit_price', parseFloat(e.target.value) || 0)}
-                      />
-                    </div>
-                    <div className="col-span-2">
-                      <Label>Total</Label>
-                      <div className="mt-2 font-medium">
-                        {formatCurrency(item.line_total)}
-                      </div>
+        {/* PDF-like Content */}
+        <div className="bg-white p-8 space-y-6 print:p-0 print:space-y-4">
+          {/* Header Section */}
+          <div className="relative">
+            {profile?.header_image_url ? (
+              <img 
+                src={profile.header_image_url} 
+                alt="Header" 
+                className="w-full h-20 object-cover rounded-lg"
+              />
+            ) : (
+              <div className="bg-orange-600 text-white p-4 rounded-lg">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h1 className="text-2xl font-bold">{profile?.company_name || 'BHAIRAVNEX'}</h1>
+                    <p className="text-sm italic">"Engineering Tomorrow's Technologies, Today"</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-bold">GST: 37ABDFB9225A1Z5</p>
+                    <div className="bg-orange-400 w-8 h-8 flex items-center justify-center rounded text-xs mt-2">
+                      LOGO
                     </div>
                   </div>
-                ))}
+                </div>
               </div>
-            </CardContent>
-          </Card>
+            )}
+          </div>
 
-          {/* Totals */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Summary</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span>Subtotal:</span>
-                  <span>{formatCurrency(quotation.subtotal)}</span>
+          {/* QUOTATION Label */}
+          <div className="text-center">
+            <div className="bg-black text-white px-6 py-2 inline-block font-bold text-lg">
+              QUOTATION
+            </div>
+          </div>
+
+          {/* Quotation Details */}
+          <div className="flex justify-between text-sm mb-4">
+            <span>Quotation No.: <strong>{quotation.quotation_number}</strong></span>
+            <span>Date: <strong>{new Date(quotation.created_at).toLocaleDateString('en-GB')}</strong></span>
+          </div>
+
+          {/* Salutation and Introduction */}
+          <div className="space-y-3 text-sm">
+            <p>Dear Sir,</p>
+            <p>We would like to submit our lowest budgetary quote for the supply and installation of the following items:</p>
+            <p><strong>Sub: {quotation.title}</strong></p>
+          </div>
+
+          {/* Items Table */}
+          <div className="border border-gray-300">
+            {/* Table Header */}
+            <div className="bg-gray-100 grid grid-cols-12 border-b font-bold text-sm p-3">
+              <div className="col-span-5">Description</div>
+              <div className="col-span-1 text-center">Qty</div>
+              <div className="col-span-2 text-center">Rate (₹)</div>
+              <div className="col-span-2 text-center">GST Amount</div>
+              <div className="col-span-2 text-center">Total (₹)</div>
+            </div>
+            
+            {/* Table Rows */}
+            {items.map((item, index) => {
+              const itemSubtotal = item.quantity * item.unit_price
+              const gstAmount = (itemSubtotal * quotation.tax_rate) / 100
+              const itemTotal = itemSubtotal + gstAmount
+              
+              return (
+                <div key={item.id} className={`grid grid-cols-12 border-b text-sm p-3 ${index % 2 === 1 ? 'bg-gray-50' : ''}`}>
+                  <div className="col-span-5 pr-2">
+                    <div className="whitespace-pre-wrap">{item.description}</div>
+                  </div>
+                  <div className="col-span-1 text-center">{item.quantity}</div>
+                  <div className="col-span-2 text-center">{item.unit_price.toFixed(2)}</div>
+                  <div className="col-span-2 text-center">
+                    <div>₹{gstAmount.toFixed(2)}</div>
+                    <div>({quotation.tax_rate}%)</div>
+                  </div>
+                  <div className="col-span-2 text-center">{itemTotal.toFixed(2)}</div>
                 </div>
-                <div className="flex justify-between">
-                  <span>Tax ({quotation.tax_rate}%):</span>
-                  <span>{formatCurrency(quotation.tax_amount)}</span>
+              )
+            })}
+
+            {/* Total GST Row */}
+            <div className="bg-gray-100 grid grid-cols-12 border-b font-bold text-sm p-3">
+              <div className="col-span-7"></div>
+              <div className="col-span-2 text-center">Total GST:</div>
+              <div className="col-span-2 text-center">₹{quotation.total_amount.toFixed(2)}</div>
+            </div>
+          </div>
+
+          {/* Grand Total Section */}
+          <div className="grid grid-cols-2 border border-gray-300 text-sm">
+            <div className="p-3 border-r">
+              <div className="font-bold">Grand Total (in words):</div>
+              <div>As per calculation above</div>
+            </div>
+            <div className="p-3">
+              <div className="flex justify-between">
+                <span>Rounded</span>
+              </div>
+              <div className="flex justify-between font-bold text-lg">
+                <span>Total</span>
+                <span>₹{quotation.total_amount.toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Terms & Conditions and Signature */}
+          <div className="grid grid-cols-2 gap-6 mt-8">
+            <div className="border p-4">
+              <h3 className="font-bold text-base mb-3">Terms & Conditions</h3>
+              <div className="text-sm space-y-1">
+                <div>Completion: 90 Days</div>
+                <div>GST: As indicated</div>
+                <div>Transport: NA</div>
+              </div>
+            </div>
+            
+            <div className="border p-4">
+              <div className="text-sm space-y-3">
+                <div>With regards</div>
+                <div className="font-bold text-blue-600">
+                  For {profile?.company_name || 'BHAIRAVNEX'}
                 </div>
-                <div className="flex justify-between font-semibold text-lg border-t pt-2">
-                  <span>Total:</span>
-                  <span>{formatCurrency(quotation.total_amount)}</span>
+                
+                {profile?.signature_image_url && (
+                  <img 
+                    src={profile.signature_image_url} 
+                    alt="Signature" 
+                    className="h-16 w-auto"
+                  />
+                )}
+                
+                <div className="mt-8">
+                  <div>Managing Partner</div>
+                  <div>Authorised Signature</div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="mt-8">
+            {profile?.footer_image_url ? (
+              <img 
+                src={profile.footer_image_url} 
+                alt="Footer" 
+                className="w-full h-16 object-cover rounded-lg"
+              />
+            ) : (
+              <div className="bg-orange-600 text-white p-3 rounded-lg text-xs">
+                <div className="flex justify-between">
+                  <div>
+                    <div>Door No: 5-5, Vivekananda Nagar,</div>
+                    <div>Old Dairy Farm Post, Vishakhapatnam 530040 AP</div>
+                  </div>
+                  <div className="text-right">
+                    <div>+91 96032 79555</div>
+                    <div>Email: bhairavnex@gmail.com</div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>
