@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client'
 import { Quotation, Customer, QuotationItem } from '@/types/database'
 import { useToast } from '@/hooks/use-toast'
 import QuotationBuilder from '@/components/quotations/QuotationBuilder'
+import QuotationPreview from '@/components/quotations/QuotationPreview'
 
 export default function Quotations() {
   const navigate = useNavigate()
@@ -20,6 +21,7 @@ export default function Quotations() {
   const [loading, setLoading] = useState(true)
   const [showBuilder, setShowBuilder] = useState(false)
   const [editingQuotation, setEditingQuotation] = useState<string | null>(null)
+  const [previewQuotation, setPreviewQuotation] = useState<string | null>(null)
 
   useEffect(() => {
     if (user) {
@@ -298,6 +300,13 @@ export default function Quotations() {
                         <Button
                           variant="outline"
                           size="sm"
+                          onClick={() => setPreviewQuotation(quotation.id)}
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
                           onClick={() => handleExportPDF(quotation.id)}
                           disabled={pdfLoading}
                         >
@@ -319,6 +328,12 @@ export default function Quotations() {
             ))}
           </div>
         )}
+
+        <QuotationPreview
+          quotationId={previewQuotation}
+          open={!!previewQuotation}
+          onClose={() => setPreviewQuotation(null)}
+        />
       </main>
     </div>
   )
