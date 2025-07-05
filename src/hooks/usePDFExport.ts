@@ -261,8 +261,7 @@ export function usePDFExport() {
       Math.floor(availableWidth * 0.45), // Description - 45%
       Math.floor(availableWidth * 0.10), // Qty - 10%
       Math.floor(availableWidth * 0.15), // Rate - 15%
-      Math.floor(availableWidth * 0.10), // GST % - 10%
-      Math.floor(availableWidth * 0.10), // GST Amount - 10%
+      Math.floor(availableWidth * 0.20), // GST Amount (merged) - 20%
       Math.floor(availableWidth * 0.10)  // Total - 10%
     ]
     
@@ -283,7 +282,7 @@ export function usePDFExport() {
     pdf.setFontSize(9)
     pdf.setTextColor(0, 0, 0)
     
-    const headers = ['Description', 'Qty', 'Rate (₹)', 'GST %', 'GST Amt (₹)', 'Total (₹)']
+    const headers = ['Description', 'Qty', 'Rate (₹)', 'GST Amount', 'Total (₹)']
     headers.forEach((header, index) => {
       const textWidth = pdf.getTextWidth(header)
       const cellCenter = colPositions[index] + (colWidths[index] / 2)
@@ -342,17 +341,18 @@ export function usePDFExport() {
       const priceWidth = pdf.getTextWidth(priceText)
       pdf.text(priceText, colPositions[2] + (colWidths[2] / 2) - (priceWidth / 2), yPosition + 12)
       
-      const taxText = quotation.tax_rate.toString()
-      const taxWidth = pdf.getTextWidth(taxText)
-      pdf.text(taxText, colPositions[3] + (colWidths[3] / 2) - (taxWidth / 2), yPosition + 12)
-      
-      const gstText = gstAmount.toFixed(2)
+      // GST Amount column - showing GST amount on first line, GST % on second line
+      const gstText = `₹${gstAmount.toFixed(2)}`
       const gstWidth = pdf.getTextWidth(gstText)
-      pdf.text(gstText, colPositions[4] + (colWidths[4] / 2) - (gstWidth / 2), yPosition + 12)
+      pdf.text(gstText, colPositions[3] + (colWidths[3] / 2) - (gstWidth / 2), yPosition + 8)
+      
+      const gstPercentText = `(${quotation.tax_rate}%)`
+      const gstPercentWidth = pdf.getTextWidth(gstPercentText)
+      pdf.text(gstPercentText, colPositions[3] + (colWidths[3] / 2) - (gstPercentWidth / 2), yPosition + 16)
       
       const totalText = itemTotal.toFixed(2)
       const totalWidth = pdf.getTextWidth(totalText)
-      pdf.text(totalText, colPositions[5] + (colWidths[5] / 2) - (totalWidth / 2), yPosition + 12)
+      pdf.text(totalText, colPositions[4] + (colWidths[4] / 2) - (totalWidth / 2), yPosition + 12)
       
       yPosition += rowHeight
     })
@@ -371,15 +371,15 @@ export function usePDFExport() {
     pdf.line(pageMargin, yPosition + totalRowHeight, pageMargin + availableWidth, yPosition + totalRowHeight)
     
     pdf.setFont('helvetica', 'bold')
-    // Center align "Total GST:" text
+    // Center align "Total GST:" text in GST Amount column
     const totalGstText = 'Total GST:'
     const totalGstWidth = pdf.getTextWidth(totalGstText)
-    pdf.text(totalGstText, colPositions[4] + (colWidths[4] / 2) - (totalGstWidth / 2), yPosition + 10)
+    pdf.text(totalGstText, colPositions[3] + (colWidths[3] / 2) - (totalGstWidth / 2), yPosition + 10)
     
-    // Center align total GST amount
-    const totalGstAmountText = totalGSTAmount.toFixed(2)
-    const totalGstAmountWidth = pdf.getTextWidth(totalGstAmountText)
-    pdf.text(totalGstAmountText, colPositions[5] + (colWidths[5] / 2) - (totalGstAmountWidth / 2), yPosition + 10)
+    // Center align total amount in Total column
+    const totalAmountText = `₹${quotation.total_amount.toFixed(2)}`
+    const totalAmountWidth = pdf.getTextWidth(totalAmountText)
+    pdf.text(totalAmountText, colPositions[4] + (colWidths[4] / 2) - (totalAmountWidth / 2), yPosition + 10)
     
     yPosition += totalRowHeight + 10
     
