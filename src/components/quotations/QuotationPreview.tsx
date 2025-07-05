@@ -8,6 +8,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { Download, Printer } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { Quotation, Customer, QuotationItem } from '@/types/database'
@@ -44,17 +46,33 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
         .from('quotations')
         .select('*')
         .eq('id', quotationId)
-        .single()
+        .maybeSingle()
 
       if (quotationError) throw quotationError
+      if (!quotationData) {
+        toast({
+          title: 'Quotation not found',
+          description: 'The requested quotation could not be found.',
+          variant: 'destructive',
+        })
+        return
+      }
 
       const { data: customerData, error: customerError } = await supabase
         .from('customers')
         .select('*')
         .eq('id', quotationData.customer_id)
-        .single()
+        .maybeSingle()
 
       if (customerError) throw customerError
+      if (!customerData) {
+        toast({
+          title: 'Customer not found',
+          description: 'The customer associated with this quotation could not be found.',
+          variant: 'destructive',
+        })
+        return
+      }
 
       const { data: itemsData, error: itemsError } = await supabase
         .from('quotation_items')
@@ -94,6 +112,35 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
 
   const handlePrint = () => {
     window.print()
+  }
+
+  const updateQuotationField = (field: keyof Quotation, value: any) => {
+    if (!quotation) return
+    setQuotation({ ...quotation, [field]: value })
+  }
+
+  const updateItemField = (index: number, field: keyof QuotationItem, value: any) => {
+    const updatedItems = [...items]
+    updatedItems[index] = { ...updatedItems[index], [field]: value }
+    
+    // Recalculate totals
+    const quantity = field === 'quantity' ? value : updatedItems[index].quantity
+    const unitPrice = field === 'unit_price' ? value : updatedItems[index].unit_price
+    updatedItems[index].line_total = quantity * unitPrice
+    
+    setItems(updatedItems)
+    
+    // Update quotation totals
+    const subtotal = updatedItems.reduce((sum, item) => sum + item.line_total, 0)
+    const taxAmount = (subtotal * (quotation?.tax_rate || 0)) / 100
+    const totalAmount = subtotal + taxAmount
+    
+    setQuotation(prev => prev ? {
+      ...prev,
+      subtotal,
+      tax_amount: taxAmount,
+      total_amount: totalAmount
+    } : null)
   }
 
   if (loading) {
@@ -172,7 +219,20 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
           </div>
 
           {/* Quotation Details */}
-          <div className="flex justify-between text-sm mb-4">
+          <div className="flex justify-between text-sm mb-4 print:hidden">
+            <div className="flex items-center gap-2">
+              <span>Quotation No.:</span>
+              <Input
+                value={quotation.quotation_number}
+                onChange={(e) => updateQuotationField('quotation_number', e.target.value)}
+                className="h-6 text-sm font-bold border-0 p-0 bg-transparent"
+              />
+            </div>
+            <span>Date: <strong>{new Date(quotation.created_at).toLocaleDateString('en-GB')}</strong></span>
+          </div>
+          
+          {/* Print version - non-editable */}
+          <div className="hidden print:flex justify-between text-sm mb-4">
             <span>Quotation No.: <strong>{quotation.quotation_number}</strong></span>
             <span>Date: <strong>{new Date(quotation.created_at).toLocaleDateString('en-GB')}</strong></span>
           </div>
@@ -181,7 +241,15 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
           <div className="space-y-3 text-sm">
             <p>Dear Sir,</p>
             <p>We would like to submit our lowest budgetary quote for the supply and installation of the following items:</p>
-            <p><strong>Sub: {quotation.title}</strong></p>
+            <div className="flex items-center gap-2 print:hidden">
+              <span><strong>Sub:</strong></span>
+              <Input
+                value={quotation.title}
+                onChange={(e) => updateQuotationField('title', e.target.value)}
+                className="h-6 text-sm font-bold border-0 p-0 bg-transparent flex-1"
+              />
+            </div>
+            <p className="hidden print:block"><strong>Sub: {quotation.title}</strong></p>
           </div>
 
           {/* Items Table */}
@@ -204,10 +272,41 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
               return (
                 <div key={item.id} className={`grid grid-cols-12 border-b text-sm p-3 ${index % 2 === 1 ? 'bg-gray-50' : ''}`}>
                   <div className="col-span-5 pr-2">
-                    <div className="whitespace-pre-wrap">{item.description}</div>
+                    {/* Editable description */}
+                    <Textarea
+                      value={item.description}
+                      onChange={(e) => updateItemField(index, 'description', e.target.value)}
+                      className="border-0 p-0 bg-transparent text-sm resize-none min-h-[40px] print:hidden"
+                    />
+                    {/* Print version */}
+                    <div className="hidden print:block whitespace-pre-wrap">{item.description}</div>
                   </div>
-                  <div className="col-span-1 text-center">{item.quantity}</div>
-                  <div className="col-span-2 text-center">{item.unit_price.toFixed(2)}</div>
+                  
+                  <div className="col-span-1 text-center">
+                    {/* Editable quantity */}
+                    <Input
+                      type="number"
+                      value={item.quantity}
+                      onChange={(e) => updateItemField(index, 'quantity', parseFloat(e.target.value) || 0)}
+                      className="h-8 text-center border-0 p-0 bg-transparent text-sm print:hidden"
+                    />
+                    {/* Print version */}
+                    <div className="hidden print:block">{item.quantity}</div>
+                  </div>
+                  
+                  <div className="col-span-2 text-center">
+                    {/* Editable unit price */}
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={item.unit_price}
+                      onChange={(e) => updateItemField(index, 'unit_price', parseFloat(e.target.value) || 0)}
+                      className="h-8 text-center border-0 p-0 bg-transparent text-sm print:hidden"
+                    />
+                    {/* Print version */}
+                    <div className="hidden print:block">{item.unit_price.toFixed(2)}</div>
+                  </div>
+                  
                   <div className="col-span-2 text-center">
                     <div>₹{gstAmount.toFixed(2)}</div>
                     <div>({quotation.tax_rate}%)</div>
@@ -221,7 +320,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
             <div className="bg-gray-100 grid grid-cols-12 border-b font-bold text-sm p-3">
               <div className="col-span-7"></div>
               <div className="col-span-2 text-center">Total GST:</div>
-              <div className="col-span-2 text-center">₹{quotation.total_amount.toFixed(2)}</div>
+              <div className="col-span-2 text-center">₹{quotation.tax_amount.toFixed(2)}</div>
             </div>
           </div>
 
