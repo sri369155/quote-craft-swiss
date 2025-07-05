@@ -32,7 +32,7 @@ interface QuotationBuilderProps {
 export default function QuotationBuilder({ quotationId, onSave, onCancel }: QuotationBuilderProps) {
   const { user } = useAuth()
   const { toast } = useToast()
-  const { autofillItem, loading: aiLoading } = useOpenAI()
+  const { autofillItem, bulkAutofill, loading: aiLoading } = useOpenAI()
   
   const [customers, setCustomers] = useState<Customer[]>([])
   const [loading, setLoading] = useState(false)
@@ -49,6 +49,7 @@ export default function QuotationBuilder({ quotationId, onSave, onCancel }: Quot
   const [taxRate, setTaxRate] = useState(18) // Default GST rate for India
   const [validUntil, setValidUntil] = useState('')
   const [status, setStatus] = useState<'draft' | 'sent' | 'accepted' | 'rejected'>('draft')
+  const [bulkAIText, setBulkAIText] = useState('')
 
   // Calculations
   const subtotal = items.reduce((sum, item) => sum + item.line_total, 0)
@@ -159,6 +160,40 @@ export default function QuotationBuilder({ quotationId, onSave, onCancel }: Quot
     }
     
     setItems(updatedItems)
+  }
+
+  const useBulkAIAutofill = async () => {
+    if (!bulkAIText.trim()) {
+      toast({
+        title: 'Add project description first',
+        description: 'Please add a project description before using bulk AI autofill.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    const result = await bulkAutofill(bulkAIText)
+    if (result) {
+      // Fill basic information
+      if (result.title) setTitle(result.title)
+      if (result.description) setDescription(result.description)
+      
+      // Fill line items
+      if (result.items && result.items.length > 0) {
+        const newItems = result.items.map((item: any) => ({
+          description: item.description || '',
+          quantity: item.quantity || 1,
+          unit_price: item.unit_price || 0,
+          line_total: (item.quantity || 1) * (item.unit_price || 0)
+        }))
+        setItems(newItems)
+        
+        toast({
+          title: 'Bulk AI Autofill Complete',
+          description: `Generated ${newItems.length} line items with quotation details`,
+        })
+      }
+    }
   }
 
   const useAIAutofill = async (itemIndex: number) => {
@@ -294,9 +329,39 @@ export default function QuotationBuilder({ quotationId, onSave, onCancel }: Quot
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="space-y-6">
+        {/* Bulk AI Autofill */}
+        <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10">
+          <CardHeader>
+            <div className="flex items-center space-x-2">
+              <Sparkles className="w-5 h-5 text-primary" />
+              <CardTitle>AI Bulk Autofill</CardTitle>
+            </div>
+            <CardDescription>
+              Paste or type your project details and let AI generate the entire quotation
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Textarea
+              value={bulkAIText}
+              onChange={(e) => setBulkAIText(e.target.value)}
+              placeholder="Example: Complete website development for restaurant including design, development, hosting setup, SEO optimization, and training. Need modern responsive design with online ordering system..."
+              rows={4}
+              className="resize-none"
+            />
+            <Button 
+              onClick={useBulkAIAutofill} 
+              disabled={aiLoading || !bulkAIText.trim()}
+              className="w-full btn-primary"
+            >
+              <Sparkles className={`w-4 h-4 mr-2 ${aiLoading ? 'animate-spin' : ''}`} />
+              {aiLoading ? 'Generating...' : 'Generate Complete Quotation'}
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Header */}
+        <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-semibold tracking-tight">
             {quotationId ? 'Edit Quotation' : 'New Quotation'}

@@ -15,12 +15,13 @@ serve(async (req) => {
   try {
     console.log('OpenAI autofill function called')
     
-    const { description } = await req.json()
+    const { description, bulk_description } = await req.json()
     console.log('Description received:', description)
+    console.log('Bulk description received:', bulk_description)
 
-    if (!description) {
+    if (!description && !bulk_description) {
       return new Response(
-        JSON.stringify({ error: 'Description is required' }),
+        JSON.stringify({ error: 'Description or bulk_description is required' }),
         { 
           status: 400, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -41,7 +42,31 @@ serve(async (req) => {
       )
     }
 
-    const prompt = `Based on this item description: "${description}"
+    let prompt
+    if (bulk_description) {
+      prompt = `Based on this project/quotation description: "${bulk_description}"
+
+Break this down into individual line items for a professional quotation with realistic values:
+- Create multiple line items (typically 3-8 items)
+- Include quantity, unit price in Indian Rupees, and description for each item
+- Consider services, products, materials, labor, etc.
+
+Respond only with valid JSON in this format:
+{
+  "quotation_data": {
+    "title": "Professional quotation title",
+    "description": "Brief project description",
+    "items": [
+      {
+        "description": "Item description",
+        "quantity": number,
+        "unit_price": number
+      }
+    ]
+  }
+}`
+    } else {
+      prompt = `Based on this item description: "${description}"
 
 Please suggest realistic values for a quotation line item:
 - Quantity (whole number, typically 1-100)
@@ -59,6 +84,7 @@ Respond only with valid JSON in this format:
   "unit_price": number,
   "reasoning": "brief explanation"
 }`
+    }
 
     console.log('Making request to OpenAI API')
     
@@ -111,11 +137,16 @@ Respond only with valid JSON in this format:
       throw new Error('Invalid JSON response from OpenAI')
     }
     
-    const result = {
-      description,
-      quantity: suggestion.quantity || 1,
-      unit_price: suggestion.unit_price || 0,
-      reasoning: suggestion.reasoning || 'AI suggestion'
+    let result
+    if (bulk_description) {
+      result = suggestion.quotation_data || suggestion
+    } else {
+      result = {
+        description,
+        quantity: suggestion.quantity || 1,
+        unit_price: suggestion.unit_price || 0,
+        reasoning: suggestion.reasoning || 'AI suggestion'
+      }
     }
     
     console.log('Returning result:', result)
