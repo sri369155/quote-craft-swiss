@@ -30,12 +30,49 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
   const [customer, setCustomer] = useState<Customer | null>(null)
   const [items, setItems] = useState<QuotationItem[]>([])
   const [loading, setLoading] = useState(false)
+  
+  // Editable text states
+  const [editableText, setEditableText] = useState({
+    salutation: 'Dear Sir,',
+    introText: 'We would like to submit our lowest budgetary quote for the supply and installation of the following items:',
+    companyName: '',
+    tagline: '"Engineering Tomorrow\'s Technologies, Today"',
+    gstNumber: 'GST: 37ABDFB9225A1Z5',
+    termsTitle: 'Terms & Conditions',
+    completionTerm: 'Completion: 90 Days',
+    gstTerm: 'GST: As indicated',
+    transportTerm: 'Transport: NA',
+    signatureText: 'With regards',
+    signatureRole1: 'Managing Partner',
+    signatureRole2: 'Authorised Signature',
+    footerAddress1: 'Door No: 5-5, Vivekananda Nagar,',
+    footerAddress2: 'Old Dairy Farm Post, Vishakhapatnam 530040 AP',
+    footerPhone: '+91 96032 79555',
+    footerEmail: 'Email: bhairavnex@gmail.com',
+    grandTotalText: 'Grand Total (in words):',
+    grandTotalDescription: 'As per calculation above',
+    roundedText: 'Rounded',
+    totalText: 'Total'
+  })
 
   useEffect(() => {
     if (quotationId && open) {
       loadQuotationData()
     }
   }, [quotationId, open])
+
+  useEffect(() => {
+    if (profile && quotation) {
+      setEditableText(prev => ({
+        ...prev,
+        companyName: profile.company_name || 'BHAIRAVNEX'
+      }))
+    }
+  }, [profile, quotation])
+
+  const updateEditableText = (field: string, value: string) => {
+    setEditableText(prev => ({ ...prev, [field]: value }))
+  }
 
   const loadQuotationData = async () => {
     if (!quotationId) return
@@ -197,11 +234,30 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
               <div className="bg-orange-600 text-white p-4 rounded-lg">
                 <div className="flex justify-between items-center">
                   <div>
-                    <h1 className="text-2xl font-bold">{profile?.company_name || 'BHAIRAVNEX'}</h1>
-                    <p className="text-sm italic">"Engineering Tomorrow's Technologies, Today"</p>
+                    {/* Editable company name */}
+                    <Input
+                      value={editableText.companyName || profile?.company_name || 'BHAIRAVNEX'}
+                      onChange={(e) => updateEditableText('companyName', e.target.value)}
+                      className="text-2xl font-bold bg-transparent border-0 p-0 text-white placeholder-white/70 print:hidden"
+                    />
+                    <h1 className="hidden print:block text-2xl font-bold">{editableText.companyName || profile?.company_name || 'BHAIRAVNEX'}</h1>
+                    
+                    {/* Editable tagline */}
+                    <Textarea
+                      value={editableText.tagline}
+                      onChange={(e) => updateEditableText('tagline', e.target.value)}
+                      className="text-sm italic bg-transparent border-0 p-0 text-white placeholder-white/70 resize-none min-h-[20px] print:hidden"
+                    />
+                    <p className="hidden print:block text-sm italic">{editableText.tagline}</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold">GST: 37ABDFB9225A1Z5</p>
+                    {/* Editable GST number */}
+                    <Input
+                      value={editableText.gstNumber}
+                      onChange={(e) => updateEditableText('gstNumber', e.target.value)}
+                      className="font-bold bg-transparent border-0 p-0 text-white placeholder-white/70 text-right print:hidden"
+                    />
+                    <p className="hidden print:block font-bold">{editableText.gstNumber}</p>
                     <div className="bg-orange-400 w-8 h-8 flex items-center justify-center rounded text-xs mt-2">
                       LOGO
                     </div>
@@ -228,7 +284,15 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                 className="h-6 text-sm font-bold border-0 p-0 bg-transparent"
               />
             </div>
-            <span>Date: <strong>{new Date(quotation.created_at).toLocaleDateString('en-GB')}</strong></span>
+            <div className="flex items-center gap-2">
+              <span>Date:</span>
+              <Input
+                type="date"
+                value={new Date(quotation.created_at).toISOString().split('T')[0]}
+                onChange={(e) => updateQuotationField('created_at', e.target.value)}
+                className="h-6 text-sm font-bold border-0 p-0 bg-transparent"
+              />
+            </div>
           </div>
           
           {/* Print version - non-editable */}
@@ -239,8 +303,22 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
 
           {/* Salutation and Introduction */}
           <div className="space-y-3 text-sm">
-            <p>Dear Sir,</p>
-            <p>We would like to submit our lowest budgetary quote for the supply and installation of the following items:</p>
+            {/* Editable salutation */}
+            <Input
+              value={editableText.salutation}
+              onChange={(e) => updateEditableText('salutation', e.target.value)}
+              className="border-0 p-0 bg-transparent text-sm print:hidden"
+            />
+            <p className="hidden print:block">{editableText.salutation}</p>
+            
+            {/* Editable intro text */}
+            <Textarea
+              value={editableText.introText}
+              onChange={(e) => updateEditableText('introText', e.target.value)}
+              className="border-0 p-0 bg-transparent text-sm resize-none min-h-[40px] print:hidden"
+            />
+            <p className="hidden print:block">{editableText.introText}</p>
+            
             <div className="flex items-center gap-2 print:hidden">
               <span><strong>Sub:</strong></span>
               <Input
@@ -327,15 +405,37 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
           {/* Grand Total Section */}
           <div className="grid grid-cols-2 border border-gray-300 text-sm">
             <div className="p-3 border-r">
-              <div className="font-bold">Grand Total (in words):</div>
-              <div>As per calculation above</div>
+              {/* Editable grand total text */}
+              <Input
+                value={editableText.grandTotalText}
+                onChange={(e) => updateEditableText('grandTotalText', e.target.value)}
+                className="font-bold border-0 p-0 bg-transparent text-sm print:hidden"
+              />
+              <div className="hidden print:block font-bold">{editableText.grandTotalText}</div>
+              
+              <Input
+                value={editableText.grandTotalDescription}
+                onChange={(e) => updateEditableText('grandTotalDescription', e.target.value)}
+                className="border-0 p-0 bg-transparent text-sm print:hidden"
+              />
+              <div className="hidden print:block">{editableText.grandTotalDescription}</div>
             </div>
             <div className="p-3">
               <div className="flex justify-between">
-                <span>Rounded</span>
+                <Input
+                  value={editableText.roundedText}
+                  onChange={(e) => updateEditableText('roundedText', e.target.value)}
+                  className="border-0 p-0 bg-transparent text-sm print:hidden"
+                />
+                <span className="hidden print:block">{editableText.roundedText}</span>
               </div>
               <div className="flex justify-between font-bold text-lg">
-                <span>Total</span>
+                <Input
+                  value={editableText.totalText}
+                  onChange={(e) => updateEditableText('totalText', e.target.value)}
+                  className="font-bold text-lg border-0 p-0 bg-transparent print:hidden"
+                />
+                <span className="hidden print:block">{editableText.totalText}</span>
                 <span>₹{quotation.total_amount.toFixed(2)}</span>
               </div>
             </div>
@@ -344,19 +444,51 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
           {/* Terms & Conditions and Signature */}
           <div className="grid grid-cols-2 gap-6 mt-8">
             <div className="border p-4">
-              <h3 className="font-bold text-base mb-3">Terms & Conditions</h3>
+              {/* Editable terms title */}
+              <Input
+                value={editableText.termsTitle}
+                onChange={(e) => updateEditableText('termsTitle', e.target.value)}
+                className="font-bold text-base mb-3 border-0 p-0 bg-transparent print:hidden"
+              />
+              <h3 className="hidden print:block font-bold text-base mb-3">{editableText.termsTitle}</h3>
+              
               <div className="text-sm space-y-1">
-                <div>Completion: 90 Days</div>
-                <div>GST: As indicated</div>
-                <div>Transport: NA</div>
+                {/* Editable terms */}
+                <Input
+                  value={editableText.completionTerm}
+                  onChange={(e) => updateEditableText('completionTerm', e.target.value)}
+                  className="border-0 p-0 bg-transparent text-sm print:hidden"
+                />
+                <div className="hidden print:block">{editableText.completionTerm}</div>
+                
+                <Input
+                  value={editableText.gstTerm}
+                  onChange={(e) => updateEditableText('gstTerm', e.target.value)}
+                  className="border-0 p-0 bg-transparent text-sm print:hidden"
+                />
+                <div className="hidden print:block">{editableText.gstTerm}</div>
+                
+                <Input
+                  value={editableText.transportTerm}
+                  onChange={(e) => updateEditableText('transportTerm', e.target.value)}
+                  className="border-0 p-0 bg-transparent text-sm print:hidden"
+                />
+                <div className="hidden print:block">{editableText.transportTerm}</div>
               </div>
             </div>
             
             <div className="border p-4">
               <div className="text-sm space-y-3">
-                <div>With regards</div>
+                {/* Editable signature text */}
+                <Input
+                  value={editableText.signatureText}
+                  onChange={(e) => updateEditableText('signatureText', e.target.value)}
+                  className="border-0 p-0 bg-transparent text-sm print:hidden"
+                />
+                <div className="hidden print:block">{editableText.signatureText}</div>
+                
                 <div className="font-bold text-blue-600">
-                  For {profile?.company_name || 'BHAIRAVNEX'}
+                  For {editableText.companyName || profile?.company_name || 'BHAIRAVNEX'}
                 </div>
                 
                 {profile?.signature_image_url && (
@@ -368,8 +500,19 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                 )}
                 
                 <div className="mt-8">
-                  <div>Managing Partner</div>
-                  <div>Authorised Signature</div>
+                  <Input
+                    value={editableText.signatureRole1}
+                    onChange={(e) => updateEditableText('signatureRole1', e.target.value)}
+                    className="border-0 p-0 bg-transparent text-sm print:hidden"
+                  />
+                  <div className="hidden print:block">{editableText.signatureRole1}</div>
+                  
+                  <Input
+                    value={editableText.signatureRole2}
+                    onChange={(e) => updateEditableText('signatureRole2', e.target.value)}
+                    className="border-0 p-0 bg-transparent text-sm print:hidden"
+                  />
+                  <div className="hidden print:block">{editableText.signatureRole2}</div>
                 </div>
               </div>
             </div>
@@ -387,12 +530,36 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
               <div className="bg-orange-600 text-white p-3 rounded-lg text-xs">
                 <div className="flex justify-between">
                   <div>
-                    <div>Door No: 5-5, Vivekananda Nagar,</div>
-                    <div>Old Dairy Farm Post, Vishakhapatnam 530040 AP</div>
+                    {/* Editable footer address */}
+                    <Input
+                      value={editableText.footerAddress1}
+                      onChange={(e) => updateEditableText('footerAddress1', e.target.value)}
+                      className="border-0 p-0 bg-transparent text-xs text-white placeholder-white/70 print:hidden"
+                    />
+                    <div className="hidden print:block">{editableText.footerAddress1}</div>
+                    
+                    <Input
+                      value={editableText.footerAddress2}
+                      onChange={(e) => updateEditableText('footerAddress2', e.target.value)}
+                      className="border-0 p-0 bg-transparent text-xs text-white placeholder-white/70 print:hidden"
+                    />
+                    <div className="hidden print:block">{editableText.footerAddress2}</div>
                   </div>
                   <div className="text-right">
-                    <div>+91 96032 79555</div>
-                    <div>Email: bhairavnex@gmail.com</div>
+                    {/* Editable footer contact */}
+                    <Input
+                      value={editableText.footerPhone}
+                      onChange={(e) => updateEditableText('footerPhone', e.target.value)}
+                      className="border-0 p-0 bg-transparent text-xs text-white placeholder-white/70 text-right print:hidden"
+                    />
+                    <div className="hidden print:block">{editableText.footerPhone}</div>
+                    
+                    <Input
+                      value={editableText.footerEmail}
+                      onChange={(e) => updateEditableText('footerEmail', e.target.value)}
+                      className="border-0 p-0 bg-transparent text-xs text-white placeholder-white/70 text-right print:hidden"
+                    />
+                    <div className="hidden print:block">{editableText.footerEmail}</div>
                   </div>
                 </div>
               </div>
