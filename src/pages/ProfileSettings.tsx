@@ -38,10 +38,18 @@ export default function ProfileSettings() {
   const handleSave = async () => {
     setLoading(true)
     try {
-      await updateProfile({
-        full_name: formData.full_name,
-        company_name: formData.company_name,
-      })
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          full_name: formData.full_name,
+          company_name: formData.company_name,
+          header_image_url: formData.header_image_url,
+          footer_image_url: formData.footer_image_url,
+          signature_image_url: formData.signature_image_url,
+        })
+        .eq('id', user?.id)
+
+      if (error) throw error
 
       toast({
         title: 'Profile updated',
