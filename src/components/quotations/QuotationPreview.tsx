@@ -56,6 +56,18 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
     totalText: 'Total'
   })
 
+  // Spacing controls
+  const [spacing, setSpacing] = useState({
+    headerSpacing: 6,
+    quotationLabelSpacing: 4,
+    detailsSpacing: 4,
+    introSpacing: 6,
+    tableSpacing: 6,
+    totalSpacing: 6,
+    termsSpacing: 8,
+    footerSpacing: 8
+  })
+
   useEffect(() => {
     if (quotationId && open) {
       loadQuotationData()
@@ -73,6 +85,10 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
 
   const updateEditableText = (field: string, value: string) => {
     setEditableText(prev => ({ ...prev, [field]: value }))
+  }
+
+  const updateSpacing = (field: string, value: number) => {
+    setSpacing(prev => ({ ...prev, [field]: value }))
   }
 
   const loadQuotationData = async () => {
@@ -219,10 +235,117 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
               </Button>
             </div>
           </div>
+          
+          {/* Spacing Controls */}
+          <div className="print:hidden border-t pt-4 mt-4">
+            <div className="text-sm font-medium mb-2">Adjust Spacing:</div>
+            <div className="grid grid-cols-4 gap-2 text-xs">
+              <div className="flex items-center gap-1">
+                <label>Header:</label>
+                <input
+                  type="range"
+                  min="0"
+                  max="12"
+                  value={spacing.headerSpacing}
+                  onChange={(e) => updateSpacing('headerSpacing', parseInt(e.target.value))}
+                  className="w-12"
+                />
+                <span>{spacing.headerSpacing}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <label>Label:</label>
+                <input
+                  type="range"
+                  min="0"
+                  max="12"
+                  value={spacing.quotationLabelSpacing}
+                  onChange={(e) => updateSpacing('quotationLabelSpacing', parseInt(e.target.value))}
+                  className="w-12"
+                />
+                <span>{spacing.quotationLabelSpacing}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <label>Details:</label>
+                <input
+                  type="range"
+                  min="0"
+                  max="12"
+                  value={spacing.detailsSpacing}
+                  onChange={(e) => updateSpacing('detailsSpacing', parseInt(e.target.value))}
+                  className="w-12"
+                />
+                <span>{spacing.detailsSpacing}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <label>Intro:</label>
+                <input
+                  type="range"
+                  min="0"
+                  max="12"
+                  value={spacing.introSpacing}
+                  onChange={(e) => updateSpacing('introSpacing', parseInt(e.target.value))}
+                  className="w-12"
+                />
+                <span>{spacing.introSpacing}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <label>Table:</label>
+                <input
+                  type="range"
+                  min="0"
+                  max="12"
+                  value={spacing.tableSpacing}
+                  onChange={(e) => updateSpacing('tableSpacing', parseInt(e.target.value))}
+                  className="w-12"
+                />
+                <span>{spacing.tableSpacing}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <label>Total:</label>
+                <input
+                  type="range"
+                  min="0"
+                  max="12"
+                  value={spacing.totalSpacing}
+                  onChange={(e) => updateSpacing('totalSpacing', parseInt(e.target.value))}
+                  className="w-12"
+                />
+                <span>{spacing.totalSpacing}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <label>Terms:</label>
+                <input
+                  type="range"
+                  min="0"
+                  max="12"
+                  value={spacing.termsSpacing}
+                  onChange={(e) => updateSpacing('termsSpacing', parseInt(e.target.value))}
+                  className="w-12"
+                />
+                <span>{spacing.termsSpacing}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <label>Footer:</label>
+                <input
+                  type="range"
+                  min="0"
+                  max="12"
+                  value={spacing.footerSpacing}
+                  onChange={(e) => updateSpacing('footerSpacing', parseInt(e.target.value))}
+                  className="w-12"
+                />
+                <span>{spacing.footerSpacing}</span>
+              </div>
+            </div>
+          </div>
         </DialogHeader>
 
         {/* PDF-like Content */}
-        <div className="bg-white p-8 space-y-6 print:p-0 print:space-y-4">
+        <div className="bg-white p-8 print:p-0" style={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          gap: `${spacing.headerSpacing * 0.25}rem` 
+        }}>
           {/* Header Section */}
           <div className="relative">
             {profile?.header_image_url ? (
@@ -269,14 +392,14 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
           </div>
 
           {/* QUOTATION Label */}
-          <div className="text-center">
+          <div className="text-center" style={{ marginTop: `${spacing.quotationLabelSpacing * 0.25}rem` }}>
             <div className="bg-black text-white px-6 py-2 inline-block font-bold text-lg">
               QUOTATION
             </div>
           </div>
 
           {/* Quotation Details */}
-          <div className="flex justify-between text-sm mb-4 print:hidden">
+          <div className="flex justify-between text-sm print:hidden" style={{ marginTop: `${spacing.detailsSpacing * 0.25}rem`, marginBottom: `${spacing.detailsSpacing * 0.25}rem` }}>
             <div className="flex items-center gap-2">
               <span>Quotation No.:</span>
               <Input
@@ -297,13 +420,14 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
           </div>
           
           {/* Print version - non-editable */}
-          <div className="hidden print:flex justify-between text-sm mb-4">
+          <div className="hidden print:flex justify-between text-sm" style={{ marginTop: `${spacing.detailsSpacing * 0.25}rem`, marginBottom: `${spacing.detailsSpacing * 0.25}rem` }}>
             <span>Quotation No.: <strong>{quotation.quotation_number}</strong></span>
             <span>Date: <strong>{new Date(quotation.created_at).toLocaleDateString('en-GB')}</strong></span>
           </div>
 
           {/* Salutation and Introduction */}
-          <div className="space-y-3 text-sm">
+          <div className="text-sm" style={{ marginTop: `${spacing.introSpacing * 0.25}rem`, marginBottom: `${spacing.introSpacing * 0.25}rem` }}>
+            <div className="space-y-3">
             {/* Editable salutation */}
             <Input
               value={editableText.salutation}
@@ -329,10 +453,11 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
               />
             </div>
             <p className="hidden print:block"><strong>Sub: {quotation.title}</strong></p>
+            </div>
           </div>
 
           {/* Items Table */}
-          <div className="border border-gray-300">
+          <div className="border border-gray-300" style={{ marginTop: `${spacing.tableSpacing * 0.25}rem` }}>
             {/* Table Header */}
             <div className="bg-gray-100 grid grid-cols-12 border-b font-bold text-sm p-3">
               <div className="col-span-5">Description</div>
@@ -406,7 +531,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
           </div>
 
           {/* Grand Total Section */}
-          <div className="grid grid-cols-2 border border-gray-300 text-sm">
+          <div className="grid grid-cols-2 border border-gray-300 text-sm" style={{ marginTop: `${spacing.totalSpacing * 0.25}rem` }}>
             <div className="p-3 border-r">
               {/* Editable grand total text */}
               <Input
@@ -440,7 +565,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
           </div>
 
           {/* Terms & Conditions and Signature */}
-          <div className="grid grid-cols-2 gap-6 mt-8">
+          <div className="grid grid-cols-2 gap-6" style={{ marginTop: `${spacing.termsSpacing * 0.25}rem` }}>
             <div className="border p-4">
               {/* Editable terms title */}
               <Input
@@ -517,7 +642,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
           </div>
 
           {/* Footer */}
-          <div className="mt-8">
+          <div style={{ marginTop: `${spacing.footerSpacing * 0.25}rem` }}>
             {profile?.footer_image_url ? (
               <img 
                 src={profile.footer_image_url} 
