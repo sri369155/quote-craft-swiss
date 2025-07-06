@@ -44,33 +44,51 @@ export type Database = {
       }
       profiles: {
         Row: {
+          company_address: string | null
+          company_email: string | null
+          company_logo_url: string | null
           company_name: string | null
+          company_phone: string | null
+          company_slogan: string | null
           created_at: string | null
           email: string
           footer_image_url: string | null
           full_name: string | null
+          gst_number: string | null
           header_image_url: string | null
           id: string
           signature_image_url: string | null
           updated_at: string | null
         }
         Insert: {
+          company_address?: string | null
+          company_email?: string | null
+          company_logo_url?: string | null
           company_name?: string | null
+          company_phone?: string | null
+          company_slogan?: string | null
           created_at?: string | null
           email: string
           footer_image_url?: string | null
           full_name?: string | null
+          gst_number?: string | null
           header_image_url?: string | null
           id: string
           signature_image_url?: string | null
           updated_at?: string | null
         }
         Update: {
+          company_address?: string | null
+          company_email?: string | null
+          company_logo_url?: string | null
           company_name?: string | null
+          company_phone?: string | null
+          company_slogan?: string | null
           created_at?: string | null
           email?: string
           footer_image_url?: string | null
           full_name?: string | null
+          gst_number?: string | null
           header_image_url?: string | null
           id?: string
           signature_image_url?: string | null

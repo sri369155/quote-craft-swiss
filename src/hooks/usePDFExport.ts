@@ -113,7 +113,7 @@ export function usePDFExport() {
       // Check if we need a new page for the signature section
       if (termsStartY + 70 > pageHeight - 30) {
         // Add footer to current page
-        addFooterToPage(pdf, pageWidth, pageHeight, footerImage)
+        addFooterToPage(pdf, pageWidth, pageHeight, footerImage, userProfile)
         
         // Add new page
         pdf.addPage()
@@ -209,7 +209,7 @@ export function usePDFExport() {
       }
       
       // Footer
-      addFooterToPage(pdf, pageWidth, pageHeight, footerImage)
+      addFooterToPage(pdf, pageWidth, pageHeight, footerImage, userProfile)
       
       // Save the PDF
       pdf.save(`quotation-${quotation.quotation_number}.pdf`)
@@ -243,12 +243,14 @@ export function usePDFExport() {
     
     pdf.setFontSize(10)
     pdf.setFont('helvetica', 'normal')
-    pdf.text('"Engineering Tomorrow\'s Technologies, Today"', 15, 30)
+    const companySlogan = userProfile?.company_slogan || '"Engineering Tomorrow\'s Technologies, Today"'
+    pdf.text(companySlogan, 15, 30)
     
     // GST number in top right
     pdf.setFontSize(12)
     pdf.setFont('helvetica', 'bold')
-    pdf.text('GST: 37ABDFB9225A1Z5', pageWidth - 15, 15, { align: 'right' })
+    const gstNumber = userProfile?.gst_number || 'GST: 37ABDFB9225A1Z5'
+    pdf.text(gstNumber, pageWidth - 15, 15, { align: 'right' })
     
     // Company logo placeholder (triangle shape in top right)
     pdf.setFillColor(255, 165, 0)
@@ -260,17 +262,24 @@ export function usePDFExport() {
     return 45
   }
 
-  const renderDefaultFooter = (pdf: jsPDF, pageWidth: number, footerY: number) => {
+  const renderDefaultFooter = (pdf: jsPDF, pageWidth: number, footerY: number, userProfile?: Profile) => {
     pdf.setFillColor(210, 105, 30)
     pdf.rect(0, footerY, pageWidth, 25, 'F')
     
     pdf.setTextColor(255, 255, 255)
     pdf.setFontSize(8)
-    pdf.text('Door No: 5-5, Vivekananda Nagar,', 15, footerY + 8)
-    pdf.text('Old Dairy Farm Post, Vishakhapatnam 530040 AP', 15, footerY + 15)
     
-    pdf.text('+91 96032 79555', pageWidth - 15, footerY + 8, { align: 'right' })
-    pdf.text('Email: bhairavnex@gmail.com', pageWidth - 15, footerY + 15, { align: 'right' })
+    const address1 = userProfile?.company_address?.split(',')[0] || 'Door No: 5-5, Vivekananda Nagar'
+    const address2 = userProfile?.company_address?.split(',').slice(1).join(',') || 'Old Dairy Farm Post, Vishakhapatnam 530040 AP'
+    
+    pdf.text(address1, 15, footerY + 8)
+    pdf.text(address2, 15, footerY + 15)
+    
+    const phone = userProfile?.company_phone || '+91 96032 79555'
+    const email = userProfile?.company_email || 'bhairavnex@gmail.com'
+    
+    pdf.text(phone, pageWidth - 15, footerY + 8, { align: 'right' })
+    pdf.text(`Email: ${email}`, pageWidth - 15, footerY + 15, { align: 'right' })
   }
 
   const addHeaderToPage = (pdf: jsPDF, pageWidth: number, headerImage: string | null, userProfile?: Profile) => {
@@ -287,17 +296,17 @@ export function usePDFExport() {
     }
   }
 
-  const addFooterToPage = (pdf: jsPDF, pageWidth: number, pageHeight: number, footerImage: string | null) => {
+  const addFooterToPage = (pdf: jsPDF, pageWidth: number, pageHeight: number, footerImage: string | null, userProfile?: Profile) => {
     const footerY = pageHeight - 30
     if (footerImage) {
       try {
         pdf.addImage(footerImage, 'JPEG', 0, footerY, pageWidth, 30)
       } catch (error) {
         console.error('Error adding footer image:', error)
-        renderDefaultFooter(pdf, pageWidth, footerY)
+        renderDefaultFooter(pdf, pageWidth, footerY, userProfile)
       }
     } else {
-      renderDefaultFooter(pdf, pageWidth, footerY)
+      renderDefaultFooter(pdf, pageWidth, footerY, userProfile)
     }
   }
 
@@ -372,7 +381,7 @@ export function usePDFExport() {
       // Check if we need a new page
       if (yPosition + rowHeight + 50 > maxContentHeight) { // 50 extra for totals
         // Add footer to current page
-        addFooterToPage(pdf, pageWidth, pageHeight, footerImage)
+        addFooterToPage(pdf, pageWidth, pageHeight, footerImage, userProfile)
         
         // Add new page
         pdf.addPage()

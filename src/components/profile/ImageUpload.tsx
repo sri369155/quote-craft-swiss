@@ -10,7 +10,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/use-toast'
 
 interface ImageUploadProps {
-  type: 'header' | 'footer' | 'signature'
+  type: 'header' | 'footer' | 'signature' | 'company_logo'
   currentImageUrl?: string
   onImageUploaded: (url: string) => void
 }
@@ -26,6 +26,7 @@ export default function ImageUpload({ type, currentImageUrl, onImageUploaded }: 
       case 'header': return 'Header Image'
       case 'footer': return 'Footer Image'
       case 'signature': return 'Signature Image'
+      case 'company_logo': return 'Company Logo'
     }
   }
 
@@ -34,6 +35,7 @@ export default function ImageUpload({ type, currentImageUrl, onImageUploaded }: 
       case 'header': return 'Upload your company header/logo (recommended: 800x200px)'
       case 'footer': return 'Upload your company footer image (recommended: 800x100px)'
       case 'signature': return 'Upload your signature image (recommended: 300x100px)'
+      case 'company_logo': return 'Upload your company logo (recommended: 200x200px)'
     }
   }
 

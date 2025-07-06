@@ -18,6 +18,12 @@ export default function ProfileSettings() {
   const [formData, setFormData] = useState({
     full_name: '',
     company_name: '',
+    company_slogan: '',
+    gst_number: '',
+    company_address: '',
+    company_phone: '',
+    company_email: '',
+    company_logo_url: '',
     header_image_url: '',
     footer_image_url: '',
     signature_image_url: '',
@@ -28,6 +34,12 @@ export default function ProfileSettings() {
       setFormData({
         full_name: profile.full_name || '',
         company_name: profile.company_name || '',
+        company_slogan: profile.company_slogan || '',
+        gst_number: profile.gst_number || '',
+        company_address: profile.company_address || '',
+        company_phone: profile.company_phone || '',
+        company_email: profile.company_email || '',
+        company_logo_url: profile.company_logo_url || '',
         header_image_url: profile.header_image_url || '',
         footer_image_url: profile.footer_image_url || '',
         signature_image_url: profile.signature_image_url || '',
@@ -43,6 +55,12 @@ export default function ProfileSettings() {
         .update({
           full_name: formData.full_name,
           company_name: formData.company_name,
+          company_slogan: formData.company_slogan,
+          gst_number: formData.gst_number,
+          company_address: formData.company_address,
+          company_phone: formData.company_phone,
+          company_email: formData.company_email,
+          company_logo_url: formData.company_logo_url,
           header_image_url: formData.header_image_url,
           footer_image_url: formData.footer_image_url,
           signature_image_url: formData.signature_image_url,
@@ -93,9 +111,9 @@ export default function ProfileSettings() {
           {/* Basic Information */}
           <Card>
             <CardHeader>
-              <CardTitle>Basic Information</CardTitle>
+              <CardTitle>Company Details</CardTitle>
               <CardDescription>
-                Update your personal and company information
+                Update your company information for PDF headers and footers
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -118,6 +136,51 @@ export default function ProfileSettings() {
                     placeholder="Your company name"
                   />
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="company_slogan">Company Slogan</Label>
+                  <Input
+                    id="company_slogan"
+                    value={formData.company_slogan}
+                    onChange={(e) => setFormData(prev => ({ ...prev, company_slogan: e.target.value }))}
+                    placeholder="Your company slogan"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="gst_number">GST Number</Label>
+                  <Input
+                    id="gst_number"
+                    value={formData.gst_number}
+                    onChange={(e) => setFormData(prev => ({ ...prev, gst_number: e.target.value }))}
+                    placeholder="GST Number"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="company_phone">Company Phone</Label>
+                  <Input
+                    id="company_phone"
+                    value={formData.company_phone}
+                    onChange={(e) => setFormData(prev => ({ ...prev, company_phone: e.target.value }))}
+                    placeholder="Company phone number"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="company_email">Company Email</Label>
+                  <Input
+                    id="company_email"
+                    value={formData.company_email}
+                    onChange={(e) => setFormData(prev => ({ ...prev, company_email: e.target.value }))}
+                    placeholder="Company email address"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="company_address">Company Address</Label>
+                <Input
+                  id="company_address"
+                  value={formData.company_address}
+                  onChange={(e) => setFormData(prev => ({ ...prev, company_address: e.target.value }))}
+                  placeholder="Complete company address"
+                />
               </div>
               <Button onClick={handleSave} disabled={loading} className="btn-primary">
                 <Save className="w-4 h-4 mr-2" />
@@ -135,7 +198,12 @@ export default function ProfileSettings() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <ImageUpload
+                  type="company_logo"
+                  currentImageUrl={formData.company_logo_url}
+                  onImageUploaded={(url) => handleImageUploaded('company_logo', url)}
+                />
                 <ImageUpload
                   type="header"
                   currentImageUrl={formData.header_image_url}

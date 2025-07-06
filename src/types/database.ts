@@ -7,6 +7,12 @@ export interface Database {
           email: string
           full_name: string | null
           company_name: string | null
+          company_slogan: string | null
+          gst_number: string | null
+          company_address: string | null
+          company_phone: string | null
+          company_email: string | null
+          company_logo_url: string | null
           header_image_url: string | null
           footer_image_url: string | null
           signature_image_url: string | null
@@ -18,6 +24,12 @@ export interface Database {
           email: string
           full_name?: string | null
           company_name?: string | null
+          company_slogan?: string | null
+          gst_number?: string | null
+          company_address?: string | null
+          company_phone?: string | null
+          company_email?: string | null
+          company_logo_url?: string | null
           header_image_url?: string | null
           footer_image_url?: string | null
           signature_image_url?: string | null
@@ -29,6 +41,12 @@ export interface Database {
           email?: string
           full_name?: string | null
           company_name?: string | null
+          company_slogan?: string | null
+          gst_number?: string | null
+          company_address?: string | null
+          company_phone?: string | null
+          company_email?: string | null
+          company_logo_url?: string | null
           header_image_url?: string | null
           footer_image_url?: string | null
           signature_image_url?: string | null
