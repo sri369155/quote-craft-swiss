@@ -550,9 +550,9 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
             <div className="bg-gray-100 grid grid-cols-12 border-b font-bold text-sm p-3">
               <div className="col-span-5">Description</div>
               <div className="col-span-1 text-center">Qty</div>
-              <div className="col-span-2 text-center">Rate (₹)</div>
+              <div className="col-span-2 text-center">Rate (Rs.)</div>
               <div className="col-span-2 text-center">GST Amount</div>
-              <div className="col-span-2 text-center">Total (₹)</div>
+              <div className="col-span-2 text-center">Total (Rs.)</div>
             </div>
             
             {/* Table Rows */}
@@ -599,11 +599,11 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                     <div className="hidden print:block">{item.unit_price.toFixed(2)}</div>
                   </div>
                   
-                  <div className="col-span-2 text-center">
-                    <div>₹{gstAmount.toFixed(2)}</div>
-                    <div>({quotation.tax_rate}%)</div>
-                  </div>
-                  <div className="col-span-2 text-center">{itemTotal.toFixed(2)}</div>
+                   <div className="col-span-2 text-center">
+                     <div>Rs. {gstAmount.toFixed(2)}</div>
+                     <div>({quotation.tax_rate}%)</div>
+                   </div>
+                   <div className="col-span-2 text-center">Rs. {itemTotal.toFixed(2)}</div>
                 </div>
               )
             })}
@@ -613,8 +613,8 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
               <div className="col-span-5 flex items-center">Sub Total</div>
               <div className="col-span-1"></div>
               <div className="col-span-2"></div>
-              <div className="col-span-2 text-center">₹{quotation.tax_amount.toFixed(2)}</div>
-              <div className="col-span-2 text-center">₹{quotation.subtotal.toFixed(2)}</div>
+               <div className="col-span-2 text-center">Rs. {quotation.tax_amount.toFixed(2)}</div>
+               <div className="col-span-2 text-center">Rs. {quotation.subtotal.toFixed(2)}</div>
             </div>
           </div>
 
@@ -647,7 +647,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                   className="font-bold text-lg border-0 p-0 bg-transparent print:hidden"
                 />
                 <span className="hidden print:block">{editableText.totalText}</span>
-                <span>₹{Math.round(quotation.subtotal)}</span>
+                <span>Rs. {Math.round(quotation.subtotal)}</span>
               </div>
             </div>
           </div>
