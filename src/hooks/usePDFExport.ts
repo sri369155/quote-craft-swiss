@@ -276,19 +276,26 @@ export function usePDFExport() {
     pdf.setTextColor(255, 255, 255)
     pdf.setFontSize(8)
     
-    // Company Address - Left Aligned
-    const address1 = userProfile?.company_address?.split(',')[0]?.trim() || 'Door No: 5-5, Vivekananda Nagar'
-    const address2 = userProfile?.company_address?.split(',').slice(1).join(',').trim() || 'Old Dairy Farm Post, Vishakhapatnam 530040 AP'
+    // Company Address - Left Aligned (only if exists)
+    if (userProfile?.company_address) {
+      const address1 = userProfile.company_address.split(',')[0]?.trim()
+      const address2 = userProfile.company_address.split(',').slice(1).join(',').trim()
+      
+      if (address1) {
+        pdf.text(address1, 15, footerY + 8)
+      }
+      if (address2) {
+        pdf.text(address2, 15, footerY + 15)
+      }
+    }
     
-    pdf.text(address1, 15, footerY + 8)
-    pdf.text(address2, 15, footerY + 15)
-    
-    // Phone Number and Email - Right Aligned
-    const phone = userProfile?.company_phone || '+91 96032 79555'
-    const email = userProfile?.company_email || 'bhairavnex@gmail.com'
-    
-    pdf.text(phone, pageWidth - 15, footerY + 8, { align: 'right' })
-    pdf.text(`Email: ${email}`, pageWidth - 15, footerY + 15, { align: 'right' })
+    // Phone Number and Email - Right Aligned (only if exists)
+    if (userProfile?.company_phone) {
+      pdf.text(userProfile.company_phone, pageWidth - 15, footerY + 8, { align: 'right' })
+    }
+    if (userProfile?.company_email) {
+      pdf.text(`Email: ${userProfile.company_email}`, pageWidth - 15, footerY + 15, { align: 'right' })
+    }
   }
 
   const addHeaderToPage = (pdf: jsPDF, pageWidth: number, headerImage: string | null, userProfile?: Profile) => {

@@ -46,10 +46,10 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
     signatureText: 'With regards',
     signatureRole1: 'Managing Partner',
     signatureRole2: 'Authorised Signature',
-    footerAddress1: profile?.company_address?.split(',')[0] || 'Door No: 5-5, Vivekananda Nagar',
-    footerAddress2: profile?.company_address?.split(',').slice(1).join(',') || 'Old Dairy Farm Post, Vishakhapatnam 530040 AP',
-    footerPhone: profile?.company_phone || '+91 96032 79555',
-    footerEmail: `Email: ${profile?.company_email || 'bhairavnex@gmail.com'}`,
+    footerAddress1: profile?.company_address?.split(',')[0]?.trim() || '',
+    footerAddress2: profile?.company_address?.split(',').slice(1).join(',').trim() || '',
+    footerPhone: profile?.company_phone || '',
+    footerEmail: profile?.company_email ? `Email: ${profile.company_email}` : '',
     grandTotalText: 'Grand Total (in words):',
     grandTotalDescription: 'As per calculation above',
     roundedText: 'Rounded',
@@ -88,10 +88,10 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
         companyName: profile.company_name || 'BHAIRAVNEX',
         tagline: profile.company_slogan || '"Engineering Tomorrow\'s Technologies, Today"',
         gstNumber: profile.gst_number ? `GST: ${profile.gst_number}` : 'GST: 37ABDFB9225A1Z5',
-        footerAddress1: profile.company_address?.split(',')[0] || 'Door No: 5-5, Vivekananda Nagar',
-        footerAddress2: profile.company_address?.split(',').slice(1).join(',') || 'Old Dairy Farm Post, Vishakhapatnam 530040 AP',
-        footerPhone: profile.company_phone || '+91 96032 79555',
-        footerEmail: `Email: ${profile.company_email || 'bhairavnex@gmail.com'}`
+        footerAddress1: profile.company_address?.split(',')[0]?.trim() || '',
+        footerAddress2: profile.company_address?.split(',').slice(1).join(',').trim() || '',
+        footerPhone: profile.company_phone || '',
+        footerEmail: profile.company_email ? `Email: ${profile.company_email}` : ''
       }))
     }
   }, [profile, quotation])
