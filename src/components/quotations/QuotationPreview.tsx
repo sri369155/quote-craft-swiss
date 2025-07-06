@@ -14,6 +14,7 @@ import { Download, Printer } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { Quotation, Customer, QuotationItem } from '@/types/database'
 import { useToast } from '@/hooks/use-toast'
+import { numberToWords } from '@/lib/utils'
 
 interface QuotationPreviewProps {
   quotationId: string | null
@@ -394,12 +395,13 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
               )
             })}
 
-            {/* Total GST Row */}
+            {/* Subtotal Row */}
             <div className="bg-gray-100 grid grid-cols-12 border-b font-bold text-sm p-3">
-              <div className="col-span-7"></div>
-              <div className="col-span-2 text-Left">Sub Total:</div>
+              <div className="col-span-5 flex items-center">Sub Total</div>
+              <div className="col-span-1"></div>
+              <div className="col-span-2"></div>
               <div className="col-span-2 text-center">₹{quotation.tax_amount.toFixed(2)}</div>
-
+              <div className="col-span-2 text-center">₹{quotation.subtotal.toFixed(2)}</div>
             </div>
           </div>
 
@@ -414,12 +416,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
               />
               <div className="hidden print:block font-bold">{editableText.grandTotalText}</div>
               
-              <Input
-                value={editableText.grandTotalDescription}
-                onChange={(e) => updateEditableText('grandTotalDescription', e.target.value)}
-                className="border-0 p-0 bg-transparent text-sm print:hidden"
-              />
-              <div className="hidden print:block">{editableText.grandTotalDescription}</div>
+              <div className="text-sm">{numberToWords(quotation.total_amount)}</div>
             </div>
             <div className="p-3">
               <div className="flex justify-between">

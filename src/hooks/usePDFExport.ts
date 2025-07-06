@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { jsPDF } from 'jspdf'
 import { useToast } from '@/hooks/use-toast'
 import { Quotation, QuotationItem, Customer, Profile } from '@/types/database'
+import { numberToWords } from '@/lib/utils'
 
 export function usePDFExport() {
   const { toast } = useToast()
@@ -431,15 +432,7 @@ export function usePDFExport() {
       yPosition += rowHeight
     })
     
-    // Check if we need space for totals
-    if (yPosition + 60 > maxContentHeight) {
-      addFooterToPage(pdf, pageWidth, pageHeight, footerImage)
-      pdf.addPage()
-      const headerHeight = addHeaderToPage(pdf, pageWidth, headerImage, userProfile)
-      yPosition = headerHeight + 10
-    }
-    
-    // Total GST row
+    // Subtotal row
     const totalRowHeight = 15
     pdf.setFillColor(240, 240, 240)
     pdf.rect(pageMargin, yPosition, availableWidth, totalRowHeight, 'F')
@@ -452,13 +445,15 @@ export function usePDFExport() {
     pdf.line(pageMargin, yPosition + totalRowHeight, pageMargin + availableWidth, yPosition + totalRowHeight)
     
     pdf.setFont('helvetica', 'bold')
-    const totalGstText = 'Total GST:'
+    pdf.text('Sub Total', colPositions[0] + 2, yPosition + 10)
+    
+    const totalGstText = `₹${quotation.tax_amount.toFixed(2)}`
     const totalGstWidth = pdf.getTextWidth(totalGstText)
     pdf.text(totalGstText, colPositions[3] + (colWidths[3] / 2) - (totalGstWidth / 2), yPosition + 10)
     
-    const totalAmountText = `₹${quotation.total_amount.toFixed(2)}`
-    const totalAmountWidth = pdf.getTextWidth(totalAmountText)
-    pdf.text(totalAmountText, colPositions[4] + (colWidths[4] / 2) - (totalAmountWidth / 2), yPosition + 10)
+    const subtotalText = `₹${quotation.subtotal.toFixed(2)}`
+    const subtotalWidth = pdf.getTextWidth(subtotalText)
+    pdf.text(subtotalText, colPositions[4] + (colWidths[4] / 2) - (subtotalWidth / 2), yPosition + 10)
     
     yPosition += totalRowHeight + 10
     
@@ -473,7 +468,9 @@ export function usePDFExport() {
     pdf.setFont('helvetica', 'normal')
     pdf.setFontSize(8)
     pdf.text('Grand Total (in words):', pageMargin + 2, yPosition + 8)
-    pdf.text('As per calculation above', pageMargin + 2, yPosition + 15)
+    const wordsText = numberToWords(quotation.total_amount)
+    const splitWordsText = pdf.splitTextToSize(wordsText, summaryBoxWidth - 4)
+    pdf.text(splitWordsText, pageMargin + 2, yPosition + 15)
     
     pdf.text('Rounded', pageMargin + summaryBoxWidth + 2, yPosition + 8)
     pdf.text('Total', pageMargin + summaryBoxWidth + 2, yPosition + 15)
