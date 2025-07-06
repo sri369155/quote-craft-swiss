@@ -437,7 +437,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                   <Input
                     value={editableText.gstNumber}
                     onChange={(e) => updateEditableText('gstNumber', e.target.value)}
-                    className="font-bold bg-transparent border-0 p-0 text-white placeholder-white/70 text-right print:hidden"
+                    className="font-bold bg-transparent border-0 p-0 text-blue-600 placeholder-blue-600/70 text-right print:hidden"
                   />
                   <p className="hidden print:block font-bold">{editableText.gstNumber}</p>
                 </div>
@@ -459,7 +459,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                       <Input
                         value={editableText.companyName || profile?.company_name || 'BHAIRAVNEX'}
                         onChange={(e) => updateEditableText('companyName', e.target.value)}
-                        className="text-4xl font-bold bg-transparent border-0 p-0 text-white placeholder-white/70 print:hidden text-center underline"
+                        className="text-4xl font-bold bg-transparent border-0 p-0 text-blue-600 placeholder-blue-600/70 print:hidden text-center underline"
                       />
                       <h1 className="hidden print:block text-4xl font-bold underline">{editableText.companyName || profile?.company_name || 'BHAIRAVNEX'}</h1>
                     </div>
@@ -471,7 +471,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                   <Textarea
                     value={editableText.tagline}
                     onChange={(e) => updateEditableText('tagline', e.target.value)}
-                    className="text-sm italic bg-transparent border-0 p-0 text-white placeholder-white/70 resize-none min-h-[20px] print:hidden"
+                    className="text-sm italic bg-transparent border-0 p-0 text-blue-600 placeholder-blue-600/70 resize-none min-h-[20px] print:hidden"
                   />
                   <p className="hidden print:block text-sm italic">{editableText.tagline}</p>
                 </div>
@@ -481,7 +481,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
 
           {/* QUOTATION Label */}
           <div className="text-center" style={{ marginTop: `${spacing.quotationLabelSpacing * 0.25}rem` }}>
-            <div className="bg-black text-white px-6 py-2 inline-block font-bold text-lg">
+            <div className="bg-black text-blue-600 px-6 py-2 inline-block font-bold text-lg">
               QUOTATION
             </div>
           </div>
@@ -742,21 +742,21 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                 className="w-full h-16 object-cover rounded-lg"
               />
             ) : (
-              <div className="bg-orange-600 text-white p-3 rounded-lg text-xs">
+              <div className="bg-orange-600 text-blue-600 p-3 rounded-lg text-xs">
                 <div className="flex justify-between items-start">
                   <div className="text-left">
                     {/* Company Address - Left Aligned */}
                     <Input
                       value={editableText.footerAddress1}
                       onChange={(e) => updateEditableText('footerAddress1', e.target.value)}
-                      className="border-0 p-0 bg-transparent text-xs text-white placeholder-white/70 print:hidden"
+                      className="border-0 p-0 bg-transparent text-xs text-blue-600 placeholder-blue-600/70 print:hidden"
                     />
                     <div className="hidden print:block">{editableText.footerAddress1}</div>
                     
                     <Input
                       value={editableText.footerAddress2}
                       onChange={(e) => updateEditableText('footerAddress2', e.target.value)}
-                      className="border-0 p-0 bg-transparent text-xs text-white placeholder-white/70 print:hidden"
+                      className="border-0 p-0 bg-transparent text-xs text-blue-600 placeholder-blue-600/70 print:hidden"
                     />
                     <div className="hidden print:block">{editableText.footerAddress2}</div>
                   </div>
@@ -765,7 +765,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                     <Input
                       value={editableText.footerPhone}
                       onChange={(e) => updateEditableText('footerPhone', e.target.value)}
-                      className="border-0 p-0 bg-transparent text-xs text-white placeholder-white/70 text-right print:hidden"
+                      className="border-0 p-0 bg-transparent text-xs text-blue-600 placeholder-blue-600/70 text-right print:hidden"
                     />
                     <div className="hidden print:block">{editableText.footerPhone}</div>
                     
@@ -773,7 +773,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                     <Input
                       value={editableText.footerEmail}
                       onChange={(e) => updateEditableText('footerEmail', e.target.value)}
-                      className="border-0 p-0 bg-transparent text-xs text-white placeholder-white/70 text-right print:hidden"
+                      className="border-0 p-0 bg-transparent text-xs text-blue-600 placeholder-blue-600/70 text-right print:hidden"
                     />
                     <div className="hidden print:block">{editableText.footerEmail}</div>
                   </div>
