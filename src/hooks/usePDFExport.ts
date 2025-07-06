@@ -468,7 +468,7 @@ export function usePDFExport() {
     pdf.setFont('helvetica', 'normal')
     pdf.setFontSize(8)
     pdf.text('Grand Total (in words):', pageMargin + 2, yPosition + 8)
-    const wordsText = numberToWords(quotation.total_amount)
+    const wordsText = numberToWords(Math.round(quotation.total_amount))
     const splitWordsText = pdf.splitTextToSize(wordsText, summaryBoxWidth - 4)
     pdf.text(splitWordsText, pageMargin + 2, yPosition + 15)
     
@@ -476,7 +476,7 @@ export function usePDFExport() {
     pdf.text('Total', pageMargin + summaryBoxWidth + 2, yPosition + 15)
     pdf.setFont('helvetica', 'bold')
     pdf.setFontSize(10)
-    const finalTotalText = `₹${quotation.total_amount.toFixed(2)}`
+    const finalTotalText = `₹${Math.round(quotation.total_amount)}`
     const finalTotalWidth = pdf.getTextWidth(finalTotalText)
     pdf.text(finalTotalText, pageMargin + summaryBoxWidth + totalBoxWidth - 2 - finalTotalWidth, yPosition + 12)
     
