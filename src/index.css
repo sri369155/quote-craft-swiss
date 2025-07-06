@@ -4,12 +4,12 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Swiss-style Design System */
+/* Swiss-style Design System - Updated for Yellow BG and Dark Blue Font */
 
 @layer base {
   :root {
-    --background: 251 251 251;
-    --foreground: 0 33 71;
+    --background: 255 253 231;            /* Light Yellow (#FFFDE7) */
+    --foreground: 0 33 71;                /* Dark Blue (#002147) */
 
     --card: 255 255 255;
     --card-foreground: 0 33 71;
@@ -17,16 +17,16 @@
     --popover: 255 255 255;
     --popover-foreground: 0 33 71;
 
-    --primary: 30 58 138;
-    --primary-foreground: 0 33 71;
+    --primary: 0 33 71;
+    --primary-foreground: 255 255 255;
 
-    --secondary: 244 244 245;
+    --secondary: 255 245 204;
     --secondary-foreground: 0 33 71;
 
-    --muted: 249 249 249;
+    --muted: 255 250 212;
     --muted-foreground: 0 33 71;
 
-    --accent: 244 244 245;
+    --accent: 255 250 212;
     --accent-foreground: 0 33 71;
 
     --destructive: 239 68 68;
@@ -34,57 +34,57 @@
 
     --border: 228 228 231;
     --input: 228 228 231;
-    --ring: 13 13 14;
+    --ring: 0 33 71;
 
     --radius: 1rem;
 
-    --sidebar-background: 255 255 255;
+    --sidebar-background: 255 253 231;
     --sidebar-foreground: 0 33 71;
-    --sidebar-primary: 30 58 138;
-    --sidebar-primary-foreground: 0 33 71;
-    --sidebar-accent: 244 244 245;
+    --sidebar-primary: 0 33 71;
+    --sidebar-primary-foreground: 255 255 255;
+    --sidebar-accent: 255 250 212;
     --sidebar-accent-foreground: 0 33 71;
     --sidebar-border: 228 228 231;
-    --sidebar-ring: 13 13 14;
+    --sidebar-ring: 0 33 71;
   }
 
   .dark {
-    --background: 13 13 14;
-    --foreground: 0 33 71;
+    --background: 51 51 51;
+    --foreground: 255 255 255;
 
-    --card: 24 24 27;
-    --card-foreground: 0 33 71;
+    --card: 38 38 38;
+    --card-foreground: 255 255 255;
 
-    --popover: 24 24 27;
-    --popover-foreground: 0 33 71;
+    --popover: 38 38 38;
+    --popover-foreground: 255 255 255;
 
-    --primary: 30 58 138;
-    --primary-foreground: 0 33 71;
+    --primary: 0 33 71;
+    --primary-foreground: 255 255 255;
 
-    --secondary: 39 39 42;
-    --secondary-foreground: 0 33 71;
+    --secondary: 64 64 64;
+    --secondary-foreground: 255 255 255;
 
-    --muted: 39 39 42;
-    --muted-foreground: 0 33 71;
+    --muted: 72 72 72;
+    --muted-foreground: 255 255 255;
 
-    --accent: 39 39 42;
-    --accent-foreground: 0 33 71;
+    --accent: 72 72 72;
+    --accent-foreground: 255 255 255;
 
     --destructive: 220 38 38;
-    --destructive-foreground: 0 33 71;
+    --destructive-foreground: 255 255 255;
 
-    --border: 39 39 42;
-    --input: 39 39 42;
-    --ring: 244 244 245;
+    --border: 64 64 64;
+    --input: 64 64 64;
+    --ring: 255 255 255;
 
-    --sidebar-background: 24 24 27;
-    --sidebar-foreground: 0 33 71;
-    --sidebar-primary: 30 58 138;
-    --sidebar-primary-foreground: 0 33 71;
-    --sidebar-accent: 39 39 42;
-    --sidebar-accent-foreground: 0 33 71;
-    --sidebar-border: 39 39 42;
-    --sidebar-ring: 244 244 245;
+    --sidebar-background: 38 38 38;
+    --sidebar-foreground: 255 255 255;
+    --sidebar-primary: 0 33 71;
+    --sidebar-primary-foreground: 255 255 255;
+    --sidebar-accent: 64 64 64;
+    --sidebar-accent-foreground: 255 255 255;
+    --sidebar-border: 64 64 64;
+    --sidebar-ring: 255 255 255;
   }
 }
 
