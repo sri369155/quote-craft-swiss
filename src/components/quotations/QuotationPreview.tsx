@@ -36,9 +36,9 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
   const [editableText, setEditableText] = useState({
     salutation: 'Dear Sir,',
     introText: 'We would like to submit our lowest budgetary quote for the supply and installation of the following items:',
-    companyName: '',
-    tagline: '"Engineering Tomorrow\'s Technologies, Today"',
-    gstNumber: 'GST: 37ABDFB9225A1Z5',
+    companyName: profile?.company_name || '',
+    tagline: profile?.company_slogan || '"Engineering Tomorrow\'s Technologies, Today"',
+    gstNumber: profile?.gst_number || 'GST: 37ABDFB9225A1Z5',
     termsTitle: 'Terms & Conditions',
     completionTerm: 'Completion: 90 Days',
     gstTerm: 'GST: As indicated',
@@ -46,10 +46,10 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
     signatureText: 'With regards',
     signatureRole1: 'Managing Partner',
     signatureRole2: 'Authorised Signature',
-    footerAddress1: 'Door No: 5-5, Vivekananda Nagar,',
-    footerAddress2: 'Old Dairy Farm Post, Vishakhapatnam 530040 AP',
-    footerPhone: '+91 96032 79555',
-    footerEmail: 'Email: bhairavnex@gmail.com',
+    footerAddress1: profile?.company_address?.split(',')[0] || 'Door No: 5-5, Vivekananda Nagar',
+    footerAddress2: profile?.company_address?.split(',').slice(1).join(',') || 'Old Dairy Farm Post, Vishakhapatnam 530040 AP',
+    footerPhone: profile?.company_phone || '+91 96032 79555',
+    footerEmail: `Email: ${profile?.company_email || 'bhairavnex@gmail.com'}`,
     grandTotalText: 'Grand Total (in words):',
     grandTotalDescription: 'As per calculation above',
     roundedText: 'Rounded',
@@ -85,7 +85,13 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
     if (profile && quotation) {
       setEditableText(prev => ({
         ...prev,
-        companyName: profile.company_name || 'BHAIRAVNEX'
+        companyName: profile.company_name || 'BHAIRAVNEX',
+        tagline: profile.company_slogan || '"Engineering Tomorrow\'s Technologies, Today"',
+        gstNumber: profile.gst_number || 'GST: 37ABDFB9225A1Z5',
+        footerAddress1: profile.company_address?.split(',')[0] || 'Door No: 5-5, Vivekananda Nagar',
+        footerAddress2: profile.company_address?.split(',').slice(1).join(',') || 'Old Dairy Farm Post, Vishakhapatnam 530040 AP',
+        footerPhone: profile.company_phone || '+91 96032 79555',
+        footerEmail: `Email: ${profile.company_email || 'bhairavnex@gmail.com'}`
       }))
     }
   }, [profile, quotation])
@@ -427,7 +433,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
             ) : (
               <div className="bg-orange-600 text-white p-4 rounded-lg">
                 <div className="flex justify-between items-center">
-                  <div>
+                  <div className="flex-1">
                     {/* Editable company name */}
                     <Input
                       value={editableText.companyName || profile?.company_name || 'BHAIRAVNEX'}
@@ -436,7 +442,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                     />
                     <h1 className="hidden print:block text-2xl font-bold">{editableText.companyName || profile?.company_name || 'BHAIRAVNEX'}</h1>
                     
-                    {/* Editable tagline */}
+                    {/* Editable company slogan */}
                     <Textarea
                       value={editableText.tagline}
                       onChange={(e) => updateEditableText('tagline', e.target.value)}
@@ -444,17 +450,27 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                     />
                     <p className="hidden print:block text-sm italic">{editableText.tagline}</p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-right flex flex-col items-end">
                     {/* Editable GST number */}
                     <Input
                       value={editableText.gstNumber}
                       onChange={(e) => updateEditableText('gstNumber', e.target.value)}
-                      className="font-bold bg-transparent border-0 p-0 text-white placeholder-white/70 text-right print:hidden"
+                      className="font-bold bg-transparent border-0 p-0 text-white placeholder-white/70 text-right print:hidden mb-2"
                     />
-                    <p className="hidden print:block font-bold">{editableText.gstNumber}</p>
-                    <div className="bg-orange-400 w-8 h-8 flex items-center justify-center rounded text-xs mt-2">
-                      LOGO
-                    </div>
+                    <p className="hidden print:block font-bold mb-2">{editableText.gstNumber}</p>
+                    
+                    {/* Company Logo */}
+                    {profile?.company_logo_url ? (
+                      <img 
+                        src={profile.company_logo_url} 
+                        alt="Company Logo" 
+                        className="h-12 w-12 object-contain rounded"
+                      />
+                    ) : (
+                      <div className="bg-orange-400 w-12 h-12 flex items-center justify-center rounded text-xs">
+                        LOGO
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -725,9 +741,9 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
               />
             ) : (
               <div className="bg-orange-600 text-white p-3 rounded-lg text-xs">
-                <div className="flex justify-between">
-                  <div>
-                    {/* Editable footer address */}
+                <div className="flex justify-between items-start">
+                  <div className="text-left">
+                    {/* Company Address - Left Aligned */}
                     <Input
                       value={editableText.footerAddress1}
                       onChange={(e) => updateEditableText('footerAddress1', e.target.value)}
@@ -743,7 +759,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                     <div className="hidden print:block">{editableText.footerAddress2}</div>
                   </div>
                   <div className="text-right">
-                    {/* Editable footer contact */}
+                    {/* Phone Number - Right Aligned */}
                     <Input
                       value={editableText.footerPhone}
                       onChange={(e) => updateEditableText('footerPhone', e.target.value)}
@@ -751,6 +767,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                     />
                     <div className="hidden print:block">{editableText.footerPhone}</div>
                     
+                    {/* Email - Right Aligned */}
                     <Input
                       value={editableText.footerEmail}
                       onChange={(e) => updateEditableText('footerEmail', e.target.value)}

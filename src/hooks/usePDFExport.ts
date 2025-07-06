@@ -252,12 +252,32 @@ export function usePDFExport() {
     const gstNumber = userProfile?.gst_number || 'GST: 37ABDFB9225A1Z5'
     pdf.text(gstNumber, pageWidth - 15, 15, { align: 'right' })
     
-    // Company logo placeholder (triangle shape in top right)
-    pdf.setFillColor(255, 165, 0)
-    pdf.triangle(pageWidth - 40, 5, pageWidth - 15, 5, pageWidth - 27.5, 25)
-    pdf.setTextColor(255, 255, 255)
-    pdf.setFontSize(8)
-    pdf.text('LOGO', pageWidth - 27.5, 17, { align: 'center' })
+    // Company logo - try to load if available, otherwise show placeholder
+    if (userProfile?.company_logo_url) {
+      try {
+        // This would need to be implemented with base64 loading
+        // For now, show placeholder with "LOGO" text
+        pdf.setFillColor(255, 165, 0)
+        pdf.rect(pageWidth - 40, 5, 25, 20, 'F')
+        pdf.setTextColor(255, 255, 255)
+        pdf.setFontSize(8)
+        pdf.text('LOGO', pageWidth - 27.5, 17, { align: 'center' })
+      } catch (error) {
+        // Fallback to placeholder
+        pdf.setFillColor(255, 165, 0)
+        pdf.triangle(pageWidth - 40, 5, pageWidth - 15, 5, pageWidth - 27.5, 25)
+        pdf.setTextColor(255, 255, 255)
+        pdf.setFontSize(8)
+        pdf.text('LOGO', pageWidth - 27.5, 17, { align: 'center' })
+      }
+    } else {
+      // Company logo placeholder (triangle shape in top right)
+      pdf.setFillColor(255, 165, 0)
+      pdf.triangle(pageWidth - 40, 5, pageWidth - 15, 5, pageWidth - 27.5, 25)
+      pdf.setTextColor(255, 255, 255)
+      pdf.setFontSize(8)
+      pdf.text('LOGO', pageWidth - 27.5, 17, { align: 'center' })
+    }
     
     return 45
   }
@@ -269,12 +289,14 @@ export function usePDFExport() {
     pdf.setTextColor(255, 255, 255)
     pdf.setFontSize(8)
     
-    const address1 = userProfile?.company_address?.split(',')[0] || 'Door No: 5-5, Vivekananda Nagar'
-    const address2 = userProfile?.company_address?.split(',').slice(1).join(',') || 'Old Dairy Farm Post, Vishakhapatnam 530040 AP'
+    // Company Address - Left Aligned
+    const address1 = userProfile?.company_address?.split(',')[0]?.trim() || 'Door No: 5-5, Vivekananda Nagar'
+    const address2 = userProfile?.company_address?.split(',').slice(1).join(',').trim() || 'Old Dairy Farm Post, Vishakhapatnam 530040 AP'
     
     pdf.text(address1, 15, footerY + 8)
     pdf.text(address2, 15, footerY + 15)
     
+    // Phone Number and Email - Right Aligned
     const phone = userProfile?.company_phone || '+91 96032 79555'
     const email = userProfile?.company_email || 'bhairavnex@gmail.com'
     
