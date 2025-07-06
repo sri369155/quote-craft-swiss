@@ -340,7 +340,7 @@ export function usePDFExport() {
     const pageMargin = 15
     const availableWidth = pageWidth - (pageMargin * 2)
     const footerHeight = 30
-    const maxContentHeight = pageHeight - footerHeight - 20 // Leave space for footer and margin
+    const maxContentHeight = pageHeight - footerHeight - 10 // Reduced space above footer
     
     // Dynamic column widths - better proportions
     const colWidths = [
@@ -356,7 +356,7 @@ export function usePDFExport() {
       colPositions[i] = colPositions[i - 1] + colWidths[i - 1]
     }
     
-    const headers = ['Description', 'Qty', 'Rate (Rs.)', 'GST Amount', 'Total (Rs.)']
+    const headers = ['Description', 'Qty', 'Rate', 'GST Amount', 'Total']
     
     const renderTableHeader = (yPos: number) => {
       pdf.setFillColor(240, 240, 240)
@@ -394,8 +394,8 @@ export function usePDFExport() {
     items.forEach((item, index) => {
       const rowHeight = Math.max(20, Math.ceil(pdf.splitTextToSize(item.description, colWidths[0] - 4).length * 5) + 10)
       
-      // Check if we need a new page
-      if (yPosition + rowHeight + 50 > maxContentHeight) { // 50 extra for totals
+      // Check if we need a new page - improved spacing
+      if (yPosition + rowHeight + 35 > maxContentHeight) { // 35 extra for totals, reduced from 50
         // Add footer to current page
         addFooterToPage(pdf, pageWidth, pageHeight, footerImage, userProfile)
         
@@ -428,11 +428,13 @@ export function usePDFExport() {
                colPositions[colPositions.length - 1] + colWidths[colWidths.length - 1], yPosition + rowHeight)
       pdf.line(pageMargin, yPosition + rowHeight, pageMargin + availableWidth, yPosition + rowHeight)
       
-      // Cell content with proper alignment and wrapping
-      const descLines = pdf.splitTextToSize(item.description, colWidths[0] - 6)
+      // Cell content with proper alignment and wrapping - improved text wrapping
+      const descLines = pdf.splitTextToSize(item.description, colWidths[0] - 8) // More padding for better wrapping
       pdf.setFont('helvetica', 'normal')
       pdf.setFontSize(9)
-      pdf.text(descLines, colPositions[0] + 3, yPosition + 8)
+      // Better vertical alignment for multiline descriptions
+      const startY = yPosition + (rowHeight < 25 ? 12 : 8)
+      pdf.text(descLines, colPositions[0] + 4, startY)
       
       // Center align numeric values with proper formatting
       pdf.setFont('helvetica', 'normal')
@@ -440,12 +442,12 @@ export function usePDFExport() {
       const qtyWidth = pdf.getTextWidth(qtyText)
       pdf.text(qtyText, colPositions[1] + (colWidths[1] / 2) - (qtyWidth / 2), yPosition + 12)
       
-      const priceText = `Rs. ${item.unit_price.toFixed(2)}`
+      const priceText = `${item.unit_price.toFixed(2)}`
       const priceWidth = pdf.getTextWidth(priceText)
       pdf.text(priceText, colPositions[2] + (colWidths[2] / 2) - (priceWidth / 2), yPosition + 12)
       
       // GST Amount column with better formatting
-      const gstText = `Rs. ${gstAmount.toFixed(2)}`
+      const gstText = `${gstAmount.toFixed(2)}`
       const gstWidth = pdf.getTextWidth(gstText)
       pdf.text(gstText, colPositions[3] + (colWidths[3] / 2) - (gstWidth / 2), yPosition + 8)
       
@@ -453,7 +455,7 @@ export function usePDFExport() {
       const gstPercentWidth = pdf.getTextWidth(gstPercentText)
       pdf.text(gstPercentText, colPositions[3] + (colWidths[3] / 2) - (gstPercentWidth / 2), yPosition + 16)
       
-      const totalText = `Rs. ${itemTotal.toFixed(2)}`
+      const totalText = `${itemTotal.toFixed(2)}`
       const totalWidth = pdf.getTextWidth(totalText)
       pdf.text(totalText, colPositions[4] + (colWidths[4] / 2) - (totalWidth / 2), yPosition + 12)
       
@@ -475,11 +477,11 @@ export function usePDFExport() {
     pdf.setFont('helvetica', 'bold')
     pdf.text('Sub Total', colPositions[0] + 2, yPosition + 10)
     
-    const totalGstText = `Rs. ${quotation.tax_amount.toFixed(2)}`
+    const totalGstText = `${quotation.tax_amount.toFixed(2)}`
     const totalGstWidth = pdf.getTextWidth(totalGstText)
     pdf.text(totalGstText, colPositions[3] + (colWidths[3] / 2) - (totalGstWidth / 2), yPosition + 10)
     
-    const subtotalText = `Rs. ${quotation.subtotal.toFixed(2)}`
+    const subtotalText = `${quotation.subtotal.toFixed(2)}`
     const subtotalWidth = pdf.getTextWidth(subtotalText)
     pdf.text(subtotalText, colPositions[4] + (colWidths[4] / 2) - (subtotalWidth / 2), yPosition + 10)
     
@@ -505,7 +507,7 @@ export function usePDFExport() {
     pdf.text('Rounded', pageMargin + summaryBoxWidth + 2, yPosition + 8)
     pdf.text('Total', pageMargin + summaryBoxWidth + 2, yPosition + 15)
     pdf.setFontSize(10)
-    const finalTotalText = `Rs. ${Math.round(quotation.subtotal)}`
+    const finalTotalText = `${Math.round(quotation.subtotal)}`
     const finalTotalWidth = pdf.getTextWidth(finalTotalText)
     pdf.text(finalTotalText, pageMargin + summaryBoxWidth + totalBoxWidth - 2 - finalTotalWidth, yPosition + 12)
     
