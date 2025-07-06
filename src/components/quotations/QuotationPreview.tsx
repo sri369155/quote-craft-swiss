@@ -68,6 +68,13 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
     footerSpacing: 8
   })
 
+  // Image preference controls
+  const [imagePreferences, setImagePreferences] = useState({
+    useCustomHeader: !!profile?.header_image_url,
+    useCustomFooter: !!profile?.footer_image_url,
+    useCustomSignature: !!profile?.signature_image_url
+  })
+
   useEffect(() => {
     if (quotationId && open) {
       loadQuotationData()
@@ -89,6 +96,10 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
 
   const updateSpacing = (field: string, value: number) => {
     setSpacing(prev => ({ ...prev, [field]: value }))
+  }
+
+  const updateImagePreference = (field: string, value: boolean) => {
+    setImagePreferences(prev => ({ ...prev, [field]: value }))
   }
 
   const loadQuotationData = async () => {
@@ -154,7 +165,15 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
     if (!quotation || !customer) return
     
     try {
-      await exportToPDF(quotation, customer, items, profile || undefined)
+      // Create a modified profile object based on image preferences
+      const modifiedProfile = profile ? {
+        ...profile,
+        header_image_url: imagePreferences.useCustomHeader ? profile.header_image_url : null,
+        footer_image_url: imagePreferences.useCustomFooter ? profile.footer_image_url : null,
+        signature_image_url: imagePreferences.useCustomSignature ? profile.signature_image_url : null
+      } : undefined
+      
+      await exportToPDF(quotation, customer, items, modifiedProfile)
     } catch (error: any) {
       toast({
         title: 'Export Error',
@@ -233,6 +252,49 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                 <Download className={`w-4 h-4 mr-2 ${pdfLoading ? 'animate-spin' : ''}`} />
                 Download PDF
               </Button>
+            </div>
+          </div>
+          
+          {/* Image Selection Controls */}
+          <div className="print:hidden border-t pt-4 mt-4">
+            <div className="text-sm font-medium mb-2">Image Options:</div>
+            <div className="grid grid-cols-3 gap-4 text-xs">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="useCustomHeader"
+                  checked={imagePreferences.useCustomHeader}
+                  onChange={(e) => updateImagePreference('useCustomHeader', e.target.checked)}
+                  disabled={!profile?.header_image_url}
+                />
+                <label htmlFor="useCustomHeader" className={!profile?.header_image_url ? 'text-gray-400' : ''}>
+                  Use Custom Header {!profile?.header_image_url && '(Not uploaded)'}
+                </label>
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="useCustomFooter"
+                  checked={imagePreferences.useCustomFooter}
+                  onChange={(e) => updateImagePreference('useCustomFooter', e.target.checked)}
+                  disabled={!profile?.footer_image_url}
+                />
+                <label htmlFor="useCustomFooter" className={!profile?.footer_image_url ? 'text-gray-400' : ''}>
+                  Use Custom Footer {!profile?.footer_image_url && '(Not uploaded)'}
+                </label>
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="useCustomSignature"
+                  checked={imagePreferences.useCustomSignature}
+                  onChange={(e) => updateImagePreference('useCustomSignature', e.target.checked)}
+                  disabled={!profile?.signature_image_url}
+                />
+                <label htmlFor="useCustomSignature" className={!profile?.signature_image_url ? 'text-gray-400' : ''}>
+                  Use Custom Signature {!profile?.signature_image_url && '(Not uploaded)'}
+                </label>
+              </div>
             </div>
           </div>
           
@@ -348,7 +410,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
         }}>
           {/* Header Section */}
           <div className="relative">
-            {profile?.header_image_url ? (
+            {imagePreferences.useCustomHeader && profile?.header_image_url ? (
               <img 
                 src={profile.header_image_url} 
                 alt="Header" 
@@ -614,12 +676,16 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                   For {editableText.companyName || profile?.company_name || 'BHAIRAVNEX'}
                 </div>
                 
-                {profile?.signature_image_url && (
+                {imagePreferences.useCustomSignature && profile?.signature_image_url ? (
                   <img 
                     src={profile.signature_image_url} 
                     alt="Signature" 
                     className="h-16 w-auto"
                   />
+                ) : (
+                  <div className="h-16 border-b border-gray-300 mt-4 mb-2">
+                    <div className="text-xs text-gray-500 pt-12">Signature</div>
+                  </div>
                 )}
                 
                 <div className="mt-8">
@@ -643,7 +709,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
 
           {/* Footer */}
           <div style={{ marginTop: `${spacing.footerSpacing * 0.25}rem` }}>
-            {profile?.footer_image_url ? (
+            {imagePreferences.useCustomFooter && profile?.footer_image_url ? (
               <img 
                 src={profile.footer_image_url} 
                 alt="Footer" 
