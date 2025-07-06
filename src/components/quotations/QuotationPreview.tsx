@@ -431,7 +431,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                 />
               </div>
             ) : (
-              <div className="bg-orange-600 text-white p-4 rounded-lg relative">
+              <div className="bg-orange-600 text-blue-600 p-4 rounded-lg relative">
                 {/* GST Number - Top Right */}
                 <div className="absolute top-2 right-4">
                   <Input

@@ -12,7 +12,7 @@ const CTASection = () => {
         <p className="text-xl mb-8 opacity-90">
           Join thousands of businesses already using QuoteCraft.
         </p>
-        <Link to="/auth" className="bg-white text-primary hover:bg-gray-100 btn-swiss h-12 px-8 text-lg">
+        <Link to="/auth" className="bg-card text-primary hover:bg-accent hover:text-accent-foreground btn-swiss h-12 px-8 text-lg">
           Start Free Trial
         </Link>
       </div>
