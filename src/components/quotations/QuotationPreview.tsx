@@ -417,11 +417,13 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
           {/* Header Section */}
           <div className="relative">
             {imagePreferences.useCustomHeader && profile?.header_image_url ? (
-              <img 
-                src={profile.header_image_url} 
-                alt="Header" 
-                className="w-full h-20 object-cover rounded-lg"
-              />
+              <div className="w-full rounded-lg overflow-hidden">
+                <img 
+                  src={profile.header_image_url} 
+                  alt="Header" 
+                  className="w-full h-auto max-h-32 object-contain"
+                />
+              </div>
             ) : (
               <div className="bg-orange-600 text-white p-4 rounded-lg">
                 <div className="flex justify-between items-center">
