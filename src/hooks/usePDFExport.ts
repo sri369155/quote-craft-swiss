@@ -232,54 +232,41 @@ export function usePDFExport() {
   const renderDefaultHeader = (pdf: jsPDF, pageWidth: number, userProfile?: Profile) => {
     // Header background with orange gradient
     pdf.setFillColor(210, 105, 30) // Orange color
-    pdf.rect(0, 0, pageWidth, 35, 'F')
+    pdf.rect(0, 0, pageWidth, 40, 'F')
     
-    // Company name and tagline
     pdf.setTextColor(255, 255, 255)
-    pdf.setFontSize(28)
-    pdf.setFont('helvetica', 'bold')
-    const companyName = userProfile?.company_name || 'BHAIRAVNEX'
-    pdf.text(companyName, 15, 22)
-    
-    pdf.setFontSize(10)
-    pdf.setFont('helvetica', 'normal')
-    const companySlogan = userProfile?.company_slogan || '"Engineering Tomorrow\'s Technologies, Today"'
-    pdf.text(companySlogan, 15, 30)
     
     // GST number in top right
     pdf.setFontSize(12)
     pdf.setFont('helvetica', 'bold')
-    const gstNumber = userProfile?.gst_number || 'GST: 37ABDFB9225A1Z5'
-    pdf.text(gstNumber, pageWidth - 15, 15, { align: 'right' })
+    const gstNumber = `GST: ${userProfile?.gst_number || '37ABDFB9225A1Z5'}`
+    pdf.text(gstNumber, pageWidth - 15, 12, { align: 'right' })
     
-    // Company logo - try to load if available, otherwise show placeholder
+    // Company name - center, larger and underlined
+    pdf.setFontSize(32)
+    pdf.setFont('helvetica', 'bold')
+    const companyName = userProfile?.company_name || 'BHAIRAVNEX'
+    const nameWidth = pdf.getTextWidth(companyName)
+    const nameX = (pageWidth - nameWidth) / 2
+    pdf.text(companyName, nameX, 25)
+    
+    // Underline for company name
+    pdf.setLineWidth(1)
+    pdf.line(nameX, 27, nameX + nameWidth, 27)
+    
+    // Company logo - center, next to company name if available
     if (userProfile?.company_logo_url) {
-      try {
-        // This would need to be implemented with base64 loading
-        // For now, show placeholder with "LOGO" text
-        pdf.setFillColor(255, 165, 0)
-        pdf.rect(pageWidth - 40, 5, 25, 20, 'F')
-        pdf.setTextColor(255, 255, 255)
-        pdf.setFontSize(8)
-        pdf.text('LOGO', pageWidth - 27.5, 17, { align: 'center' })
-      } catch (error) {
-        // Fallback to placeholder
-        pdf.setFillColor(255, 165, 0)
-        pdf.triangle(pageWidth - 40, 5, pageWidth - 15, 5, pageWidth - 27.5, 25)
-        pdf.setTextColor(255, 255, 255)
-        pdf.setFontSize(8)
-        pdf.text('LOGO', pageWidth - 27.5, 17, { align: 'center' })
-      }
-    } else {
-      // Company logo placeholder (triangle shape in top right)
-      pdf.setFillColor(255, 165, 0)
-      pdf.triangle(pageWidth - 40, 5, pageWidth - 15, 5, pageWidth - 27.5, 25)
-      pdf.setTextColor(255, 255, 255)
-      pdf.setFontSize(8)
-      pdf.text('LOGO', pageWidth - 27.5, 17, { align: 'center' })
+      // Logo would be loaded and positioned here - for now just reserve space
+      // The actual logo loading would need to be implemented with base64 conversion
     }
     
-    return 45
+    // Company slogan - bottom left
+    pdf.setFontSize(10)
+    pdf.setFont('helvetica', 'normal')
+    const companySlogan = userProfile?.company_slogan || '"Engineering Tomorrow\'s Technologies, Today"'
+    pdf.text(companySlogan, 15, 35)
+    
+    return 50
   }
 
   const renderDefaultFooter = (pdf: jsPDF, pageWidth: number, footerY: number, userProfile?: Profile) => {

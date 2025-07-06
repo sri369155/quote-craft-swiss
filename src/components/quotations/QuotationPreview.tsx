@@ -431,47 +431,49 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                 />
               </div>
             ) : (
-              <div className="bg-orange-600 text-white p-4 rounded-lg">
-                <div className="flex justify-between items-center">
-                  <div className="flex-1">
-                    {/* Editable company name */}
-                    <Input
-                      value={editableText.companyName || profile?.company_name || 'BHAIRAVNEX'}
-                      onChange={(e) => updateEditableText('companyName', e.target.value)}
-                      className="text-2xl font-bold bg-transparent border-0 p-0 text-white placeholder-white/70 print:hidden"
-                    />
-                    <h1 className="hidden print:block text-2xl font-bold">{editableText.companyName || profile?.company_name || 'BHAIRAVNEX'}</h1>
-                    
-                    {/* Editable company slogan */}
-                    <Textarea
-                      value={editableText.tagline}
-                      onChange={(e) => updateEditableText('tagline', e.target.value)}
-                      className="text-sm italic bg-transparent border-0 p-0 text-white placeholder-white/70 resize-none min-h-[20px] print:hidden"
-                    />
-                    <p className="hidden print:block text-sm italic">{editableText.tagline}</p>
-                  </div>
-                  <div className="text-right flex flex-col items-end">
-                    {/* Editable GST number */}
-                    <Input
-                      value={editableText.gstNumber}
-                      onChange={(e) => updateEditableText('gstNumber', e.target.value)}
-                      className="font-bold bg-transparent border-0 p-0 text-white placeholder-white/70 text-right print:hidden mb-2"
-                    />
-                    <p className="hidden print:block font-bold mb-2">{editableText.gstNumber}</p>
-                    
+              <div className="bg-orange-600 text-white p-4 rounded-lg relative">
+                {/* GST Number - Top Right */}
+                <div className="absolute top-2 right-4">
+                  <Input
+                    value={editableText.gstNumber}
+                    onChange={(e) => updateEditableText('gstNumber', e.target.value)}
+                    className="font-bold bg-transparent border-0 p-0 text-white placeholder-white/70 text-right print:hidden"
+                  />
+                  <p className="hidden print:block font-bold">{editableText.gstNumber}</p>
+                </div>
+
+                {/* Company Name and Logo - Center */}
+                <div className="flex flex-col items-center justify-center pt-6 pb-4">
+                  <div className="flex items-center gap-4">
                     {/* Company Logo */}
-                    {profile?.company_logo_url ? (
+                    {profile?.company_logo_url && (
                       <img 
                         src={profile.company_logo_url} 
                         alt="Company Logo" 
-                        className="h-12 w-12 object-contain rounded"
+                        className="h-16 w-16 object-contain"
                       />
-                    ) : (
-                      <div className="bg-orange-400 w-12 h-12 flex items-center justify-center rounded text-xs">
-                        LOGO
-                      </div>
                     )}
+                    
+                    {/* Company Name */}
+                    <div className="text-center">
+                      <Input
+                        value={editableText.companyName || profile?.company_name || 'BHAIRAVNEX'}
+                        onChange={(e) => updateEditableText('companyName', e.target.value)}
+                        className="text-4xl font-bold bg-transparent border-0 p-0 text-white placeholder-white/70 print:hidden text-center underline"
+                      />
+                      <h1 className="hidden print:block text-4xl font-bold underline">{editableText.companyName || profile?.company_name || 'BHAIRAVNEX'}</h1>
+                    </div>
                   </div>
+                </div>
+
+                {/* Company Slogan - Bottom Left */}
+                <div className="absolute bottom-2 left-4">
+                  <Textarea
+                    value={editableText.tagline}
+                    onChange={(e) => updateEditableText('tagline', e.target.value)}
+                    className="text-sm italic bg-transparent border-0 p-0 text-white placeholder-white/70 resize-none min-h-[20px] print:hidden"
+                  />
+                  <p className="hidden print:block text-sm italic">{editableText.tagline}</p>
                 </div>
               </div>
             )}
