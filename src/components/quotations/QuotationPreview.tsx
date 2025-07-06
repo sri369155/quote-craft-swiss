@@ -603,7 +603,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
               />
               <div className="hidden print:block font-bold">{editableText.grandTotalText}</div>
               
-              <div className="text-sm">{numberToWords(Math.round(quotation.total_amount))}</div>
+              <div className="text-sm">{numberToWords(Math.round(quotation.subtotal))}</div>
             </div>
             <div className="p-3">
               <div className="flex justify-between">
@@ -621,7 +621,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                   className="font-bold text-lg border-0 p-0 bg-transparent print:hidden"
                 />
                 <span className="hidden print:block">{editableText.totalText}</span>
-                <span>₹{Math.round(quotation.total_amount)}</span>
+                <span>₹{Math.round(quotation.subtotal)}</span>
               </div>
             </div>
           </div>
