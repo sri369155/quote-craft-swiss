@@ -397,8 +397,13 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
             {/* Total GST Row */}
             <div className="bg-gray-100 grid grid-cols-12 border-b font-bold text-sm p-3">
               <div className="col-span-7"></div>
-              <div className="col-span-2 text-center">Total GST:</div>
+              <div className="col-span-2 text-Left">Sub Total:</div>
               <div className="col-span-2 text-center">₹{quotation.tax_amount.toFixed(2)}</div>
+
+              <div className="col-span-9"></div>
+              <div className="col-span-2 text-center">₹{quotation.itemSubtotal .toFixed(2)}</div> 
+
+              
             </div>
           </div>
 
