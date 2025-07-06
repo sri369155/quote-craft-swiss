@@ -99,6 +99,12 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
   }
 
   const updateImagePreference = (field: string, value: boolean) => {
+    console.log('Updating image preference:', field, value)
+    console.log('Profile images:', {
+      header: profile?.header_image_url,
+      footer: profile?.footer_image_url,
+      signature: profile?.signature_image_url
+    })
     setImagePreferences(prev => ({ ...prev, [field]: value }))
   }
 
