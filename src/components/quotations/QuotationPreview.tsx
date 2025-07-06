@@ -400,10 +400,6 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
               <div className="col-span-2 text-Left">Sub Total:</div>
               <div className="col-span-2 text-center">₹{quotation.tax_amount.toFixed(2)}</div>
 
-              <div className="col-span-9"></div>
-              <div className="col-span-2 text-center">₹{quotation.itemSubtotal .toFixed(2)}</div> 
-
-              
             </div>
           </div>
 
