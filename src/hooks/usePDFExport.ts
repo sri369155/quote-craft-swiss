@@ -67,7 +67,7 @@ export function usePDFExport() {
       // QUOTATION label
       pdf.setFillColor(0, 0, 0)
       pdf.rect(85, yPosition, 40, 12, 'F')
-      pdf.setTextColor(59, 130, 246)
+      pdf.setTextColor(30, 58, 138)
       pdf.setFontSize(12)
       pdf.setFont('helvetica', 'bold')
       pdf.text('QUOTATION', 105, yPosition + 8, { align: 'center' })
@@ -144,7 +144,7 @@ export function usePDFExport() {
         // Company name in signature
         pdf.setFont('helvetica', 'bold')
         pdf.setFontSize(12)
-        pdf.setTextColor(100, 100, 255)
+        pdf.setTextColor(30, 58, 138)
         const companyName = userProfile?.company_name || 'BHAIRAVNEX'
         pdf.text(`For ${companyName}`, 97, newTermsStartY + 25)
         
@@ -187,7 +187,7 @@ export function usePDFExport() {
         // Company name in signature
         pdf.setFont('helvetica', 'bold')
         pdf.setFontSize(12)
-        pdf.setTextColor(100, 100, 255)
+        pdf.setTextColor(30, 58, 138)
         const companyName = userProfile?.company_name || 'BHAIRAVNEX'
         pdf.text(`For ${companyName}`, 97, termsStartY + 25)
         
@@ -234,7 +234,7 @@ export function usePDFExport() {
     pdf.setFillColor(210, 105, 30) // Orange color
     pdf.rect(0, 0, pageWidth, 40, 'F')
     
-    pdf.setTextColor(59, 130, 246)
+    pdf.setTextColor(30, 58, 138)
     
     // GST number in top right
     pdf.setFontSize(12)
@@ -273,7 +273,7 @@ export function usePDFExport() {
     pdf.setFillColor(210, 105, 30)
     pdf.rect(0, footerY, pageWidth, 25, 'F')
     
-    pdf.setTextColor(59, 130, 246)
+    pdf.setTextColor(30, 58, 138)
     pdf.setFontSize(8)
     
     // Company Address - Left Aligned (only if exists)
