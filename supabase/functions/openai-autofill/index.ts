@@ -45,7 +45,10 @@ serve(async (req) => {
     }
 
     let prompt
+    let systemPrompt
+    
     if (bulk_description) {
+      systemPrompt = 'You are an expert in business quotations and pricing for various services and products in the Indian market. Always provide realistic, competitive pricing in Indian Rupees.'
       prompt = `Based on this project/quotation description: "${bulk_description}"
 
 Break this down into individual line items for a professional quotation with realistic values:
@@ -68,23 +71,12 @@ Respond only with valid JSON in this format:
   }
 }`
     } else {
-      prompt = `Based on this single item description: "${description}"
+      systemPrompt = 'You provide quantity and unit price suggestions for single line items only. Do not break items into multiple components or suggest additional items.'
+      prompt = `For this ONE specific item: "${description}"
 
-You must provide quantity and unit price suggestions for THIS ONE ITEM ONLY. Do not create multiple items or break this down into components.
+Provide ONLY quantity and unit price for this exact item. Do not break it down or suggest multiple items.
 
-Please suggest realistic values for this specific quotation line item:
-- Quantity (whole number, typically 1-100)
-- Unit price in Indian Rupees (realistic market price)
-
-Consider if this single item is a:
-- Service (hours/days of work)
-- Product (physical items)
-- Software/Digital service
-- Consulting work
-
-IMPORTANT: Respond with suggestions for ONLY the single item described. Do not break it into multiple components.
-
-Respond only with valid JSON in this format:
+Respond with only quantity and unit_price for this single item in this exact JSON format:
 {
   "quantity": number,
   "unit_price": number,
@@ -105,7 +97,7 @@ Respond only with valid JSON in this format:
         messages: [
           {
             role: 'system',
-            content: 'You are an expert in business quotations and pricing for various services and products in the Indian market. Always provide realistic, competitive pricing in Indian Rupees.'
+            content: systemPrompt
           },
           {
             role: 'user',
