@@ -46,31 +46,70 @@ serve(async (req) => {
 
     let prompt
     let systemPrompt
-    
+
     if (bulk_description) {
-      systemPrompt = 'You are an expert in business quotations and pricing for various services and products in the Indian market. Always provide realistic, competitive pricing in Indian Rupees.'
-      prompt = `Based on this project/quotation description: "${bulk_description}"
+      const lines = bulk_description
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0)
 
-Break this down into individual line items for a professional quotation with realistic values:
-- Create multiple line items (typically 3-8 items)
-- Include quantity, unit price in Indian Rupees, and description for each item
-- Consider services, products, materials, labor, etc.
+      if (lines.length > 1) {
+        // Multiline bulk input — break into individual items
+        const items = lines.map(line => ({
+          description: line,
+          quantity: 1,
+          unit_price: 0
+        }))
+        const result = {
+          title: 'Quotation',
+          description: 'Auto-generated from multiple lines',
+          items
+        }
 
-Respond only with valid JSON in this format:
-{
-  "quotation_data": {
-    "title": "Professional quotation title",
-    "description": "Brief project description",
-    "items": [
-      {
-        "description": "Item description",
-        "quantity": number,
-        "unit_price": number
+        console.log('Returning multiline result:', result)
+
+        return new Response(
+          JSON.stringify(result),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
       }
-    ]
-  }
-}`
+
+      // Single line bulk with possible grand total
+      const text = lines[0]
+      const grandMatch = text.match(/(?:grand total|total cost)[^\d]*([\d,]+(?:\.\d+)?)/i)
+
+      const taxRate = 18 // GST %
+      let unit_price = 0
+      const cleanDesc = grandMatch
+        ? text.replace(grandMatch[0], '').trim()
+        : text.trim()
+
+      if (grandMatch) {
+        const total = parseFloat(grandMatch[1].replace(/,/g, ''))
+        const base = total / (1 + taxRate / 100)
+        unit_price = parseFloat(base.toFixed(2))
+      }
+
+      const result = {
+        title: 'Quotation',
+        description: 'Auto-generated from single line total-based input',
+        items: [
+          {
+            description: cleanDesc,
+            quantity: 1,
+            unit_price
+          }
+        ]
+      }
+
+      console.log('Returning grand total-based result:', result)
+
+      return new Response(
+        JSON.stringify(result),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
     } else {
+      // Fallback to OpenAI for single item description
       systemPrompt = 'You provide quantity and unit price suggestions for single line items only. Do not break items into multiple components or suggest additional items.'
       prompt = `For this ONE specific item: "${description}"
 
@@ -145,16 +184,11 @@ Respond with only quantity and unit_price for this single item in this exact JSO
       throw new Error('Invalid JSON response from OpenAI')
     }
     
-    let result
-    if (bulk_description) {
-      result = suggestion.quotation_data || suggestion
-    } else {
-      result = {
-        description,
-        quantity: suggestion.quantity || 1,
-        unit_price: suggestion.unit_price || 0,
-        reasoning: suggestion.reasoning || 'AI suggestion'
-      }
+    let result = {
+      description,
+      quantity: suggestion.quantity || 1,
+      unit_price: suggestion.unit_price || 0,
+      reasoning: suggestion.reasoning || 'AI suggestion'
     }
     
     console.log('Returning result:', result)

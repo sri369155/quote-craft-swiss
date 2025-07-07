@@ -1,213 +1,137 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Swiss-style Design System - Updated for Yellow BG and Dark Blue Font */
+
+@layer base {
+  :root {
+    --background: 255 253 231;            /* Light Yellow (#FFFDE7) */
+    --foreground: 0 33 71;                /* Dark Blue (#002147) */
+
+    --card: 255 255 255;
+    --card-foreground: 0 33 71;
+
+    --popover: 255 255 255;
+    --popover-foreground: 0 33 71;
+
+    --primary: 0 33 71;
+    --primary-foreground: 255 255 255;
+
+    --secondary: 255 245 204;
+    --secondary-foreground: 0 33 71;
+
+    --muted: 255 250 212;
+    --muted-foreground: 0 33 71;
+
+    --accent: 255 250 212;
+    --accent-foreground: 0 33 71;
+
+    --destructive: 239 68 68;
+    --destructive-foreground: 255 255 255;
+
+    --border: 228 228 231;
+    --input: 228 228 231;
+    --ring: 0 33 71;
+
+    --radius: 1rem;
+
+    --sidebar-background: 255 253 231;
+    --sidebar-foreground: 0 33 71;
+    --sidebar-primary: 0 33 71;
+    --sidebar-primary-foreground: 255 255 255;
+    --sidebar-accent: 255 250 212;
+    --sidebar-accent-foreground: 0 33 71;
+    --sidebar-border: 228 228 231;
+    --sidebar-ring: 0 33 71;
+  }
+
+  .dark {
+    --background: 51 51 51;
+    --foreground: 255 255 255;
+
+    --card: 38 38 38;
+    --card-foreground: 255 255 255;
+
+    --popover: 38 38 38;
+    --popover-foreground: 255 255 255;
+
+    --primary: 0 33 71;
+    --primary-foreground: 255 255 255;
+
+    --secondary: 64 64 64;
+    --secondary-foreground: 255 255 255;
+
+    --muted: 72 72 72;
+    --muted-foreground: 255 255 255;
+
+    --accent: 72 72 72;
+    --accent-foreground: 255 255 255;
+
+    --destructive: 220 38 38;
+    --destructive-foreground: 255 255 255;
+
+    --border: 64 64 64;
+    --input: 64 64 64;
+    --ring: 255 255 255;
+
+    --sidebar-background: 38 38 38;
+    --sidebar-foreground: 255 255 255;
+    --sidebar-primary: 0 33 71;
+    --sidebar-primary-foreground: 255 255 255;
+    --sidebar-accent: 64 64 64;
+    --sidebar-accent-foreground: 255 255 255;
+    --sidebar-border: 64 64 64;
+    --sidebar-ring: 255 255 255;
+  }
 }
 
-serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+@layer base {
+  * {
+    @apply border-border;
   }
 
-  try {
-    console.log('OpenAI autofill function called')
-    
-    const { description, bulk_description } = await req.json()
-    console.log('Description received:', description)
-    console.log('Bulk description received:', bulk_description)
-
-    if (!description && !bulk_description) {
-      return new Response(
-        JSON.stringify({ error: 'Description or bulk_description is required' }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      )
-    }
-
-    const openaiApiKey = Deno.env.get('OPENAI_API_KEY')
-    console.log('OpenAI API key exists:', !!openaiApiKey)
-    console.log('OpenAI API key length:', openaiApiKey ? openaiApiKey.length : 0)
-    
-    if (!openaiApiKey) {
-      console.error('OpenAI API key not configured')
-      return new Response(
-        JSON.stringify({ error: 'OpenAI API key not configured' }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      )
-    }
-
-    let prompt
-    let systemPrompt
-
-    if (bulk_description) {
-      const lines = bulk_description
-        .split('\n')
-        .map(line => line.trim())
-        .filter(line => line.length > 0)
-
-      if (lines.length > 1) {
-        // Multiline bulk input — break into individual items
-        const items = lines.map(line => ({
-          description: line,
-          quantity: 1,
-          unit_price: 0
-        }))
-        const result = {
-          title: 'Quotation',
-          description: 'Auto-generated from multiple lines',
-          items
-        }
-
-        console.log('Returning multiline result:', result)
-
-        return new Response(
-          JSON.stringify(result),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
-      }
-
-      // Single line bulk with possible grand total
-      const text = lines[0]
-      const grandMatch = text.match(/(?:grand total|total cost)[^\d]*([\d,]+(?:\.\d+)?)/i)
-
-      const taxRate = 18 // GST %
-      let unit_price = 0
-      const cleanDesc = grandMatch
-        ? text.replace(grandMatch[0], '').trim()
-        : text.trim()
-
-      if (grandMatch) {
-        const total = parseFloat(grandMatch[1].replace(/,/g, ''))
-        const base = total / (1 + taxRate / 100)
-        unit_price = parseFloat(base.toFixed(2))
-      }
-
-      const result = {
-        title: 'Quotation',
-        description: cleanDesc,
-        items: [
-          {
-            description: cleanDesc,
-            quantity: 1,
-            unit_price
-          }
-        ]
-      }
-
-      console.log('Returning grand total-based result:', result)
-
-      return new Response(
-        JSON.stringify(result),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    } else {
-      // Fallback to OpenAI for single item description
-      systemPrompt = 'You provide quantity and unit price suggestions for single line items only. Do not break items into multiple components or suggest additional items.'
-      prompt = `For this ONE specific item: "${description}"
-
-Provide ONLY quantity and unit price for this exact item. Do not break it down or suggest multiple items.
-
-Respond with only quantity and unit_price for this single item in this exact JSON format:
-{
-  "quantity": number,
-  "unit_price": number,
-  "reasoning": "brief explanation for this single item"
-}`
-    }
-
-    console.log('Making request to OpenAI API')
-    
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openaiApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4.1-2025-04-14',
-        messages: [
-          {
-            role: 'system',
-            content: systemPrompt
-          },
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        max_tokens: 500,
-        temperature: 0.3,
-      }),
-    })
-
-    console.log('OpenAI API response status:', response.status)
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error('OpenAI API error:', response.status, errorText)
-      console.error('Request headers:', Object.fromEntries(response.headers.entries()))
-      return new Response(
-        JSON.stringify({ 
-          error: `OpenAI API error: ${response.status}`,
-          details: errorText 
-        }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      )
-    }
-
-    const openaiResult = await response.json()
-    console.log('OpenAI response:', openaiResult)
-    
-    const content = openaiResult.choices[0]?.message?.content
-
-    if (!content) {
-      throw new Error('No response from OpenAI')
-    }
-
-    // Parse the JSON response
-    let suggestion
-    try {
-      suggestion = JSON.parse(content)
-    } catch (parseError) {
-      console.error('Failed to parse OpenAI response:', content)
-      throw new Error('Invalid JSON response from OpenAI')
-    }
-
-    let result = {
-      title: 'Quotation',
-      description,
-      quantity: suggestion.quantity || 1,
-      unit_price: suggestion.unit_price || 0,
-      reasoning: suggestion.reasoning || 'AI suggestion'
-    }
-
-    console.log('Returning result:', result)
-
-    return new Response(
-      JSON.stringify(result),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
-    )
-
-  } catch (error) {
-    console.error('Error in openai-autofill function:', error)
-    return new Response(
-      JSON.stringify({ error: error.message || 'Internal server error' }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
-    )
+  body {
+    @apply bg-background text-foreground font-inter antialiased;
   }
-})
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-medium tracking-tight;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .container-app {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  .card-swiss {
+    @apply bg-card border border-border rounded-2xl shadow-sm;
+  }
+  
+  .btn-swiss {
+    @apply inline-flex items-center justify-center rounded-xl text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
+  }
+  
+  .btn-primary {
+    @apply btn-swiss bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm h-10 px-6;
+  }
+  
+  .btn-secondary {
+    @apply btn-swiss bg-secondary text-secondary-foreground hover:bg-secondary/80 h-10 px-6;
+  }
+  
+  .btn-outline {
+    @apply btn-swiss border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-6;
+  }
+  
+  .input-swiss {
+    @apply flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+}
