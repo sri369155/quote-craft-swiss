@@ -68,23 +68,27 @@ Respond only with valid JSON in this format:
   }
 }`
     } else {
-      prompt = `Based on this item description: "${description}"
+      prompt = `Based on this single item description: "${description}"
 
-Please suggest realistic values for a quotation line item:
+You must provide quantity and unit price suggestions for THIS ONE ITEM ONLY. Do not create multiple items or break this down into components.
+
+Please suggest realistic values for this specific quotation line item:
 - Quantity (whole number, typically 1-100)
 - Unit price in Indian Rupees (realistic market price)
 
-Consider if this is a:
+Consider if this single item is a:
 - Service (hours/days of work)
 - Product (physical items)
 - Software/Digital service
 - Consulting work
 
+IMPORTANT: Respond with suggestions for ONLY the single item described. Do not break it into multiple components.
+
 Respond only with valid JSON in this format:
 {
   "quantity": number,
   "unit_price": number,
-  "reasoning": "brief explanation"
+  "reasoning": "brief explanation for this single item"
 }`
     }
 
