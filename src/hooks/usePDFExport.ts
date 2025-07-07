@@ -53,46 +53,49 @@ export function usePDFExport() {
         signatureImage = await loadImageAsBase64(userProfile.signature_image_url)
       }
       
-      // Colors
-      const orangeColor = '#D2691E'
-      const blackColor = '#000000'
-      const grayColor = '#808080'
-      const lightGray = '#f5f5f5'
+      // Professional color palette
+      const primaryBlue = [30, 58, 138]   // Professional navy blue
+      const darkGreen = [20, 83, 45]      // Professional dark green  
+      const softGray = [51, 65, 85]       // Professional dark gray
+      const lightBlue = [248, 250, 252]   // Light blue-gray
       
       let yPosition = 0
       
       // Header section - First page
       yPosition = addHeaderToPage(pdf, pageWidth, headerImage, userProfile)
       
-      // QUOTATION label
-      pdf.setFillColor(0, 0, 0)
-      pdf.rect(85, yPosition, 40, 12, 'F')
-      pdf.setTextColor(30, 58, 138)
-      pdf.setFontSize(12)
+      // QUOTATION label with elegant styling
+      pdf.setTextColor(20, 83, 45) // Professional dark green
+      pdf.setFontSize(16)
       pdf.setFont('helvetica', 'bold')
       pdf.text('QUOTATION', 105, yPosition + 8, { align: 'center' })
+      
+      // Add subtle underline
+      pdf.setLineWidth(0.8)
+      pdf.setDrawColor(20, 83, 45)
+      pdf.line(85, yPosition + 12, 125, yPosition + 12)
       
       yPosition += 20
       
       // Quotation details
-      pdf.setTextColor(blackColor)
+      pdf.setTextColor(51, 65, 85) // Professional dark gray
       pdf.setFont('helvetica', 'normal')
       pdf.setFontSize(11)
       
       pdf.text(`Quotation No.: ${quotation.quotation_number}`, 15, yPosition)
       pdf.text(`Date: ${new Date(quotation.created_at).toLocaleDateString('en-GB')}`, pageWidth - 15, yPosition, { align: 'right' })
       
-      yPosition += 15
+      yPosition += 12
       pdf.text('Dear Sir,', 15, yPosition)
       
-      yPosition += 10
+      yPosition += 8
       const introText = 'We would like to submit our lowest budgetary quote for the supply and installation of the following items:'
       const splitIntro = pdf.splitTextToSize(introText, pageWidth - 30)
       pdf.text(splitIntro, 15, yPosition)
-      yPosition += splitIntro.length * 5 + 5
+      yPosition += splitIntro.length * 4 + 3
       
       pdf.text(`Sub: ${quotation.title || 'Project quotation'}`, 15, yPosition)
-      yPosition += 15
+      yPosition += 12
       
       // Table rendering with multi-page support
       yPosition = renderMultiPageTable(
@@ -129,7 +132,7 @@ export function usePDFExport() {
         // Terms & Conditions
         pdf.setFont('helvetica', 'bold')
         pdf.setFontSize(10)
-        pdf.setTextColor(blackColor)
+        pdf.setTextColor(51, 65, 85) // Professional dark gray
         pdf.text('Terms & Conditions', 17, newTermsStartY + 12)
         
         pdf.setFont('helvetica', 'normal')
@@ -160,7 +163,7 @@ export function usePDFExport() {
         // Signature placeholder text
         pdf.setFont('helvetica', 'normal')
         pdf.setFontSize(10)
-        pdf.setTextColor(blackColor)
+        pdf.setTextColor(51, 65, 85) // Professional dark gray
         pdf.text('Managing Partner', 97, newTermsStartY + 55)
         pdf.text('Authorised Signature', 97, newTermsStartY + 62)
       } else {
@@ -172,7 +175,7 @@ export function usePDFExport() {
         // Terms & Conditions
         pdf.setFont('helvetica', 'bold')
         pdf.setFontSize(10)
-        pdf.setTextColor(blackColor)
+        pdf.setTextColor(51, 65, 85) // Professional dark gray
         pdf.text('Terms & Conditions', 17, termsStartY + 12)
         
         pdf.setFont('helvetica', 'normal')
@@ -203,7 +206,7 @@ export function usePDFExport() {
         // Signature placeholder text
         pdf.setFont('helvetica', 'normal')
         pdf.setFontSize(10)
-        pdf.setTextColor(blackColor)
+        pdf.setTextColor(51, 65, 85) // Professional dark gray
         pdf.text('Managing Partner', 97, termsStartY + 55)
         pdf.text('Authorised Signature', 97, termsStartY + 62)
       }
@@ -342,12 +345,12 @@ export function usePDFExport() {
     const footerHeight = 30
     const maxContentHeight = pageHeight - footerHeight - 10 // Reduced space above footer
     
-    // Dynamic column widths - better proportions
+    // Dynamic column widths - fixed proportions to prevent overflow
     const colWidths = [
-      Math.floor(availableWidth * 0.40), // Description - 40%
-      Math.floor(availableWidth * 0.08), // Qty - 8%
-      Math.floor(availableWidth * 0.18), // Rate - 18%
-      Math.floor(availableWidth * 0.18), // GST Amount - 18%
+      Math.floor(availableWidth * 0.42), // Description - 42%
+      Math.floor(availableWidth * 0.10), // Qty - 10%
+      Math.floor(availableWidth * 0.16), // Rate - 16%
+      Math.floor(availableWidth * 0.16), // GST Amount - 16%
       Math.floor(availableWidth * 0.16)  // Total - 16%
     ]
     
@@ -359,14 +362,15 @@ export function usePDFExport() {
     const headers = ['Description', 'Qty', 'Rate', 'GST Amount', 'Total']
     
     const renderTableHeader = (yPos: number) => {
-      pdf.setFillColor(240, 240, 240)
-      pdf.setDrawColor(0, 0, 0)
+      // Professional table header with elegant colors
+      pdf.setFillColor(248, 250, 252) // Light blue-gray background
+      pdf.setDrawColor(71, 85, 105) // Professional border color
       pdf.setLineWidth(0.5)
       pdf.rect(pageMargin, yPos, availableWidth, 15, 'FD')
       
       pdf.setFont('helvetica', 'bold')
       pdf.setFontSize(9)
-      pdf.setTextColor(0, 0, 0)
+      pdf.setTextColor(51, 65, 85) // Professional dark text
       
       headers.forEach((header, index) => {
         const textWidth = pdf.getTextWidth(header)
