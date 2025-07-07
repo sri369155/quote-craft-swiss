@@ -4,10 +4,11 @@ import { useToast } from '@/hooks/use-toast'
 import { supabase } from '@/integrations/supabase/client'
 
 interface AIAutofillResult {
-  description: string
+  description?: string
   quantity: number
   unit_price: number
   reasoning?: string
+  title?: string
 }
 
 export function useOpenAI() {

@@ -54,72 +54,116 @@ serve(async (req) => {
         .filter(line => line.length > 0)
 
       if (lines.length > 1) {
-        // Multiline bulk input — break into individual items
-        const items = lines.map(line => ({
-          description: line,
-          quantity: 1,
-          unit_price: 0
-        }))
-        const result = {
-          title: 'Quotation',
-          description: 'Auto-generated from multiple lines',
-          items
+        // Multiline bulk input — Use AI to generate items with title and description
+        systemPrompt = 'You are an expert quotation assistant. Generate a professional quotation with appropriate title, description, and line items with quantities and unit prices.'
+        prompt = `Based on this multi-line project description:
+${lines.join('\n')}
+
+Generate a complete quotation with:
+1. A professional quotation title
+2. A brief project description
+3. Line items with quantities and unit prices
+
+Respond in this exact JSON format:
+{
+  "title": "Professional quotation title",
+  "description": "Brief project description",
+  "items": [
+    {
+      "description": "item description",
+      "quantity": number,
+      "unit_price": number
+    }
+  ]
+}`
+      } else {
+        // Single line - check for totals or use AI for smart processing
+        const text = lines[0]
+        const grandMatch = text.match(/(?:grand total|total cost|total amount)[^\d]*([\d,]+(?:\.\d+)?)/i)
+        const unitPriceMatch = text.match(/(?:unit price|rate|cost)[^\d]*([\d,]+(?:\.\d+)?)/i)
+
+        if (grandMatch && !unitPriceMatch) {
+          // Has grand total - calculate unit price
+          const total = parseFloat(grandMatch[1].replace(/,/g, ''))
+          const taxRate = 18 // GST %
+          const base = total / (1 + taxRate / 100)
+          const unit_price = parseFloat(base.toFixed(2))
+          const cleanDesc = text.replace(grandMatch[0], '').trim()
+
+          systemPrompt = 'Generate a professional quotation title and description for this item.'
+          prompt = `For this service/item: "${cleanDesc}"
+
+Generate a professional quotation with title and description.
+
+Respond in this exact JSON format:
+{
+  "title": "Professional quotation title",
+  "description": "Brief project description",
+  "items": [
+    {
+      "description": "${cleanDesc}",
+      "quantity": 1,
+      "unit_price": ${unit_price}
+    }
+  ]
+}`
+        } else if (unitPriceMatch && !grandMatch) {
+          // Has unit price - will calculate totals in frontend
+          const unit_price = parseFloat(unitPriceMatch[1].replace(/,/g, ''))
+          const cleanDesc = text.replace(unitPriceMatch[0], '').trim()
+
+          systemPrompt = 'Generate a professional quotation title and description for this item.'
+          prompt = `For this service/item: "${cleanDesc}"
+
+Generate a professional quotation with title and description.
+
+Respond in this exact JSON format:
+{
+  "title": "Professional quotation title", 
+  "description": "Brief project description",
+  "items": [
+    {
+      "description": "${cleanDesc}",
+      "quantity": 1,
+      "unit_price": ${unit_price}
+    }
+  ]
+}`
+        } else {
+          // No specific pricing info - let AI decide
+          systemPrompt = 'Generate a complete quotation with professional title, description, and appropriate pricing for the service/item.'
+          prompt = `For this service/item: "${text}"
+
+Generate a complete quotation with title, description, and appropriate pricing.
+
+Respond in this exact JSON format:
+{
+  "title": "Professional quotation title",
+  "description": "Brief project description", 
+  "items": [
+    {
+      "description": "detailed item description",
+      "quantity": number,
+      "unit_price": number
+    }
+  ]
+}`
         }
-
-        console.log('Returning multiline result:', result)
-
-        return new Response(
-          JSON.stringify(result),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
       }
-
-      // Single line bulk with possible grand total
-      const text = lines[0]
-      const grandMatch = text.match(/(?:grand total|total cost)[^\d]*([\d,]+(?:\.\d+)?)/i)
-
-      const taxRate = 18 // GST %
-      let unit_price = 0
-      const cleanDesc = grandMatch
-        ? text.replace(grandMatch[0], '').trim()
-        : text.trim()
-
-      if (grandMatch) {
-        const total = parseFloat(grandMatch[1].replace(/,/g, ''))
-        const base = total / (1 + taxRate / 100)
-        unit_price = parseFloat(base.toFixed(2))
-      }
-
-      const result = {
-        title: 'Quotation',
-        description: 'Auto-generated from single line total-based input',
-        items: [
-          {
-            description: cleanDesc,
-            quantity: 1,
-            unit_price
-          }
-        ]
-      }
-
-      console.log('Returning grand total-based result:', result)
-
-      return new Response(
-        JSON.stringify(result),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
     } else {
-      // Fallback to OpenAI for single item description
-      systemPrompt = 'You provide quantity and unit price suggestions for single line items only. Do not break items into multiple components or suggest additional items.'
+      // Single item description - generate title, description and pricing
+      systemPrompt = 'Generate a complete quotation with professional title, description, and appropriate pricing for the single item.'
       prompt = `For this ONE specific item: "${description}"
 
-Provide ONLY quantity and unit price for this exact item. Do not break it down or suggest multiple items.
+Generate a complete quotation with professional title, description, and appropriate pricing for this single item.
 
-Respond with only quantity and unit_price for this single item in this exact JSON format:
+Respond in this exact JSON format:
 {
+  "title": "Professional quotation title",
+  "description": "Brief project description",
   "quantity": number,
   "unit_price": number,
-  "reasoning": "brief explanation for this single item"
+  "reasoning": "brief explanation for pricing"
 }`
     }
 
@@ -184,11 +228,29 @@ Respond with only quantity and unit_price for this single item in this exact JSO
       throw new Error('Invalid JSON response from OpenAI')
     }
     
-    let result = {
-      description,
-      quantity: suggestion.quantity || 1,
-      unit_price: suggestion.unit_price || 0,
-      reasoning: suggestion.reasoning || 'AI suggestion'
+    let result
+    if (bulk_description) {
+      // Return full quotation structure for bulk descriptions
+      result = {
+        title: suggestion.title || 'Quotation',
+        description: suggestion.description || 'Auto-generated quotation',
+        items: suggestion.items || [
+          {
+            description: suggestion.description || description,
+            quantity: suggestion.quantity || 1,
+            unit_price: suggestion.unit_price || 0
+          }
+        ]
+      }
+    } else {
+      // Return single item structure for individual item descriptions
+      result = {
+        title: suggestion.title || 'Quotation',
+        description: suggestion.description || 'Auto-generated quotation',
+        quantity: suggestion.quantity || 1,
+        unit_price: suggestion.unit_price || 0,
+        reasoning: suggestion.reasoning || 'AI suggestion'
+      }
     }
     
     console.log('Returning result:', result)

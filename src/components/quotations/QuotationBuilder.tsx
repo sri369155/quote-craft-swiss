@@ -186,19 +186,23 @@ export default function QuotationBuilder({ quotationId, onSave, onCancel }: Quot
       if (result.title) setTitle(result.title)
       if (result.description) setDescription(result.description)
       
-      // Fill line items
+      // Fill line items with proper calculation
       if (result.items && result.items.length > 0) {
-        const newItems = result.items.map((item: any) => ({
-          description: item.description || '',
-          quantity: item.quantity || 1,
-          unit_price: item.unit_price || 0,
-          line_total: (item.quantity || 1) * (item.unit_price || 0)
-        }))
+        const newItems = result.items.map((item: any) => {
+          const quantity = item.quantity || 1
+          const unit_price = item.unit_price || 0
+          return {
+            description: item.description || '',
+            quantity: quantity,
+            unit_price: unit_price,
+            line_total: quantity * unit_price
+          }
+        })
         setItems(newItems)
         
         toast({
           title: 'Bulk AI Autofill Complete',
-          description: `Generated ${newItems.length} line items with quotation details`,
+          description: `Generated ${newItems.length} line items with quotation details and calculations`,
         })
       }
     }
@@ -217,12 +221,17 @@ export default function QuotationBuilder({ quotationId, onSave, onCancel }: Quot
 
     const result = await autofillItem(item.description)
     if (result) {
+      // If result has title and description, fill those too (for single items)
+      if (result.title && !title.trim()) setTitle(result.title)
+      if (result.description && !description.trim()) setDescription(result.description)
+      
+      // Update item with proper calculation
       updateItem(itemIndex, 'quantity', result.quantity)
       updateItem(itemIndex, 'unit_price', result.unit_price)
       
       toast({
         title: 'AI Autofill Complete',
-        description: `Suggested ${result.quantity} units at ₹${result.unit_price} each`,
+        description: `Suggested ${result.quantity} units at ₹${result.unit_price} each with calculations`,
       })
     }
   }
