@@ -4,87 +4,108 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Swiss-style Design System - Updated for Yellow BG and Dark Blue Font */
+/* Professional Business Design System */
 
 @layer base {
   :root {
-    --background: 255 253 231;            /* Light Yellow (#FFFDE7) */
-    --foreground: 0 33 71;                /* Dark Blue (#002147) */
+    --background: 248 250 252;            /* Slate-50 - Clean, professional base */
+    --foreground: 15 23 42;               /* Slate-800 - Rich, readable text */
 
-    --card: 255 255 255;
-    --card-foreground: 0 33 71;
+    --card: 255 255 255;                  /* Pure white cards for contrast */
+    --card-foreground: 15 23 42;
 
     --popover: 255 255 255;
-    --popover-foreground: 0 33 71;
+    --popover-foreground: 15 23 42;
 
-    --primary: 0 33 71;
+    --primary: 59 130 246;                /* Blue-500 - Professional, trustworthy */
     --primary-foreground: 255 255 255;
 
-    --secondary: 255 245 204;
-    --secondary-foreground: 0 33 71;
+    --secondary: 241 245 249;             /* Slate-100 - Subtle secondary */
+    --secondary-foreground: 51 65 85;     /* Slate-700 */
 
-    --muted: 255 250 212;
-    --muted-foreground: 0 33 71;
+    --muted: 241 245 249;                 /* Slate-100 - Gentle muted areas */
+    --muted-foreground: 100 116 139;      /* Slate-500 - Subdued text */
 
-    --accent: 255 250 212;
-    --accent-foreground: 0 33 71;
+    --accent: 16 185 129;                 /* Emerald-500 - Success/accent color */
+    --accent-foreground: 255 255 255;
 
-    --destructive: 239 68 68;
+    --destructive: 239 68 68;             /* Red-500 - Error states */
     --destructive-foreground: 255 255 255;
 
-    --border: 228 228 231;
-    --input: 228 228 231;
-    --ring: 0 33 71;
+    --border: 226 232 240;                /* Slate-200 - Subtle borders */
+    --input: 226 232 240;
+    --ring: 59 130 246;                   /* Primary blue for focus rings */
 
-    --radius: 1rem;
+    --radius: 0.75rem;                    /* Slightly rounded for modern look */
 
-    --sidebar-background: 255 253 231;
-    --sidebar-foreground: 0 33 71;
-    --sidebar-primary: 0 33 71;
+    /* Sidebar colors */
+    --sidebar-background: 255 255 255;
+    --sidebar-foreground: 15 23 42;
+    --sidebar-primary: 59 130 246;
     --sidebar-primary-foreground: 255 255 255;
-    --sidebar-accent: 255 250 212;
-    --sidebar-accent-foreground: 0 33 71;
-    --sidebar-border: 228 228 231;
-    --sidebar-ring: 0 33 71;
+    --sidebar-accent: 241 245 249;
+    --sidebar-accent-foreground: 51 65 85;
+    --sidebar-border: 226 232 240;
+    --sidebar-ring: 59 130 246;
+
+    /* Custom gradients for enhanced visuals */
+    --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(212 97% 87%));
+    --gradient-success: linear-gradient(135deg, hsl(158 64% 52%), hsl(160 84% 39%));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(210 40% 98%));
+    
+    /* Enhanced shadows */
+    --shadow-elegant: 0 4px 6px -1px hsl(220 14% 96%), 0 2px 4px -1px hsl(220 14% 96%);
+    --shadow-card: 0 1px 3px 0 hsl(0 0% 0% / 0.1), 0 1px 2px 0 hsl(0 0% 0% / 0.06);
+    --shadow-button: 0 1px 2px 0 hsl(0 0% 0% / 0.05);
   }
 
   .dark {
-    --background: 51 51 51;
-    --foreground: 255 255 255;
+    --background: 2 6 23;                 /* Slate-950 - Deep, professional dark */
+    --foreground: 248 250 252;            /* Slate-50 - Clean light text */
 
-    --card: 38 38 38;
-    --card-foreground: 255 255 255;
+    --card: 15 23 42;                     /* Slate-800 - Elevated dark cards */
+    --card-foreground: 248 250 252;
 
-    --popover: 38 38 38;
-    --popover-foreground: 255 255 255;
+    --popover: 15 23 42;
+    --popover-foreground: 248 250 252;
 
-    --primary: 0 33 71;
-    --primary-foreground: 255 255 255;
+    --primary: 96 165 250;                /* Blue-400 - Brighter for dark mode */
+    --primary-foreground: 2 6 23;
 
-    --secondary: 64 64 64;
-    --secondary-foreground: 255 255 255;
+    --secondary: 30 41 59;                /* Slate-700 - Dark secondary */
+    --secondary-foreground: 226 232 240;  /* Slate-200 */
 
-    --muted: 72 72 72;
-    --muted-foreground: 255 255 255;
+    --muted: 30 41 59;                    /* Slate-700 */
+    --muted-foreground: 148 163 184;      /* Slate-400 */
 
-    --accent: 72 72 72;
-    --accent-foreground: 255 255 255;
+    --accent: 52 211 153;                 /* Emerald-400 - Vibrant in dark */
+    --accent-foreground: 2 6 23;
 
-    --destructive: 220 38 38;
-    --destructive-foreground: 255 255 255;
+    --destructive: 248 113 113;           /* Red-400 */
+    --destructive-foreground: 2 6 23;
 
-    --border: 64 64 64;
-    --input: 64 64 64;
-    --ring: 255 255 255;
+    --border: 30 41 59;                   /* Slate-700 */
+    --input: 30 41 59;
+    --ring: 96 165 250;                   /* Primary blue */
 
-    --sidebar-background: 38 38 38;
-    --sidebar-foreground: 255 255 255;
-    --sidebar-primary: 0 33 71;
-    --sidebar-primary-foreground: 255 255 255;
-    --sidebar-accent: 64 64 64;
-    --sidebar-accent-foreground: 255 255 255;
-    --sidebar-border: 64 64 64;
-    --sidebar-ring: 255 255 255;
+    --sidebar-background: 15 23 42;
+    --sidebar-foreground: 248 250 252;
+    --sidebar-primary: 96 165 250;
+    --sidebar-primary-foreground: 2 6 23;
+    --sidebar-accent: 30 41 59;
+    --sidebar-accent-foreground: 226 232 240;
+    --sidebar-border: 30 41 59;
+    --sidebar-ring: 96 165 250;
+
+    /* Dark mode gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(217 91% 70%), hsl(212 97% 50%));
+    --gradient-success: linear-gradient(135deg, hsl(158 64% 62%), hsl(160 84% 49%));
+    --gradient-card: linear-gradient(145deg, hsl(215 28% 17%), hsl(215 28% 20%));
+    
+    /* Dark mode shadows */
+    --shadow-elegant: 0 4px 6px -1px hsl(0 0% 0% / 0.3), 0 2px 4px -1px hsl(0 0% 0% / 0.2);
+    --shadow-card: 0 4px 6px -1px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.06);
+    --shadow-button: 0 1px 3px 0 hsl(0 0% 0% / 0.12), 0 1px 2px 0 hsl(0 0% 0% / 0.24);
   }
 }
 
@@ -111,27 +132,95 @@
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
   
+  /* Enhanced card styles with professional aesthetics */
   .card-swiss {
-    @apply bg-card border border-border rounded-2xl shadow-sm;
+    @apply bg-card border border-border rounded-xl shadow-card backdrop-blur-sm;
   }
   
+  .card-premium {
+    background: var(--gradient-card);
+    @apply border border-border rounded-xl shadow-elegant backdrop-blur-sm;
+  }
+  
+  /* Professional button system */
   .btn-swiss {
-    @apply inline-flex items-center justify-center rounded-xl text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center rounded-lg text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
   }
   
   .btn-primary {
-    @apply btn-swiss bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm h-10 px-6;
+    @apply btn-swiss bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/95 shadow-button h-10 px-6;
   }
   
   .btn-secondary {
-    @apply btn-swiss bg-secondary text-secondary-foreground hover:bg-secondary/80 h-10 px-6;
+    @apply btn-swiss bg-secondary text-secondary-foreground hover:bg-secondary/80 active:bg-secondary/90 shadow-button h-10 px-6;
+  }
+  
+  .btn-accent {
+    @apply btn-swiss bg-accent text-accent-foreground hover:bg-accent/90 active:bg-accent/95 shadow-button h-10 px-6;
   }
   
   .btn-outline {
-    @apply btn-swiss border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-6;
+    @apply btn-swiss border border-border bg-background hover:bg-secondary hover:text-secondary-foreground active:bg-secondary/80 shadow-button h-10 px-6;
   }
   
+  .btn-ghost {
+    @apply btn-swiss hover:bg-secondary hover:text-secondary-foreground active:bg-secondary/80 h-10 px-6;
+  }
+  
+  /* Enhanced input styles */
   .input-swiss {
-    @apply flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+    @apply flex h-11 w-full rounded-lg border border-input bg-background px-4 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors;
+  }
+  
+  /* Gradient utilities */
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+  
+  .gradient-success {
+    background: var(--gradient-success);
+  }
+  
+  /* Professional shadows */
+  .shadow-elegant {
+    box-shadow: var(--shadow-elegant);
+  }
+  
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+  
+  .shadow-button {
+    box-shadow: var(--shadow-button);
+  }
+  
+  /* Status indicators */
+  .status-success {
+    @apply bg-accent/10 text-accent border-accent/20;
+  }
+  
+  .status-warning {
+    @apply bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800;
+  }
+  
+  .status-error {
+    @apply bg-destructive/10 text-destructive border-destructive/20;
+  }
+  
+  /* Professional table styles */
+  .table-professional {
+    @apply w-full border-collapse;
+  }
+  
+  .table-professional th {
+    @apply bg-secondary text-secondary-foreground font-medium text-left px-4 py-3 border-b border-border;
+  }
+  
+  .table-professional td {
+    @apply px-4 py-3 border-b border-border/50;
+  }
+  
+  .table-professional tr:hover {
+    @apply bg-muted/50;
   }
 }
