@@ -65,13 +65,12 @@ export function usePDFExport() {
       yPosition = addHeaderToPage(pdf, pageWidth, headerImage, userProfile)
       
       // QUOTATION label
-     
-     pdf.setTextColor(30, 58, 138)
-      pdf.setFontSize(16)
+      pdf.setTextColor(37, 99, 235) // Modern blue color
+      pdf.setFontSize(18)
       pdf.setFont('helvetica', 'bold')
-      pdf.text('QUOTATION', pageWidth / 2, yPosition + 10, { align: 'center' })
+      pdf.text('QUOTATION', pageWidth / 2, yPosition + 8, { align: 'center' })
 
-      yPosition += 20
+      yPosition += 15 // Reduced spacing
       
       // Quotation details
       pdf.setTextColor(blackColor)
@@ -81,17 +80,17 @@ export function usePDFExport() {
       pdf.text(`Quotation No.: ${quotation.quotation_number}`, 15, yPosition)
       pdf.text(`Date: ${new Date(quotation.created_at).toLocaleDateString('en-GB')}`, pageWidth - 15, yPosition, { align: 'right' })
       
-      yPosition += 15
+      yPosition += 12 // Reduced spacing
       pdf.text('Dear Sir,', 15, yPosition)
       
-      yPosition += 10
+      yPosition += 8 // Reduced spacing
       const introText = 'We would like to submit our lowest budgetary quote for the supply and installation of the following items:'
       const splitIntro = pdf.splitTextToSize(introText, pageWidth - 30)
       pdf.text(splitIntro, 15, yPosition)
-      yPosition += splitIntro.length * 5 + 5
+      yPosition += splitIntro.length * 4 + 3 // Reduced line spacing
       
       pdf.text(`Sub: ${quotation.title || 'Project quotation'}`, 15, yPosition)
-      yPosition += 15
+      yPosition += 12 // Reduced spacing
       
       // Table rendering with multi-page support
       yPosition = renderMultiPageTable(
@@ -143,7 +142,7 @@ export function usePDFExport() {
         // Company name in signature
         pdf.setFont('helvetica', 'bold')
         pdf.setFontSize(12)
-        pdf.setTextColor(30, 58, 138)
+        pdf.setTextColor(37, 99, 235) // Modern blue to match header
         const companyName = userProfile?.company_name || 'BHAIRAVNEX'
         pdf.text(`For ${companyName}`, 97, newTermsStartY + 25)
         
@@ -229,50 +228,38 @@ export function usePDFExport() {
   }
 
   const renderDefaultHeader = (pdf: jsPDF, pageWidth: number, userProfile?: Profile) => {
-    // Header background with orange gradient
-    pdf.setFillColor(210, 105, 30) // Orange color
-    pdf.rect(0, 0, pageWidth, 40, 'F')
+    // Header background with modern blue gradient
+    pdf.setFillColor(37, 99, 235) // Modern blue color
+    pdf.rect(0, 0, pageWidth, 25, 'F') // Reduced height from 40 to 25
     
-    pdf.setTextColor(30, 58, 138)
+    pdf.setTextColor(255, 255, 255) // White text on blue background
     
     // GST number in top right
-    pdf.setFontSize(12)
+    pdf.setFontSize(10)
     pdf.setFont('helvetica', 'bold')
     const gstNumber = `GST: ${userProfile?.gst_number || '37ABDFB9225A1Z5'}`
-    pdf.text(gstNumber, pageWidth - 15, 12, { align: 'right' })
+    pdf.text(gstNumber, pageWidth - 15, 10, { align: 'right' })
     
-    // Company name - center, larger and underlined
-    pdf.setFontSize(32)
+    // Company name - center, larger
+    pdf.setFontSize(16)
     pdf.setFont('helvetica', 'bold')
     const companyName = userProfile?.company_name || 'BHAIRAVNEX'
-    const nameWidth = pdf.getTextWidth(companyName)
-    const nameX = (pageWidth - nameWidth) / 2
-    pdf.text(companyName, nameX, 25)
+    pdf.text(companyName, pageWidth / 2, 15, { align: 'center' })
     
-    // Underline for company name
-    pdf.setLineWidth(1)
-    pdf.line(nameX, 27, nameX + nameWidth, 27)
-    
-    // Company logo - center, next to company name if available
-    if (userProfile?.company_logo_url) {
-      // Logo would be loaded and positioned here - for now just reserve space
-      // The actual logo loading would need to be implemented with base64 conversion
-    }
-    
-    // Company slogan - bottom left
-    pdf.setFontSize(10)
+    // Company slogan - bottom center
+    pdf.setFontSize(8)
     pdf.setFont('helvetica', 'normal')
     const companySlogan = userProfile?.company_slogan || '"Engineering Tomorrow\'s Technologies, Today"'
-    pdf.text(companySlogan, 15, 35)
+    pdf.text(companySlogan, pageWidth / 2, 22, { align: 'center' })
     
-    return 50
+    return 35 // Reduced from 50 to 35
   }
 
   const renderDefaultFooter = (pdf: jsPDF, pageWidth: number, footerY: number, userProfile?: Profile) => {
-    pdf.setFillColor(210, 105, 30)
-    pdf.rect(0, footerY, pageWidth, 25, 'F')
+    pdf.setFillColor(37, 99, 235) // Modern blue to match header
+    pdf.rect(0, footerY, pageWidth, 20, 'F') // Reduced height from 25 to 20
     
-    pdf.setTextColor(30, 58, 138)
+    pdf.setTextColor(255, 255, 255) // White text on blue background
     pdf.setFontSize(8)
     
     // Company Address - Left Aligned (only if exists)
@@ -281,27 +268,27 @@ export function usePDFExport() {
       const address2 = userProfile.company_address.split(',').slice(1).join(',').trim()
       
       if (address1) {
-        pdf.text(address1, 15, footerY + 8)
+        pdf.text(address1, 15, footerY + 6)
       }
       if (address2) {
-        pdf.text(address2, 15, footerY + 15)
+        pdf.text(address2, 15, footerY + 12)
       }
     }
     
     // Phone Number and Email - Right Aligned (only if exists)
     if (userProfile?.company_phone) {
-      pdf.text(userProfile.company_phone, pageWidth - 15, footerY + 8, { align: 'right' })
+      pdf.text(userProfile.company_phone, pageWidth - 15, footerY + 6, { align: 'right' })
     }
     if (userProfile?.company_email) {
-      pdf.text(`Email: ${userProfile.company_email}`, pageWidth - 15, footerY + 15, { align: 'right' })
+      pdf.text(`Email: ${userProfile.company_email}`, pageWidth - 15, footerY + 12, { align: 'right' })
     }
   }
 
   const addHeaderToPage = (pdf: jsPDF, pageWidth: number, headerImage: string | null, userProfile?: Profile) => {
     if (headerImage) {
       try {
-        pdf.addImage(headerImage, 'JPEG', 0, 0, pageWidth, 40)
-        return 50
+        pdf.addImage(headerImage, 'JPEG', 0, 0, pageWidth, 25) // Reduced height from 40 to 25
+        return 35 // Reduced from 50 to 35
       } catch (error) {
         console.error('Error adding header image:', error)
         return renderDefaultHeader(pdf, pageWidth, userProfile)
@@ -312,10 +299,10 @@ export function usePDFExport() {
   }
 
   const addFooterToPage = (pdf: jsPDF, pageWidth: number, pageHeight: number, footerImage: string | null, userProfile?: Profile) => {
-    const footerY = pageHeight - 30
+    const footerY = pageHeight - 20 // Reduced footer height
     if (footerImage) {
       try {
-        pdf.addImage(footerImage, 'JPEG', 0, footerY, pageWidth, 30)
+        pdf.addImage(footerImage, 'JPEG', 0, footerY, pageWidth, 20) // Reduced height from 30 to 20
       } catch (error) {
         console.error('Error adding footer image:', error)
         renderDefaultFooter(pdf, pageWidth, footerY, userProfile)
