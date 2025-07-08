@@ -106,10 +106,10 @@ export function usePDFExport() {
       )
       
       // Terms & Conditions and Signature section
-      const termsStartY = yPosition + 10
+      const termsStartY = yPosition + 5 // Reduced from 10
       
       // Check if we need a new page for the signature section
-      if (termsStartY + 70 > pageHeight - 30) {
+      if (termsStartY + 40 > pageHeight - 30) { // Reduced from 70 to 40
         // Add footer to current page
         addFooterToPage(pdf, pageWidth, pageHeight, footerImage, userProfile)
         
@@ -118,92 +118,90 @@ export function usePDFExport() {
         
         // Add header to new page
         yPosition = addHeaderToPage(pdf, pageWidth, headerImage, userProfile)
-        const newTermsStartY = yPosition + 10
+        const newTermsStartY = yPosition + 5 // Reduced from 10
         
         pdf.setFillColor(255, 255, 255)
-        pdf.rect(15, newTermsStartY, 80, 60, 'FD')
-        pdf.rect(95, newTermsStartY, 100, 60, 'FD')
+        pdf.rect(15, newTermsStartY, 80, 30, 'FD') // Reduced height from 60 to 30
+        pdf.rect(95, newTermsStartY, 100, 30, 'FD') // Reduced height from 60 to 30
         
         // Terms & Conditions
         pdf.setFont('helvetica', 'bold')
         pdf.setFontSize(10)
         pdf.setTextColor(blackColor)
-        pdf.text('Terms & Conditions', 17, newTermsStartY + 12)
+        pdf.text('Terms & Conditions', 17, newTermsStartY + 8) // Reduced from 12
         
         pdf.setFont('helvetica', 'normal')
         pdf.setFontSize(9)
-        pdf.text('Completion: 90 Days', 17, newTermsStartY + 22)
-        pdf.text('GST: As indicated', 17, newTermsStartY + 30)
-        pdf.text('Transport: NA', 17, newTermsStartY + 38)
+        pdf.text('Completion: 90 Days', 17, newTermsStartY + 15) // Reduced spacing
+        pdf.text('GST: As indicated', 17, newTermsStartY + 20) // Reduced spacing
+        pdf.text('Transport: NA', 17, newTermsStartY + 25) // Reduced spacing
         
         // Signature section
-        pdf.text('With regards', 97, newTermsStartY + 12)
+        pdf.text('With regards', 97, newTermsStartY + 8) // Reduced from 12
         
         // Company name in signature
         pdf.setFont('helvetica', 'bold')
         pdf.setFontSize(12)
         pdf.setTextColor(37, 99, 235) // Modern blue to match header
         const companyName = userProfile?.company_name || 'BHAIRAVNEX'
-        pdf.text(`For ${companyName}`, 97, newTermsStartY + 25)
+        pdf.text(`For ${companyName}`, 97, newTermsStartY + 15) // Reduced from 25
         
         // Add signature image if available
         if (signatureImage) {
           try {
-            pdf.addImage(signatureImage, 'JPEG', 97, newTermsStartY + 30, 80, 20)
+            pdf.addImage(signatureImage, 'JPEG', 97, newTermsStartY + 18, 60, 10) // Reduced size and position
           } catch (error) {
             console.error('Error adding signature image:', error)
           }
         }
         
-        // Signature placeholder text
+        // Only keep "Authorised Signature" - removed "Managing Partner"
         pdf.setFont('helvetica', 'normal')
-        pdf.setFontSize(10)
+        pdf.setFontSize(9) // Reduced font size
         pdf.setTextColor(blackColor)
-        pdf.text('Managing Partner', 97, newTermsStartY + 55)
-        pdf.text('Authorised Signature', 97, newTermsStartY + 62)
+        pdf.text('Authorised Signature', 97, newTermsStartY + 28) // Reduced from 62
       } else {
         // Keep original layout if it fits on current page
         pdf.setFillColor(255, 255, 255)
-        pdf.rect(15, termsStartY, 80, 60, 'FD')
-        pdf.rect(95, termsStartY, 100, 60, 'FD')
+        pdf.rect(15, termsStartY, 80, 30, 'FD') // Reduced height from 60 to 30
+        pdf.rect(95, termsStartY, 100, 30, 'FD') // Reduced height from 60 to 30
         
         // Terms & Conditions
         pdf.setFont('helvetica', 'bold')
         pdf.setFontSize(10)
         pdf.setTextColor(blackColor)
-        pdf.text('Terms & Conditions', 17, termsStartY + 12)
+        pdf.text('Terms & Conditions', 17, termsStartY + 8) // Reduced from 12
         
         pdf.setFont('helvetica', 'normal')
         pdf.setFontSize(9)
-        pdf.text('Completion: 90 Days', 17, termsStartY + 22)
-        pdf.text('GST: As indicated', 17, termsStartY + 30)
-        pdf.text('Transport: NA', 17, termsStartY + 38)
+        pdf.text('Completion: 90 Days', 17, termsStartY + 15) // Reduced spacing
+        pdf.text('GST: As indicated', 17, termsStartY + 20) // Reduced spacing
+        pdf.text('Transport: NA', 17, termsStartY + 25) // Reduced spacing
         
         // Signature section
-        pdf.text('With regards', 97, termsStartY + 12)
+        pdf.text('With regards', 97, termsStartY + 8) // Reduced from 12
         
         // Company name in signature
         pdf.setFont('helvetica', 'bold')
         pdf.setFontSize(12)
-        pdf.setTextColor(30, 58, 138)
+        pdf.setTextColor(37, 99, 235) // Modern blue to match header
         const companyName = userProfile?.company_name || 'BHAIRAVNEX'
-        pdf.text(`For ${companyName}`, 97, termsStartY + 25)
+        pdf.text(`For ${companyName}`, 97, termsStartY + 15) // Reduced from 25
         
         // Add signature image if available
         if (signatureImage) {
           try {
-            pdf.addImage(signatureImage, 'JPEG', 97, termsStartY + 30, 80, 20)
+            pdf.addImage(signatureImage, 'JPEG', 97, termsStartY + 18, 60, 10) // Reduced size and position
           } catch (error) {
             console.error('Error adding signature image:', error)
           }
         }
         
-        // Signature placeholder text
+        // Only keep "Authorised Signature" - removed "Managing Partner"
         pdf.setFont('helvetica', 'normal')
-        pdf.setFontSize(10)
+        pdf.setFontSize(9) // Reduced font size
         pdf.setTextColor(blackColor)
-        pdf.text('Managing Partner', 97, termsStartY + 55)
-        pdf.text('Authorised Signature', 97, termsStartY + 62)
+        pdf.text('Authorised Signature', 97, termsStartY + 28) // Reduced from 62
       }
       
       // Footer
