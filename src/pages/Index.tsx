@@ -1,4 +1,3 @@
-
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import FeatureGrid from '@/components/FeatureGrid';
@@ -7,9 +6,9 @@ import Footer from '@/components/Footer';
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-green-100">
+    <div className="min-h-screen bg-gradient-to-b from-[#FFE2D1] via-[#FCE4EC] to-[#E0C3FC] text-gray-800">
       <Header />
-      <main>
+      <main className="max-w-6xl mx-auto px-4">
         <HeroSection />
         <FeatureGrid />
         <CTASection />

@@ -115,7 +115,7 @@
   }
 
   body {
-    @apply bg-background text-foreground font-inter antialiased;
+     @apply bg-gradient-to-b from-[#FFE2D1] via-[#FCE4EC] to-[#E0C3FC];
   }
 
   h1, h2, h3, h4, h5, h6 {
