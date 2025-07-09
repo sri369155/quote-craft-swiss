@@ -11,8 +11,8 @@
     --background: 250 251 255;            /* Ultra-light blue-white for modern feel */
     --foreground: 30 41 59;               /* Slate-700 - Sophisticated dark text */
 
-    --card: 255 255 255;                  /* Pure white cards with subtle shadow */
-    --card-foreground: 100m116 139;
+    --card: 248 250 252;                  /* Pure white cards with subtle shadow */
+    --card-foreground: 100 116 139;
 
     --popover: 255 255 255;
     --popover-foreground: 30 41 59;
