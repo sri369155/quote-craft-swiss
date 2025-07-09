@@ -16,38 +16,38 @@
     --popover: 255 255 255;
     --popover-foreground: 15 25 45;
 
-    --primary: 59 130 246;                 /* Bright blue-500 */
+    --primary: 236 72 153;                 /* Pink-500 */
     --primary-foreground: 255 255 255;
 
-    --secondary: 241 245 254;              /* Light blue tint */
+    --secondary: 253 244 255;              /* Light pink tint */
     --secondary-foreground: 15 25 45;
 
-   --muted: 240 240 240;
+   --muted: 250 245 255;
     --muted-foreground: 51 51 51;
 
-    --accent: 14 165 233;                  /* Sky-500 - vibrant sky blue */
+    --accent: 147 51 234;                  /* Purple-600 - vibrant purple */
     --accent-foreground: 255 255 255;
 
     --destructive: 239 68 68;
     --destructive-foreground: 255 255 255;
 
-    --border: 219 234 254;
-    --input: 248 250 254;
-    --ring: 59 130 246;
+    --border: 244 224 255;
+    --input: 253 244 255;
+    --ring: 236 72 153;
 
     --radius: 0.75rem;
 
-    /* Vibrant Gradients */
-    --gradient-primary: linear-gradient(135deg, #60a5fa, #3b82f6, #2563eb);
-    --gradient-accent: linear-gradient(135deg, #38bdf8, #0ea5e9, #0284c7);
-    --gradient-background: linear-gradient(135deg, #f0f9ff, #e0f2fe, #bae6fd);
-    --gradient-card: linear-gradient(135deg, #ffffff, #f8fafc);
-    --gradient-hero: linear-gradient(135deg, #dbeafe, #bfdbfe, #93c5fd);
+    /* Pink & Blue Gradient Mix - Lovable Style */
+    --gradient-primary: linear-gradient(135deg, #ec4899, #8b5cf6, #3b82f6);
+    --gradient-accent: linear-gradient(135deg, #f472b6, #a855f7, #6366f1);
+    --gradient-background: linear-gradient(135deg, #fdf2f8, #f3e8ff, #ede9fe);
+    --gradient-card: linear-gradient(135deg, #ec4899, #8b5cf6, #3b82f6);
+    --gradient-hero: linear-gradient(135deg, #fce7f3, #e879f9, #c084fc);
 
-    --shadow-elegant: 0 10px 25px -5px hsl(213, 94%, 90%), 0 8px 10px -6px hsl(213, 94%, 85%);
-    --shadow-card: 0 4px 6px -1px hsl(213, 94%, 90%), 0 2px 4px -2px hsl(213, 94%, 85%);
-    --shadow-button: 0 4px 14px 0 hsl(213, 94%, 70%);
-    --shadow-glow: 0 0 30px hsl(213, 94%, 80%);
+    --shadow-elegant: 0 10px 25px -5px hsl(322, 84%, 90%), 0 8px 10px -6px hsl(322, 84%, 85%);
+    --shadow-card: 0 4px 6px -1px hsl(322, 84%, 90%), 0 2px 4px -2px hsl(322, 84%, 85%);
+    --shadow-button: 0 4px 14px 0 hsl(322, 84%, 70%);
+    --shadow-glow: 0 0 30px hsl(322, 84%, 80%);
   }
 
   .dark {
@@ -147,5 +147,19 @@
       transform: translateY(-10px) scale(1.02);
       filter: brightness(1.1);
     }
+  }
+
+  /* Gradient Card Utilities */
+  .gradient-card {
+    background: var(--gradient-card);
+    @apply text-white shadow-elegant;
+  }
+
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+
+  .gradient-accent {
+    background: var(--gradient-accent);
   }
 }
