@@ -5,12 +5,13 @@ import { useAuth } from '@/hooks/useAuth'
 import { usePDFExport } from '@/hooks/usePDFExport'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Plus, FileText, Eye, Edit, Trash2, Download, Settings } from 'lucide-react'
+import { Plus, FileText, Eye, Edit, Trash2, Download, Settings, Search } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { Quotation, Customer, QuotationItem } from '@/types/database'
 import { useToast } from '@/hooks/use-toast'
 import QuotationBuilder from '@/components/quotations/QuotationBuilder'
 import QuotationPreview from '@/components/quotations/QuotationPreview'
+import QuotationSearch from '@/components/quotations/QuotationSearch'
 
 export default function Quotations() {
   const navigate = useNavigate()
@@ -227,7 +228,7 @@ export default function Quotations() {
 
       <main className="container-app py-8">
         {/* Page Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-semibold tracking-tight">Quotations</h1>
             <p className="text-muted-foreground">
@@ -238,6 +239,16 @@ export default function Quotations() {
             <Plus className="w-4 h-4 mr-2" />
             New Quotation
           </Button>
+        </div>
+
+        {/* Search Bar */}
+        <div className="mb-8">
+          <QuotationSearch
+            onEditQuotation={handleEditQuotation}
+            onPreviewQuotation={setPreviewQuotation}
+            onExportPDF={handleExportPDF}
+            pdfLoading={pdfLoading}
+          />
         </div>
 
         {/* Quotations List */}
