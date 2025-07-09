@@ -10,8 +10,8 @@
     --background: 250 252 255;             /* Ultra light blue-white */
     --foreground: 15 25 45;                /* Deep navy text */
 
-    --card: 255 255 255;
-    --card-foreground: 15 25 45;
+    --card: 240 240 240;
+    --card-foreground: 51 51 45;
 
     --popover: 255 255 255;
     --popover-foreground: 15 25 45;
