@@ -22,8 +22,8 @@
     --secondary: 241 245 254;              /* Light blue tint */
     --secondary-foreground: 15 25 45;
 
-    --muted: 248 250 254;
-    --muted-foreground: 71 85 105;
+   --muted: 240 240 240;
+    --muted-foreground: 51 51 51;
 
     --accent: 14 165 233;                  /* Sky-500 - vibrant sky blue */
     --accent-foreground: 255 255 255;
