@@ -253,7 +253,7 @@ export default function Quotations() {
 
         {/* Quotations List */}
         {quotations.length === 0 ? (
-          <Card>
+          <Card className="gradient-card">
             <CardContent className="text-center py-12">
               <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-medium mb-2">No quotations yet</h3>
