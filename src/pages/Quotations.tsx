@@ -1,11 +1,24 @@
-
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { usePDFExport } from '@/hooks/usePDFExport'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Plus, FileText, Eye, Edit, Trash2, Download, Settings, Search } from 'lucide-react'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import {
+  Plus,
+  FileText,
+  Eye,
+  Edit,
+  Trash2,
+  Download,
+  Settings,
+} from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { Quotation, Customer, QuotationItem } from '@/types/database'
 import { useToast } from '@/hooks/use-toast'
@@ -68,22 +81,11 @@ export default function Quotations() {
   }
 
   const handleDeleteQuotation = async (quotationId: string) => {
-    if (!confirm('Are you sure you want to delete this quotation?')) {
-      return
-    }
+    if (!confirm('Are you sure you want to delete this quotation?')) return
 
     try {
-      // Delete quotation items first
-      await supabase
-        .from('quotation_items')
-        .delete()
-        .eq('quotation_id', quotationId)
-
-      // Delete quotation
-      const { error } = await supabase
-        .from('quotations')
-        .delete()
-        .eq('id', quotationId)
+      await supabase.from('quotation_items').delete().eq('quotation_id', quotationId)
+      const { error } = await supabase.from('quotations').delete().eq('id', quotationId)
 
       if (error) throw error
 
@@ -104,13 +106,11 @@ export default function Quotations() {
 
   const handleExportPDF = async (quotationId: string) => {
     try {
-      // Fetch quotation with customer and items
       const { data: quotation, error: quotationError } = await supabase
         .from('quotations')
         .select('*')
         .eq('id', quotationId)
         .single()
-
       if (quotationError) throw quotationError
 
       const { data: customer, error: customerError } = await supabase
@@ -118,7 +118,6 @@ export default function Quotations() {
         .select('*')
         .eq('id', quotation.customer_id)
         .single()
-
       if (customerError) throw customerError
 
       const { data: items, error: itemsError } = await supabase
@@ -126,7 +125,6 @@ export default function Quotations() {
         .select('*')
         .eq('quotation_id', quotationId)
         .order('created_at')
-
       if (itemsError) throw itemsError
 
       await exportToPDF(quotation as Quotation, customer, items || [], profile || undefined)
@@ -156,30 +154,30 @@ export default function Quotations() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'draft': return 'text-orange-600 bg-orange-50'
-      case 'sent': return 'text-blue-600 bg-blue-50'
-      case 'accepted': return 'text-green-600 bg-green-50'
-      case 'rejected': return 'text-red-600 bg-red-50'
-      default: return 'text-gray-600 bg-gray-50'
+      case 'draft': return 'text-orange-100 bg-orange-500'
+      case 'sent': return 'text-blue-100 bg-blue-500'
+      case 'accepted': return 'text-green-100 bg-green-500'
+      case 'rejected': return 'text-red-100 bg-red-500'
+      default: return 'text-gray-100 bg-gray-500'
     }
   }
 
   if (showBuilder) {
     return (
-      <div className="min-h-screen bg-green-50">
-        <header className="sticky top-0 z-50 bg-green-100/80 backdrop-blur-md border-b border-border">
+      <div className="min-h-screen bg-gradient-to-br from-lime-100 to-green-200">
+        <header className="sticky top-0 z-50 bg-gradient-to-r from-green-400 to-lime-300/80 backdrop-blur-md border-b border-border">
           <div className="container-app">
             <div className="flex items-center justify-between h-16">
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                  <FileText className="w-4 h-4 text-primary-foreground" />
+                  <FileText className="w-4 h-4 text-white" />
                 </div>
-                <span className="font-semibold text-lg tracking-tight">InvoiceGen</span>
+                <span className="font-semibold text-white text-lg tracking-tight">InvoiceGen</span>
               </div>
             </div>
           </div>
         </header>
-        
+
         <main className="container-app py-8">
           <QuotationBuilder
             quotationId={editingQuotation || undefined}
@@ -193,7 +191,7 @@ export default function Quotations() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-green-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-lime-100 to-green-200 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-muted-foreground">Loading quotations...</p>
@@ -203,22 +201,17 @@ export default function Quotations() {
   }
 
   return (
-    <div className="min-h-screen bg-green-50">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-green-100/80 backdrop-blur-md border-b border-border">
+    <div className="min-h-screen bg-gradient-to-br from-lime-100 to-green-200">
+      <header className="sticky top-0 z-50 bg-gradient-to-r from-green-400 to-lime-300/80 backdrop-blur-md border-b border-border">
         <div className="container-app">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <FileText className="w-4 h-4 text-primary-foreground" />
+                <FileText className="w-4 h-4 text-white" />
               </div>
-              <span className="font-semibold text-lg tracking-tight">InvoiceGen</span>
+              <span className="font-semibold text-white text-lg tracking-tight">InvoiceGen</span>
             </div>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => navigate('/profile-settings')}
-            >
+            <Button variant="outline" size="sm" onClick={() => navigate('/profile-settings')}>
               <Settings className="w-4 h-4 mr-2" />
               Customize PDF
             </Button>
@@ -227,21 +220,17 @@ export default function Quotations() {
       </header>
 
       <main className="container-app py-8">
-        {/* Page Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight">Quotations</h1>
-            <p className="text-muted-foreground">
-              Manage your quotations and track their status
-            </p>
+            <h1 className="text-3xl font-semibold tracking-tight text-foreground">Quotations</h1>
+            <p className="text-muted-foreground">Manage your quotations and track their status</p>
           </div>
-          <Button onClick={handleNewQuotation} className="btn-primary">
+          <Button onClick={handleNewQuotation} className="btn-accent">
             <Plus className="w-4 h-4 mr-2" />
             New Quotation
           </Button>
         </div>
 
-        {/* Search Bar */}
         <div className="mb-8">
           <QuotationSearch
             onEditQuotation={handleEditQuotation}
@@ -251,16 +240,13 @@ export default function Quotations() {
           />
         </div>
 
-        {/* Quotations List */}
         {quotations.length === 0 ? (
-          <Card className="gradient-card">
+          <Card className="gradient-card text-white">
             <CardContent className="text-center py-12">
-              <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+              <FileText className="w-12 h-12 text-white/80 mx-auto mb-4" />
               <h3 className="text-lg font-medium mb-2">No quotations yet</h3>
-              <p className="text-muted-foreground mb-4">
-                Create your first quotation to get started
-              </p>
-              <Button onClick={handleNewQuotation} className="btn-primary">
+              <p className="text-muted-foreground mb-4">Create your first quotation to get started</p>
+              <Button onClick={handleNewQuotation} className="btn-accent">
                 <Plus className="w-4 h-4 mr-2" />
                 Create Quotation
               </Button>
@@ -269,12 +255,12 @@ export default function Quotations() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {quotations.map((quotation) => (
-              <Card key={quotation.id} className="hover:shadow-lg transition-shadow">
+              <Card key={quotation.id} className="gradient-card text-white hover:shadow-xl transition-shadow">
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div>
                       <CardTitle className="text-lg">{quotation.title}</CardTitle>
-                      <CardDescription className="font-mono text-sm">
+                      <CardDescription className="text-sm text-white/80">
                         {quotation.quotation_number}
                       </CardDescription>
                     </div>
@@ -286,33 +272,25 @@ export default function Quotations() {
                 <CardContent>
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Amount:</span>
+                      <span className="text-white/80">Amount:</span>
                       <span className="font-semibold">{formatCurrency(quotation.total_amount)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Created:</span>
+                      <span className="text-white/80">Created:</span>
                       <span>{formatDate(quotation.created_at)}</span>
                     </div>
                     {quotation.valid_until && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Valid Until:</span>
+                        <span className="text-white/80">Valid Until:</span>
                         <span>{formatDate(quotation.valid_until)}</span>
                       </div>
                     )}
-                    <div className="flex items-center justify-between pt-3 border-t">
+                    <div className="flex items-center justify-between pt-3 border-t border-white/30">
                       <div className="flex space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEditQuotation(quotation.id)}
-                        >
+                        <Button variant="outline" size="sm" onClick={() => handleEditQuotation(quotation.id)}>
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setPreviewQuotation(quotation.id)}
-                        >
+                        <Button variant="outline" size="sm" onClick={() => setPreviewQuotation(quotation.id)}>
                           <Eye className="w-4 h-4" />
                         </Button>
                         <Button
