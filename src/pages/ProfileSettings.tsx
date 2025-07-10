@@ -109,10 +109,10 @@ export default function ProfileSettings() {
       <main className="container-app py-8">
         <div className="max-w-4xl mx-auto space-y-6">
           {/* Basic Information */}
-          <Card>
+          <Card className="gradient-card">
             <CardHeader>
-              <CardTitle>Company Details</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-white">Company Details</CardTitle>
+              <CardDescription className="text-white/80">
                 Update your company information for PDF headers and footers
               </CardDescription>
             </CardHeader>
@@ -190,10 +190,10 @@ export default function ProfileSettings() {
           </Card>
 
           {/* PDF Customization Images */}
-          <Card>
+          <Card className="gradient-card">
             <CardHeader>
-              <CardTitle>PDF Customization</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-white">PDF Customization</CardTitle>
+              <CardDescription className="text-white/80">
                 Upload custom images for your quotation PDFs
               </CardDescription>
             </CardHeader>

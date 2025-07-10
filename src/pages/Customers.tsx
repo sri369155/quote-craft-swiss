@@ -141,11 +141,11 @@ export default function Customers() {
 
         {/* Customers List */}
         {customers.length === 0 ? (
-          <Card>
+          <Card className="gradient-card">
             <CardContent className="text-center py-12">
-              <Users className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-medium mb-2">No customers yet</h3>
-              <p className="text-muted-foreground mb-4">
+              <Users className="w-12 h-12 text-white/80 mx-auto mb-4" />
+              <h3 className="text-lg font-medium mb-2 text-white">No customers yet</h3>
+              <p className="text-white/80 mb-4">
                 Add your first customer to start creating quotations
               </p>
               <Dialog open={showForm} onOpenChange={setShowForm}>
@@ -170,12 +170,12 @@ export default function Customers() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {customers.map((customer) => (
-              <Card key={customer.id} className="hover:shadow-lg transition-shadow">
+              <Card key={customer.id} className="gradient-card hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div>
-                      <CardTitle className="text-lg">{customer.name}</CardTitle>
-                      <CardDescription>
+                      <CardTitle className="text-lg text-white">{customer.name}</CardTitle>
+                      <CardDescription className="text-white/80">
                         Added {formatDate(customer.created_at)}
                       </CardDescription>
                     </div>
@@ -184,24 +184,24 @@ export default function Customers() {
                 <CardContent>
                   <div className="space-y-3">
                     {customer.email && (
-                      <div className="flex items-center text-sm text-muted-foreground">
+                      <div className="flex items-center text-sm text-white/80">
                         <Mail className="w-4 h-4 mr-2" />
                         <span className="truncate">{customer.email}</span>
                       </div>
                     )}
                     {customer.phone && (
-                      <div className="flex items-center text-sm text-muted-foreground">
+                      <div className="flex items-center text-sm text-white/80">
                         <Phone className="w-4 h-4 mr-2" />
                         <span>{customer.phone}</span>
                       </div>
                     )}
                     {customer.address && (
-                      <div className="flex items-start text-sm text-muted-foreground">
+                      <div className="flex items-start text-sm text-white/80">
                         <MapPin className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />
                         <span className="line-clamp-2">{customer.address}</span>
                       </div>
                     )}
-                    <div className="flex items-center justify-between pt-3 border-t">
+                    <div className="flex items-center justify-between pt-3 border-t border-white/30">
                       <Button
                         variant="outline"
                         size="sm"
