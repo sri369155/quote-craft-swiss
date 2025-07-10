@@ -107,19 +107,19 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background to-secondary/30 flex items-center justify-center">
+      <div className="min-h-screen bg-green-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4 animate-glow-soft"></div>
-          <p className="text-muted-foreground animate-pulse-soft">Loading dashboard...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading dashboard...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-secondary/30">
+    <div className="min-h-screen bg-green-50">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-gradient-to-r from-primary/10 to-accent/10 backdrop-blur-md border-b border-border/50">
+      <header className="sticky top-0 z-50 bg-green-100/80 backdrop-blur-md border-b border-border">
         <div className="container-app">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-8">
@@ -146,10 +146,10 @@ export default function Dashboard() {
             </div>
             
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-muted-foreground animate-pulse-soft">
+              <span className="text-sm text-muted-foreground">
                 Welcome, {profile?.full_name || user?.email}
               </span>
-              <Button variant="outline" size="sm" onClick={handleSignOut} className="hover-glow">
+              <Button variant="outline" size="sm" onClick={handleSignOut}>
                 <LogOut className="w-4 h-4 mr-2" />
                 Sign Out
               </Button>
@@ -161,93 +161,93 @@ export default function Dashboard() {
       <main className="container-app py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="gradient-card hover-glow animate-slide-up">
+          <Card className="gradient-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-foreground">Total Quotations</CardTitle>
-              <FileText className="h-4 w-4 text-primary animate-bounce-gentle" />
+              <CardTitle className="text-sm font-medium text-white">Total Quotations</CardTitle>
+              <FileText className="h-4 w-4 text-white/80" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-foreground">{stats.totalQuotations}</div>
+              <div className="text-2xl font-bold text-white">{stats.totalQuotations}</div>
             </CardContent>
           </Card>
 
-          <Card className="gradient-card hover-glow animate-slide-up">
+          <Card className="gradient-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-foreground">Draft Quotations</CardTitle>
-              <FileText className="h-4 w-4 text-primary animate-pulse-soft" />
+              <CardTitle className="text-sm font-medium text-white">Draft Quotations</CardTitle>
+              <FileText className="h-4 w-4 text-white/80" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-foreground">{stats.draftQuotations}</div>
+              <div className="text-2xl font-bold text-white">{stats.draftQuotations}</div>
             </CardContent>
           </Card>
 
-          <Card className="gradient-card hover-glow animate-slide-up">
+          <Card className="gradient-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-foreground">Accepted</CardTitle>
-              <TrendingUp className="h-4 w-4 text-accent animate-float" />
+              <CardTitle className="text-sm font-medium text-white">Accepted</CardTitle>
+              <TrendingUp className="h-4 w-4 text-white/80" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-foreground">{stats.acceptedQuotations}</div>
+              <div className="text-2xl font-bold text-white">{stats.acceptedQuotations}</div>
             </CardContent>
           </Card>
 
-          <Card className="gradient-card hover-glow animate-slide-up">
+          <Card className="gradient-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-foreground">Total Revenue</CardTitle>
-              <TrendingUp className="h-4 w-4 text-accent animate-glow-soft" />
+              <CardTitle className="text-sm font-medium text-white">Total Revenue</CardTitle>
+              <TrendingUp className="h-4 w-4 text-white/80" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-foreground">{formatCurrency(stats.totalRevenue)}</div>
+              <div className="text-2xl font-bold text-white">{formatCurrency(stats.totalRevenue)}</div>
             </CardContent>
           </Card>
         </div>
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="gradient-card hover-lift animate-fade-in-scale cursor-pointer" onClick={() => navigate('/quotations')}>
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/quotations')}>
             <CardContent className="p-6 text-center">
-              <FileText className="w-12 h-12 text-foreground mx-auto mb-4 animate-float" />
-              <h3 className="font-semibold mb-2 text-foreground">Create Quotation</h3>
+              <FileText className="w-12 h-12 text-primary mx-auto mb-4" />
+              <h3 className="font-semibold mb-2">Create Quotation</h3>
               <p className="text-sm text-muted-foreground">Generate professional quotations for your clients</p>
             </CardContent>
           </Card>
 
-          <Card className="gradient-card hover-lift animate-fade-in-scale cursor-pointer" onClick={() => navigate('/customers')}>
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/customers')}>
             <CardContent className="p-6 text-center">
-              <Users className="w-12 h-12 text-foreground mx-auto mb-4 animate-bounce-slow" />
-              <h3 className="font-semibold mb-2 text-foreground">Manage Customers</h3>
+              <Users className="w-12 h-12 text-primary mx-auto mb-4" />
+              <h3 className="font-semibold mb-2">Manage Customers</h3>
               <p className="text-sm text-muted-foreground">Add and organize your customer information</p>
             </CardContent>
           </Card>
 
-          <Card className="gradient-card hover-lift animate-fade-in-scale cursor-pointer">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
             <CardContent className="p-6 text-center">
-              <TrendingUp className="w-12 h-12 text-foreground mx-auto mb-4 animate-pulse-soft" />
-              <h3 className="font-semibold mb-2 text-foreground">View Reports</h3>
+              <TrendingUp className="w-12 h-12 text-primary mx-auto mb-4" />
+              <h3 className="font-semibold mb-2">View Reports</h3>
               <p className="text-sm text-muted-foreground">Analyze your quotation performance</p>
             </CardContent>
           </Card>
         </div>
 
         {/* Recent Quotations */}
-        <Card className="gradient-card animate-slide-up">
+        <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-foreground">Recent Quotations</CardTitle>
-                <CardDescription className="text-muted-foreground">
+                <CardTitle>Recent Quotations</CardTitle>
+                <CardDescription>
                   Your latest quotations and their status
                 </CardDescription>
               </div>
               <div className="flex gap-2">
-                <Button className="btn-primary hover-lift animate-glow-soft" onClick={() => navigate('/quotations')}>
-                  <Plus className="w-4 h-4 mr-2 animate-bounce-slow" />
+                <Button className="btn-primary" onClick={() => navigate('/quotations')}>
+                  <Plus className="w-4 h-4 mr-2" />
                   New Quotation
                 </Button>
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button variant="outline" className="hover-glow">
-                      <Upload className="w-4 h-4 mr-2 animate-pulse-soft" />
+                    <Button variant="outline">
+                      <Upload className="w-4 h-4 mr-2" />
                       Import
                     </Button>
                   </DialogTrigger>
@@ -269,8 +269,8 @@ export default function Dashboard() {
                 <p className="text-muted-foreground mb-4">
                   Create your first quotation to get started
                 </p>
-                <Button className="btn-primary hover-lift animate-shimmer" onClick={() => navigate('/quotations')}>
-                  <Plus className="w-4 h-4 mr-2 animate-bounce-gentle" />
+                <Button className="btn-primary" onClick={() => navigate('/quotations')}>
+                  <Plus className="w-4 h-4 mr-2" />
                   Create Quotation
                 </Button>
               </div>
@@ -287,13 +287,13 @@ export default function Dashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {quotations.slice(0, 5).map((quotation, index) => (
-                      <tr key={quotation.id} className="border-b hover:bg-primary/5 cursor-pointer transition-all duration-300 hover-lift animate-fade-in-scale" onClick={() => navigate('/quotations')} style={{ animationDelay: `${index * 0.1}s` }}>
-                        <td className="py-3 px-2 font-mono text-sm text-foreground">{quotation.quotation_number}</td>
-                        <td className="py-3 px-2 font-medium text-foreground">{quotation.title}</td>
-                        <td className="py-3 px-2 text-foreground">{formatCurrency(quotation.total_amount)}</td>
+                    {quotations.slice(0, 5).map((quotation) => (
+                      <tr key={quotation.id} className="border-b hover:bg-muted/50 cursor-pointer" onClick={() => navigate('/quotations')}>
+                        <td className="py-3 px-2 font-mono text-sm">{quotation.quotation_number}</td>
+                        <td className="py-3 px-2 font-medium">{quotation.title}</td>
+                        <td className="py-3 px-2">{formatCurrency(quotation.total_amount)}</td>
                         <td className="py-3 px-2">
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium animate-pulse-soft ${getStatusColor(quotation.status)}`}>
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(quotation.status)}`}>
                             {quotation.status.charAt(0).toUpperCase() + quotation.status.slice(1)}
                           </span>
                         </td>
@@ -304,7 +304,7 @@ export default function Dashboard() {
                 </table>
                 {quotations.length > 5 && (
                   <div className="text-center pt-4">
-                    <Button variant="outline" className="hover-glow animate-bounce-gentle" onClick={() => navigate('/quotations')}>
+                    <Button variant="outline" onClick={() => navigate('/quotations')}>
                       View All Quotations
                     </Button>
                   </div>
