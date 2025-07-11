@@ -49,7 +49,15 @@ export default function QuotationBuilder({ quotationId, onSave, onCancel }: Quot
   const [taxRate, setTaxRate] = useState(18) // Default GST rate for India
   const [validUntil, setValidUntil] = useState('')
   const [status, setStatus] = useState<'draft' | 'sent' | 'accepted' | 'rejected'>('draft')
-  const [bulkAIText, setBulkAIText] = useState('')
+  const [bulkAIText, setBulkAIText] = useState(`1. Item description: 
+2. Quantity/qty: 
+3. GST %: 18
+4. Scope of work (Y/N): 
+5. Any other instructions: 
+
+Or paste your bulk project details directly...
+
+Example: Complete website development for restaurant including design, development, hosting setup, SEO optimization, and training. Need modern responsive design with online ordering system...`)
 
   // Memoized calculations to prevent performance issues
   const subtotal = useMemo(() => 
@@ -362,15 +370,6 @@ export default function QuotationBuilder({ quotationId, onSave, onCancel }: Quot
             <Textarea
               value={bulkAIText}
               onChange={(e) => setBulkAIText(e.target.value)}
-              placeholder={`1. Item description: Website development with modern design
-2. Quantity/qty: 1
-3. GST %: 18
-4. Scope of work (Y/N): Y - Complete responsive website with admin panel
-5. Any other instructions: Include SEO optimization and 1-year hosting
-
-Or paste your bulk project details directly...
-
-Example: Complete website development for restaurant including design, development, hosting setup, SEO optimization, and training. Need modern responsive design with online ordering system...`}
               rows={8}
               className="resize-none bg-gradient-to-br from-pink-25/50 to-blue-25/50 border-pink-200/40 text-pink-800 placeholder:text-pink-500/70 focus:border-pink-300/60 focus:ring-pink-200/40 animate-shimmer"
             />
