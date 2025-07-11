@@ -348,30 +348,38 @@ export default function QuotationBuilder({ quotationId, onSave, onCancel }: Quot
   return (
       <div className="space-y-6">
         {/* Bulk AI Autofill */}
-        <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10">
+        <Card className="border-pink-200/30 bg-gradient-to-br from-pink-50/70 via-blue-50/70 to-pink-50/70 shadow-lg backdrop-blur-sm animate-pulse-soft">
           <CardHeader>
             <div className="flex items-center space-x-2">
-              <Sparkles className="w-5 h-5 text-primary" />
-              <CardTitle>AI Bulk Autofill</CardTitle>
+              <Sparkles className="w-5 h-5 text-pink-500 animate-bounce-gentle" />
+              <CardTitle className="text-pink-700">AI Bulk Autofill</CardTitle>
             </div>
-            <CardDescription>
-              Paste or type your project details and let AI generate the entire quotation
+            <CardDescription className="text-pink-600/80">
+              Fill in the template below or paste your project details for AI generation
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <Textarea
               value={bulkAIText}
               onChange={(e) => setBulkAIText(e.target.value)}
-              placeholder="Example: Complete website development for restaurant including design, development, hosting setup, SEO optimization, and training. Need modern responsive design with online ordering system..."
-              rows={4}
-              className="resize-none"
+              placeholder={`1. Item description: Website development with modern design
+2. Quantity/qty: 1
+3. GST %: 18
+4. Scope of work (Y/N): Y - Complete responsive website with admin panel
+5. Any other instructions: Include SEO optimization and 1-year hosting
+
+Or paste your bulk project details directly...
+
+Example: Complete website development for restaurant including design, development, hosting setup, SEO optimization, and training. Need modern responsive design with online ordering system...`}
+              rows={8}
+              className="resize-none bg-gradient-to-br from-pink-25/50 to-blue-25/50 border-pink-200/40 text-pink-800 placeholder:text-pink-500/70 focus:border-pink-300/60 focus:ring-pink-200/40 animate-shimmer"
             />
             <Button 
               onClick={useBulkAIAutofill} 
               disabled={aiLoading || !bulkAIText.trim()}
-              className="w-full btn-primary"
+              className="w-full bg-gradient-to-r from-pink-400 to-blue-400 hover:from-pink-500 hover:to-blue-500 text-white shadow-lg hover:shadow-xl transition-all duration-300 animate-glow-soft"
             >
-              <Sparkles className={`w-4 h-4 mr-2 ${aiLoading ? 'animate-spin' : ''}`} />
+              <Sparkles className={`w-4 h-4 mr-2 ${aiLoading ? 'animate-spin' : 'animate-bounce-gentle'}`} />
               {aiLoading ? 'Generating...' : 'Generate Complete Quotation'}
             </Button>
           </CardContent>
