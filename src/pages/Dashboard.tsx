@@ -127,19 +127,19 @@ export default function Dashboard() {
                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                   <FileText className="w-4 h-4 text-primary-foreground" />
                 </div>
-                <span className="font-semibold text-lg tracking-tight">InvoiceGen</span>
+                <span className="font-bold text-lg tracking-tight text-thick-blue">InvoiceGen</span>
               </div>
               
               <nav className="hidden md:flex items-center space-x-1">
-                <Button variant="ghost" className="h-9 px-4 text-sm font-medium" onClick={() => navigate('/dashboard')}>
+                <Button variant="ghost" className="h-9 px-4 text-sm font-bold text-thick-blue" onClick={() => navigate('/dashboard')}>
                   Dashboard
                 </Button>
-                <Button variant="ghost" className="h-9 px-4 text-sm font-medium" onClick={() => navigate('/quotations')}>
-                  <FileText className="w-4 h-4 mr-2" />
+                <Button variant="ghost" className="h-9 px-4 text-sm font-bold text-thick-blue" onClick={() => navigate('/quotations')}>
+                  <FileText className="w-4 h-4 mr-2 text-thick-blue" />
                   Quotations
                 </Button>
-                <Button variant="ghost" className="h-9 px-4 text-sm font-medium" onClick={() => navigate('/customers')}>
-                  <Users className="w-4 h-4 mr-2" />
+                <Button variant="ghost" className="h-9 px-4 text-sm font-bold text-thick-blue" onClick={() => navigate('/customers')}>
+                  <Users className="w-4 h-4 mr-2 text-thick-blue" />
                   Customers
                 </Button>
               </nav>
@@ -206,25 +206,25 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/quotations')}>
             <CardContent className="p-6 text-center">
-              <FileText className="w-12 h-12 text-primary mx-auto mb-4" />
-              <h3 className="font-semibold mb-2">Create Quotation</h3>
-              <p className="text-sm text-muted-foreground">Generate professional quotations for your clients</p>
+              <FileText className="w-12 h-12 text-thick-blue mx-auto mb-4" />
+              <h3 className="font-bold mb-2 text-thick-blue">Create Quotation</h3>
+              <p className="text-sm text-thick-blue/70">Generate professional quotations for your clients</p>
             </CardContent>
           </Card>
 
           <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/customers')}>
             <CardContent className="p-6 text-center">
-              <Users className="w-12 h-12 text-primary mx-auto mb-4" />
-              <h3 className="font-semibold mb-2">Manage Customers</h3>
-              <p className="text-sm text-muted-foreground">Add and organize your customer information</p>
+              <Users className="w-12 h-12 text-thick-blue mx-auto mb-4" />
+              <h3 className="font-bold mb-2 text-thick-blue">Manage Customers</h3>
+              <p className="text-sm text-thick-blue/70">Add and organize your customer information</p>
             </CardContent>
           </Card>
 
           <Card className="hover:shadow-lg transition-shadow cursor-pointer">
             <CardContent className="p-6 text-center">
-              <TrendingUp className="w-12 h-12 text-primary mx-auto mb-4" />
-              <h3 className="font-semibold mb-2">View Reports</h3>
-              <p className="text-sm text-muted-foreground">Analyze your quotation performance</p>
+              <TrendingUp className="w-12 h-12 text-thick-blue mx-auto mb-4" />
+              <h3 className="font-bold mb-2 text-thick-blue">View Reports</h3>
+              <p className="text-sm text-thick-blue/70">Analyze your quotation performance</p>
             </CardContent>
           </Card>
         </div>
@@ -234,8 +234,8 @@ export default function Dashboard() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle>Recent Quotations</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-thick-blue font-bold">Recent Quotations</CardTitle>
+                <CardDescription className="text-thick-blue/70">
                   Your latest quotations and their status
                 </CardDescription>
               </div>
@@ -264,9 +264,9 @@ export default function Dashboard() {
           <CardContent>
             {quotations.length === 0 ? (
               <div className="text-center py-12">
-                <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">No quotations yet</h3>
-                <p className="text-muted-foreground mb-4">
+                <FileText className="w-12 h-12 text-thick-blue mx-auto mb-4" />
+                <h3 className="text-lg font-bold mb-2 text-thick-blue">No quotations yet</h3>
+                <p className="text-thick-blue/70 mb-4">
                   Create your first quotation to get started
                 </p>
                 <Button className="btn-primary" onClick={() => navigate('/quotations')}>
@@ -279,19 +279,19 @@ export default function Dashboard() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b">
-                      <th className="text-left py-3 px-2 font-medium text-muted-foreground">Number</th>
-                      <th className="text-left py-3 px-2 font-medium text-muted-foreground">Title</th>
-                      <th className="text-left py-3 px-2 font-medium text-muted-foreground">Amount</th>
-                      <th className="text-left py-3 px-2 font-medium text-muted-foreground">Status</th>
-                      <th className="text-left py-3 px-2 font-medium text-muted-foreground">Date</th>
+                      <th className="text-left py-3 px-2 font-bold text-thick-blue">Number</th>
+                      <th className="text-left py-3 px-2 font-bold text-thick-blue">Title</th>
+                      <th className="text-left py-3 px-2 font-bold text-thick-blue">Amount</th>
+                      <th className="text-left py-3 px-2 font-bold text-thick-blue">Status</th>
+                      <th className="text-left py-3 px-2 font-bold text-thick-blue">Date</th>
                     </tr>
                   </thead>
                   <tbody>
                     {quotations.slice(0, 5).map((quotation) => (
                       <tr key={quotation.id} className="border-b hover:bg-muted/50 cursor-pointer" onClick={() => navigate('/quotations')}>
-                        <td className="py-3 px-2 font-mono text-sm">{quotation.quotation_number}</td>
-                        <td className="py-3 px-2 font-medium">{quotation.title}</td>
-                        <td className="py-3 px-2">{formatCurrency(quotation.total_amount)}</td>
+                        <td className="py-3 px-2 font-mono text-sm text-thick-blue">{quotation.quotation_number}</td>
+                        <td className="py-3 px-2 font-bold text-thick-blue">{quotation.title}</td>
+                        <td className="py-3 px-2 text-thick-blue font-semibold">{formatCurrency(quotation.total_amount)}</td>
                         <td className="py-3 px-2">
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(quotation.status)}`}>
                             {quotation.status.charAt(0).toUpperCase() + quotation.status.slice(1)}
