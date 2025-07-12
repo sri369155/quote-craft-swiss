@@ -161,43 +161,43 @@ export default function Dashboard() {
       <main className="container-app py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="gradient-card">
+          <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white">Total Quotations</CardTitle>
-              <FileText className="h-4 w-4 text-white/80" />
+              <CardTitle className="text-sm font-medium text-thick-blue">Total Quotations</CardTitle>
+              <FileText className="h-4 w-4 text-thick-blue" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">{stats.totalQuotations}</div>
+              <div className="text-2xl font-bold text-thick-blue">{stats.totalQuotations}</div>
             </CardContent>
           </Card>
 
-          <Card className="gradient-card">
+          <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white">Draft Quotations</CardTitle>
-              <FileText className="h-4 w-4 text-white/80" />
+              <CardTitle className="text-sm font-medium text-thick-blue">Draft Quotations</CardTitle>
+              <FileText className="h-4 w-4 text-thick-blue" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">{stats.draftQuotations}</div>
+              <div className="text-2xl font-bold text-thick-blue">{stats.draftQuotations}</div>
             </CardContent>
           </Card>
 
-          <Card className="gradient-card">
+          <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white">Accepted</CardTitle>
-              <TrendingUp className="h-4 w-4 text-white/80" />
+              <CardTitle className="text-sm font-medium text-thick-blue">Accepted</CardTitle>
+              <TrendingUp className="h-4 w-4 text-thick-blue" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">{stats.acceptedQuotations}</div>
+              <div className="text-2xl font-bold text-thick-blue">{stats.acceptedQuotations}</div>
             </CardContent>
           </Card>
 
-          <Card className="gradient-card">
+          <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white">Total Revenue</CardTitle>
-              <TrendingUp className="h-4 w-4 text-white/80" />
+              <CardTitle className="text-sm font-medium text-thick-blue">Total Revenue</CardTitle>
+              <TrendingUp className="h-4 w-4 text-thick-blue" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">{formatCurrency(stats.totalRevenue)}</div>
+              <div className="text-2xl font-bold text-thick-blue">{formatCurrency(stats.totalRevenue)}</div>
             </CardContent>
           </Card>
         </div>
