@@ -202,17 +202,15 @@
 
   @keyframes flash-slow {
     0%, 100% {
-      background-color: hsl(var(--input));
       opacity: 1;
     }
     50% {
-      background-color: hsl(60 100% 95%);
-      opacity: 0.95;
+      opacity: 0.6;
     }
   }
 
-  /* Input styling with animation */
-  input, textarea, select {
+  /* Remove input animation and apply only to muted text */
+  .text-muted-foreground {
     @apply animate-flash-slow;
   }
 
