@@ -22,7 +22,7 @@
     --secondary: 248 250 252;              /* Slate-50 - subtle background */
     --secondary-foreground: 30 41 59;      /* Slate-700 */
 
-    --muted: 255 255 240;                  /* Very light yellow background */
+    --muted: 255 255 250;                  /* Very very light yellow background */
     --muted-foreground: 0 0 0;             /* Black text for muted elements */
 
     --accent: 59 130 246;                  /* Blue-500 - vibrant accent */
@@ -37,7 +37,7 @@
     --destructive-foreground: 255 255 255;
 
     --border: 226 232 240;                 /* Slate-200 - clean borders */
-    --input: 255 255 230;                  /* Very light yellow input backgrounds */
+    --input: 255 255 245;                  /* Very very light yellow input backgrounds */
     --ring: 59 130 246;                    /* Blue-500 - focus rings */
 
     --radius: 0.75rem;
@@ -209,9 +209,22 @@
     }
   }
 
-  /* Remove input animation and apply only to muted text */
-  .text-muted-foreground {
-    @apply animate-flash-slow;
+  /* Apply flashing animation to all muted text elements */
+  .text-muted-foreground,
+  [class*="text-muted"],
+  .muted,
+  p.text-xs,
+  .text-sm.text-muted-foreground {
+    animation: flash-slow 4s ease-in-out infinite !important;
+    color: hsl(var(--muted-foreground)) !important;
+  }
+
+  /* Ensure all inputs have light yellow background without animation */
+  input,
+  textarea,
+  select,
+  .input {
+    background-color: hsl(var(--input)) !important;
   }
 
   /* Gradient Card Utilities */
