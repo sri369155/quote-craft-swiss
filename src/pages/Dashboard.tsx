@@ -161,43 +161,47 @@ export default function Dashboard() {
       <main className="container-app py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
+          <Card className="border border-border/50 shadow-card hover:shadow-elegant transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-thick-blue">Total Quotations</CardTitle>
-              <FileText className="h-4 w-4 text-thick-blue" />
+              <CardTitle className="text-sm font-medium text-contrast-blue">Total Quotations</CardTitle>
+              <FileText className="h-5 w-5 text-vibrant-purple" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-thick-blue">{stats.totalQuotations}</div>
+              <div className="text-2xl font-bold text-contrast-blue">{stats.totalQuotations}</div>
+              <p className="text-xs text-soft-gray">All time</p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border border-border/50 shadow-card hover:shadow-elegant transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-thick-blue">Draft Quotations</CardTitle>
-              <FileText className="h-4 w-4 text-thick-blue" />
+              <CardTitle className="text-sm font-medium text-contrast-blue">Draft Quotations</CardTitle>
+              <FileText className="h-5 w-5 text-accent" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-thick-blue">{stats.draftQuotations}</div>
+              <div className="text-2xl font-bold text-contrast-blue">{stats.draftQuotations}</div>
+              <p className="text-xs text-soft-gray">Pending completion</p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border border-border/50 shadow-card hover:shadow-elegant transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-thick-blue">Accepted</CardTitle>
-              <TrendingUp className="h-4 w-4 text-thick-blue" />
+              <CardTitle className="text-sm font-medium text-contrast-blue">Accepted</CardTitle>
+              <TrendingUp className="h-5 w-5 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-thick-blue">{stats.acceptedQuotations}</div>
+              <div className="text-2xl font-bold text-contrast-blue">{stats.acceptedQuotations}</div>
+              <p className="text-xs text-soft-gray">Success rate</p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border border-border/50 shadow-card hover:shadow-elegant transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-thick-blue">Total Revenue</CardTitle>
-              <TrendingUp className="h-4 w-4 text-thick-blue" />
+              <CardTitle className="text-sm font-medium text-contrast-blue">Total Revenue</CardTitle>
+              <TrendingUp className="h-5 w-5 text-vibrant-purple" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-thick-blue">{formatCurrency(stats.totalRevenue)}</div>
+              <div className="text-2xl font-bold text-contrast-blue">{formatCurrency(stats.totalRevenue)}</div>
+              <p className="text-xs text-soft-gray">From accepted quotes</p>
             </CardContent>
           </Card>
         </div>
