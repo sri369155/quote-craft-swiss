@@ -161,47 +161,47 @@ export default function Dashboard() {
       <main className="container-app py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="border border-border/50 shadow-card hover:shadow-elegant transition-shadow">
+          <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-contrast-blue">Total Quotations</CardTitle>
-              <FileText className="h-5 w-5 text-vibrant-purple" />
+              <CardTitle className="text-sm font-medium text-white">Total Quotations</CardTitle>
+              <FileText className="h-5 w-5 text-white/90" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-contrast-blue">{stats.totalQuotations}</div>
-              <p className="text-xs text-soft-gray">All time</p>
+              <div className="text-2xl font-bold text-white">{stats.totalQuotations}</div>
+              <p className="text-xs text-white/70">All time</p>
             </CardContent>
           </Card>
 
-          <Card className="border border-border/50 shadow-card hover:shadow-elegant transition-shadow">
+          <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-contrast-blue">Draft Quotations</CardTitle>
-              <FileText className="h-5 w-5 text-accent" />
+              <CardTitle className="text-sm font-medium text-white">Draft Quotations</CardTitle>
+              <FileText className="h-5 w-5 text-white/90" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-contrast-blue">{stats.draftQuotations}</div>
-              <p className="text-xs text-soft-gray">Pending completion</p>
+              <div className="text-2xl font-bold text-white">{stats.draftQuotations}</div>
+              <p className="text-xs text-white/70">Pending completion</p>
             </CardContent>
           </Card>
 
-          <Card className="border border-border/50 shadow-card hover:shadow-elegant transition-shadow">
+          <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-contrast-blue">Accepted</CardTitle>
-              <TrendingUp className="h-5 w-5 text-primary" />
+              <CardTitle className="text-sm font-medium text-white">Accepted</CardTitle>
+              <TrendingUp className="h-5 w-5 text-white/90" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-contrast-blue">{stats.acceptedQuotations}</div>
-              <p className="text-xs text-soft-gray">Success rate</p>
+              <div className="text-2xl font-bold text-white">{stats.acceptedQuotations}</div>
+              <p className="text-xs text-white/70">Success rate</p>
             </CardContent>
           </Card>
 
-          <Card className="border border-border/50 shadow-card hover:shadow-elegant transition-shadow">
+          <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-contrast-blue">Total Revenue</CardTitle>
-              <TrendingUp className="h-5 w-5 text-vibrant-purple" />
+              <CardTitle className="text-sm font-medium text-white">Total Revenue</CardTitle>
+              <TrendingUp className="h-5 w-5 text-white/90" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-contrast-blue">{formatCurrency(stats.totalRevenue)}</div>
-              <p className="text-xs text-soft-gray">From accepted quotes</p>
+              <div className="text-2xl font-bold text-white">{formatCurrency(stats.totalRevenue)}</div>
+              <p className="text-xs text-white/70">From accepted quotes</p>
             </CardContent>
           </Card>
         </div>

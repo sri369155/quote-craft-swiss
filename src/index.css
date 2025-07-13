@@ -42,12 +42,13 @@
 
     --radius: 0.75rem;
 
-    /* Pink & Blue Gradient Mix - Lovable Style */
-    --gradient-primary: linear-gradient(135deg, #ec4899, #8b5cf6, #3b82f6);
-    --gradient-accent: linear-gradient(135deg, #f472b6, #a855f7, #6366f1);
-    --gradient-background: linear-gradient(135deg, #fdf2f8, #f3e8ff, #ede9fe);
-    --gradient-card: linear-gradient(135deg, #ec4899, #8b5cf6, #3b82f6);
-    --gradient-hero: linear-gradient(135deg, #fce7f3, #e879f9, #c084fc);
+    /* Lovable-style Pink, Violet & Blue Gradients */
+    --gradient-primary: linear-gradient(135deg, #f472b6 0%, #a855f7 50%, #3b82f6 100%);
+    --gradient-accent: linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #6366f1 100%);
+    --gradient-background: linear-gradient(135deg, #fdf2f8 0%, #f3e8ff 50%, #eff6ff 100%);
+    --gradient-card: linear-gradient(135deg, #f472b6 0%, #a855f7 50%, #3b82f6 100%);
+    --gradient-card-medium: linear-gradient(135deg, rgba(244, 114, 182, 0.8) 0%, rgba(168, 85, 247, 0.8) 50%, rgba(59, 130, 246, 0.8) 100%);
+    --gradient-hero: linear-gradient(135deg, #fce7f3 0%, #e879f9 50%, #c084fc 100%);
 
     --shadow-elegant: 0 10px 25px -5px hsl(322, 84%, 90%), 0 8px 10px -6px hsl(322, 84%, 85%);
     --shadow-card: 0 4px 6px -1px hsl(322, 84%, 90%), 0 2px 4px -2px hsl(322, 84%, 85%);
@@ -197,6 +198,11 @@
 
   /* Gradient Card Utilities */
   .gradient-card {
+    background: var(--gradient-card-medium);
+    @apply text-white shadow-elegant backdrop-blur-sm;
+  }
+
+  .gradient-card-full {
     background: var(--gradient-card);
     @apply text-white shadow-elegant;
   }
