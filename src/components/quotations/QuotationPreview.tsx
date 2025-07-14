@@ -15,6 +15,7 @@ import { supabase } from '@/integrations/supabase/client'
 import { Quotation, Customer, QuotationItem } from '@/types/database'
 import { useToast } from '@/hooks/use-toast'
 import { numberToWords } from '@/lib/utils'
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 
 interface QuotationPreviewProps {
   quotationId: string | null
@@ -564,12 +565,24 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
               return (
                 <div key={item.id} className={`grid grid-cols-12 border-b text-sm p-3 ${index % 2 === 1 ? 'bg-gray-50' : ''}`}>
                   <div className="col-span-5 pr-2">
-                    {/* Editable description */}
-                    <Textarea
-                      value={item.description}
-                      onChange={(e) => updateItemField(index, 'description', e.target.value)}
-                      className="border-0 p-0 bg-transparent text-sm resize-none min-h-[40px] print:hidden"
-                    />
+                    {/* Editable description with hover card */}
+                    <HoverCard>
+                      <HoverCardTrigger asChild>
+                        <Textarea
+                          value={item.description}
+                          onChange={(e) => updateItemField(index, 'description', e.target.value)}
+                          className="border-0 p-0 bg-transparent text-sm resize-none min-h-[40px] print:hidden cursor-pointer"
+                        />
+                      </HoverCardTrigger>
+                      {item.description && (
+                        <HoverCardContent className="w-80 max-w-sm">
+                          <div className="text-sm">
+                            <p className="font-medium mb-2">Full Description:</p>
+                            <p className="whitespace-pre-wrap break-words">{item.description}</p>
+                          </div>
+                        </HoverCardContent>
+                      )}
+                    </HoverCard>
                     {/* Print version */}
                     <div className="hidden print:block whitespace-pre-wrap">{item.description}</div>
                   </div>

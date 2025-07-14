@@ -13,6 +13,7 @@ import { Plus, Trash2, Save, FileText, Sparkles, Users } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { useToast } from '@/hooks/use-toast'
 import { Customer, Quotation, QuotationItem } from '@/types/database'
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 import CustomerForm from './CustomerForm'
 
 interface QuotationItemForm {
@@ -549,12 +550,24 @@ Example: Complete website development for restaurant including design, developme
                       <TableRow key={index}>
                         <TableCell>
                           <div className="flex space-x-2">
-                            <Input
-                              value={item.description}
-                              onChange={(e) => updateItem(index, 'description', e.target.value)}
-                              placeholder="Item description"
-                              className="flex-1"
-                            />
+                            <HoverCard>
+                              <HoverCardTrigger asChild>
+                                <Input
+                                  value={item.description}
+                                  onChange={(e) => updateItem(index, 'description', e.target.value)}
+                                  placeholder="Item description"
+                                  className="flex-1"
+                                />
+                              </HoverCardTrigger>
+                              {item.description && (
+                                <HoverCardContent className="w-80 max-w-sm">
+                                  <div className="text-sm">
+                                    <p className="font-medium mb-2">Full Description:</p>
+                                    <p className="whitespace-pre-wrap break-words">{item.description}</p>
+                                  </div>
+                                </HoverCardContent>
+                              )}
+                            </HoverCard>
                             <Button
                               variant="outline"
                               size="sm"
