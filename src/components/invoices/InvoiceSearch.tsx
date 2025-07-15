@@ -49,7 +49,7 @@ const InvoiceSearch: React.FC<InvoiceSearchProps> = ({ onNewInvoice, onEditInvoi
 
       if (error) throw error
 
-      setInvoices(data || [])
+      setInvoices((data as any) || [])
     } catch (error) {
       console.error('Error fetching invoices:', error)
       toast({

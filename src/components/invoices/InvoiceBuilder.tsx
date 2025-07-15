@@ -45,7 +45,7 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, onSave, onPr
     issueDate: new Date(),
     dueDate: new Date(),
     taxRate: 0,
-    status: 'draft'
+    status: 'draft' as 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled'
   })
 
   const [items, setItems] = useState<InvoiceItemForm[]>([
@@ -141,7 +141,7 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, onSave, onPr
         issueDate: new Date(invoice.issue_date),
         dueDate: new Date(invoice.due_date),
         taxRate: Number(invoice.tax_rate),
-        status: invoice.status || 'draft'
+        status: (invoice.status as 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled') || 'draft'
       })
 
       setItems(invoiceItems.map(item => ({
@@ -465,7 +465,7 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, onSave, onPr
 
             <div>
               <Label htmlFor="status">Status</Label>
-              <Select value={invoiceData.status} onValueChange={(value) => setInvoiceData(prev => ({ ...prev, status: value }))}>
+              <Select value={invoiceData.status} onValueChange={(value: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled') => setInvoiceData(prev => ({ ...prev, status: value }))}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>

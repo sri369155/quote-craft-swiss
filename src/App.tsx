@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Quotations from "./pages/Quotations";
+import Invoices from "./pages/Invoices";
 import Customers from "./pages/Customers";
 import ProfileSettings from "./pages/ProfileSettings";
 import NotFound from "./pages/NotFound";
@@ -69,6 +70,11 @@ const App = () => (
             <Route path="/quotations" element={
               <ProtectedRoute>
                 <Quotations />
+              </ProtectedRoute>
+            } />
+            <Route path="/invoices" element={
+              <ProtectedRoute>
+                <Invoices />
               </ProtectedRoute>
             } />
             <Route path="/customers" element={

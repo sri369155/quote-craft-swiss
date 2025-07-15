@@ -60,7 +60,7 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ invoiceId, invoice: pro
 
       if (itemsError) throw itemsError
 
-      setInvoice(invoiceData)
+      setInvoice(invoiceData as Invoice)
       setItems(itemsData)
       fetchCustomer(invoiceData.customer_id)
     } catch (error) {

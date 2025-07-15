@@ -165,6 +165,88 @@ export interface Database {
           created_at?: string
         }
       }
+      invoices: {
+        Row: {
+          id: string
+          user_id: string
+          customer_id: string
+          invoice_number: string
+          title: string
+          description: string | null
+          status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled'
+          subtotal: number
+          tax_rate: number
+          tax_amount: number
+          total_amount: number
+          issue_date: string | null
+          due_date: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          customer_id: string
+          invoice_number: string
+          title: string
+          description?: string | null
+          status?: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled'
+          subtotal?: number
+          tax_rate?: number
+          tax_amount?: number
+          total_amount?: number
+          issue_date?: string | null
+          due_date?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          customer_id?: string
+          invoice_number?: string
+          title?: string
+          description?: string | null
+          status?: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled'
+          subtotal?: number
+          tax_rate?: number
+          tax_amount?: number
+          total_amount?: number
+          issue_date?: string | null
+          due_date?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      invoice_items: {
+        Row: {
+          id: string
+          invoice_id: string
+          description: string
+          quantity: number
+          unit_price: number
+          line_total: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          invoice_id: string
+          description: string
+          quantity?: number
+          unit_price?: number
+          line_total?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          invoice_id?: string
+          description?: string
+          quantity?: number
+          unit_price?: number
+          line_total?: number
+          created_at?: string
+        }
+      }
     }
   }
 }
@@ -173,3 +255,5 @@ export type Profile = Database['public']['Tables']['profiles']['Row']
 export type Customer = Database['public']['Tables']['customers']['Row']
 export type Quotation = Database['public']['Tables']['quotations']['Row']
 export type QuotationItem = Database['public']['Tables']['quotation_items']['Row']
+export type Invoice = Database['public']['Tables']['invoices']['Row']
+export type InvoiceItem = Database['public']['Tables']['invoice_items']['Row']
