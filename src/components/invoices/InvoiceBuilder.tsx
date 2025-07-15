@@ -28,6 +28,7 @@ interface InvoiceBuilderProps {
   invoiceId?: string
   onSave?: (invoice: Invoice) => void
   onPreview?: (invoice: Invoice) => void
+  onCancel?: () => void
 }
 
 const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, onSave, onPreview }) => {

@@ -138,6 +138,10 @@ export default function Dashboard() {
                   <FileText className="w-4 h-4 mr-2 text-thick-blue" />
                   Quotations
                 </Button>
+                <Button variant="ghost" className="h-9 px-4 text-sm font-bold text-thick-blue" onClick={() => navigate('/invoices')}>
+                  <FileText className="w-4 h-4 mr-2 text-thick-blue" />
+                  Invoices
+                </Button>
                 <Button variant="ghost" className="h-9 px-4 text-sm font-bold text-thick-blue" onClick={() => navigate('/customers')}>
                   <Users className="w-4 h-4 mr-2 text-thick-blue" />
                   Customers
@@ -207,12 +211,20 @@ export default function Dashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/quotations')}>
             <CardContent className="p-6 text-center">
               <FileText className="w-12 h-12 text-thick-blue mx-auto mb-4" />
               <h3 className="font-bold mb-2 text-thick-blue">Create Quotation</h3>
               <p className="text-sm text-thick-blue/70">Generate professional quotations for your clients</p>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/invoices')}>
+            <CardContent className="p-6 text-center">
+              <FileText className="w-12 h-12 text-thick-blue mx-auto mb-4" />
+              <h3 className="font-bold mb-2 text-thick-blue">Create Invoice</h3>
+              <p className="text-sm text-thick-blue/70">Generate professional invoices for your clients</p>
             </CardContent>
           </Card>
 
