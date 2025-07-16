@@ -465,7 +465,7 @@ export function usePDFExport() {
     const totalGstWidth = pdf.getTextWidth(totalGstText)
     pdf.text(totalGstText, colPositions[3] + (colWidths[3] / 2) - (totalGstWidth / 2), yPosition + 10)
     
-    const subtotalText = `${quotation.total_amount.toFixed(2)}`total_amount.
+    const subtotalText = `${quotation.total_amount.toFixed(2)}`
     const subtotalWidth = pdf.getTextWidth(subtotalText)
     pdf.text(subtotalText, colPositions[4] + (colWidths[4] / 2) - (subtotalWidth / 2), yPosition + 10)
     
@@ -483,7 +483,7 @@ export function usePDFExport() {
     pdf.setFontSize(8)
     pdf.text('Grand Total (in words):', pageMargin + 2, yPosition + 8)
     pdf.setFont('helvetica', 'normal')
-    const wordsText = numberToWords(Math.round(quotation.total_amount))
+    const wordsText = numberToWords(Math.round(quotation.subtotal))
     const splitWordsText = pdf.splitTextToSize(wordsText, summaryBoxWidth - 4)
     pdf.text(splitWordsText, pageMargin + 2, yPosition + 15)
     
@@ -491,7 +491,7 @@ export function usePDFExport() {
     pdf.text('Rounded', pageMargin + summaryBoxWidth + 2, yPosition + 8)
     pdf.text('Total', pageMargin + summaryBoxWidth + 2, yPosition + 15)
     pdf.setFontSize(10)
-    const finalTotalText = `${Math.round(quotation.total_amount).toFixed(2)}`
+    const finalTotalText = `${Math.round(quotation.subtotal).toFixed(2)}`
     const finalTotalWidth = pdf.getTextWidth(finalTotalText)
     pdf.text(finalTotalText, pageMargin + summaryBoxWidth + totalBoxWidth - 2 - finalTotalWidth, yPosition + 12)
     
