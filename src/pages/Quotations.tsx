@@ -137,6 +137,95 @@ export default function Quotations() {
     }
   }
 
+  const handleGenerateInvoice = async (quotationId: string) => {
+    try {
+      // Fetch quotation data
+      const { data: quotation, error: quotationError } = await supabase
+        .from('quotations')
+        .select('*')
+        .eq('id', quotationId)
+        .single()
+      if (quotationError) throw quotationError
+
+      const { data: items, error: quotationItemsError } = await supabase
+        .from('quotation_items')
+        .select('*')
+        .eq('quotation_id', quotationId)
+        .order('created_at')
+      if (quotationItemsError) throw quotationItemsError
+
+      // Generate invoice number
+      const { data: lastInvoice } = await supabase
+        .from('invoices')
+        .select('invoice_number')
+        .order('created_at', { ascending: false })
+        .limit(1)
+
+      let nextNumber = 1
+      if (lastInvoice && lastInvoice.length > 0) {
+        const lastNumber = lastInvoice[0].invoice_number
+        const match = lastNumber.match(/INV-(\d+)/)
+        if (match) {
+          nextNumber = parseInt(match[1]) + 1
+        }
+      }
+
+      const invoiceNumber = `INV-${nextNumber.toString().padStart(4, '0')}`
+
+      // Create invoice
+      const { data: newInvoice, error: invoiceError } = await supabase
+        .from('invoices')
+        .insert({
+          user_id: user!.id,
+          customer_id: quotation.customer_id,
+          invoice_number: invoiceNumber,
+          title: quotation.title,
+          description: quotation.description,
+          subtotal: quotation.subtotal,
+          tax_rate: quotation.tax_rate,
+          tax_amount: quotation.tax_amount,
+          total_amount: quotation.total_amount,
+          issue_date: new Date().toISOString().split('T')[0],
+          due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days from now
+          status: 'draft'
+        })
+        .select()
+        .single()
+
+      if (invoiceError) throw invoiceError
+
+      // Copy items
+      const invoiceItems = items.map(item => ({
+        invoice_id: newInvoice.id,
+        description: item.description,
+        quantity: item.quantity,
+        unit_price: item.unit_price,
+        line_total: item.line_total,
+        hsn_code: item.hsn_code
+      }))
+
+      const { error: invoiceItemsError } = await supabase
+        .from('invoice_items')
+        .insert(invoiceItems)
+
+      if (invoiceItemsError) throw invoiceItemsError
+
+      toast({
+        title: 'Invoice Generated',
+        description: `Invoice ${invoiceNumber} created successfully from quotation.`,
+      })
+
+      // Navigate to invoices page
+      navigate('/invoices')
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to generate invoice.',
+        variant: 'destructive',
+      })
+    }
+  }
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -300,6 +389,14 @@ export default function Quotations() {
                           disabled={pdfLoading}
                         >
                           <Download className={`w-4 h-4 ${pdfLoading ? 'animate-spin' : ''}`} />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleGenerateInvoice(quotation.id)}
+                          className="bg-green-100 text-green-800 border-green-200 hover:bg-green-200"
+                        >
+                          <FileText className="w-4 h-4" />
                         </Button>
                       </div>
                       <Button

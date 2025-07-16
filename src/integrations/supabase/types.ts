@@ -51,6 +51,7 @@ export type Database = {
         Row: {
           created_at: string | null
           description: string
+          hsn_code: string | null
           id: string
           invoice_id: string
           line_total: number
@@ -60,6 +61,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           description: string
+          hsn_code?: string | null
           id?: string
           invoice_id: string
           line_total?: number
@@ -69,6 +71,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           description?: string
+          hsn_code?: string | null
           id?: string
           invoice_id?: string
           line_total?: number
@@ -197,6 +200,7 @@ export type Database = {
         Row: {
           created_at: string | null
           description: string
+          hsn_code: string | null
           id: string
           line_total: number
           quantity: number
@@ -206,6 +210,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           description: string
+          hsn_code?: string | null
           id?: string
           line_total?: number
           quantity?: number
@@ -215,6 +220,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           description?: string
+          hsn_code?: string | null
           id?: string
           line_total?: number
           quantity?: number

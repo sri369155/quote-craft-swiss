@@ -69,7 +69,8 @@ const InvoiceSearch: React.FC<InvoiceSearchProps> = ({ onNewInvoice, onEditInvoi
       filtered = filtered.filter(invoice => 
         invoice.invoice_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
         invoice.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        invoice.customer?.name.toLowerCase().includes(searchTerm.toLowerCase())
+        invoice.customer?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        invoice.description?.toLowerCase().includes(searchTerm.toLowerCase())
       )
     }
 

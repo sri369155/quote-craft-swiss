@@ -11,6 +11,7 @@ import { cn, numberToWords } from '@/lib/utils'
 import { supabase } from '@/integrations/supabase/client'
 import { Invoice, Customer, InvoiceItem } from '@/types/database'
 import { useToast } from '@/hooks/use-toast'
+import { useAuth } from '@/hooks/useAuth'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 
 interface InvoicePreviewProps {
@@ -24,10 +25,51 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ invoiceId, invoice: pro
   const [invoice, setInvoice] = useState<Invoice | null>(propInvoice || null)
   const [customer, setCustomer] = useState<Customer | null>(null)
   const [items, setItems] = useState<InvoiceItem[]>([])
-  const [profile, setProfile] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
+  const { profile } = useAuth()
   const { toast } = useToast()
+
+  // Editable text states similar to quotation preview
+  const [editableText, setEditableText] = useState({
+    companyName: profile?.company_name || '',
+    tagline: profile?.company_slogan || '"Engineering Tomorrow\'s Technologies, Today"',
+    gstNumber: profile?.gst_number ? `GST: ${profile.gst_number}` : 'GST: 37ABDFB9225A1Z5',
+    termsTitle: 'Payment Terms',
+    paymentTerm: 'Payment Due: As per due date',
+    gstTerm: 'GST: As indicated',
+    transportTerm: 'Transport: NA',
+    signatureText: 'Thank you for your business',
+    signatureRole1: 'Authorized Signatory',
+    signatureRole2: 'Company Name',
+    footerAddress1: profile?.company_address?.split(',')[0]?.trim() || '',
+    footerAddress2: profile?.company_address?.split(',').slice(1).join(',').trim() || '',
+    footerPhone: profile?.company_phone || '',
+    footerEmail: profile?.company_email ? `Email: ${profile.company_email}` : '',
+    grandTotalText: 'Total Amount (in words):',
+    grandTotalDescription: 'As per calculation above',
+    roundedText: 'Rounded',
+    totalText: 'Total Amount'
+  })
+
+  // Spacing controls
+  const [spacing, setSpacing] = useState({
+    headerSpacing: 6,
+    invoiceLabelSpacing: 4,
+    detailsSpacing: 4,
+    introSpacing: 6,
+    tableSpacing: 6,
+    totalSpacing: 6,
+    termsSpacing: 8,
+    footerSpacing: 8
+  })
+
+  // Image preference controls
+  const [imagePreferences, setImagePreferences] = useState({
+    useCustomHeader: !!profile?.header_image_url,
+    useCustomFooter: !!profile?.footer_image_url,
+    useCustomSignature: !!profile?.signature_image_url
+  })
 
   useEffect(() => {
     if (invoiceId && !propInvoice) {
@@ -36,8 +78,22 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ invoiceId, invoice: pro
       setInvoice(propInvoice)
       fetchCustomer(propInvoice.customer_id)
     }
-    fetchProfile()
   }, [invoiceId, propInvoice])
+
+  useEffect(() => {
+    if (profile && invoice) {
+      setEditableText(prev => ({
+        ...prev,
+        companyName: profile.company_name || 'Your Company',
+        tagline: profile.company_slogan || '"Engineering Tomorrow\'s Technologies, Today"',
+        gstNumber: profile.gst_number ? `GST: ${profile.gst_number}` : 'GST: 37ABDFB9225A1Z5',
+        footerAddress1: profile.company_address?.split(',')[0]?.trim() || '',
+        footerAddress2: profile.company_address?.split(',').slice(1).join(',').trim() || '',
+        footerPhone: profile.company_phone || '',
+        footerEmail: profile.company_email ? `Email: ${profile.company_email}` : ''
+      }))
+    }
+  }, [profile, invoice])
 
   const fetchInvoice = async () => {
     if (!invoiceId) return
@@ -90,110 +146,6 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ invoiceId, invoice: pro
     }
   }
 
-  const fetchProfile = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .single()
-
-      if (error) throw error
-      setProfile(data)
-    } catch (error) {
-      console.error('Error fetching profile:', error)
-    }
-  }
-
-  const updateItemField = async (index: number, field: keyof InvoiceItem, value: string | number) => {
-    const newItems = [...items]
-    newItems[index] = { ...newItems[index], [field]: value }
-    
-    if (field === 'quantity' || field === 'unit_price') {
-      newItems[index].line_total = newItems[index].quantity * Number(newItems[index].unit_price)
-    }
-    
-    setItems(newItems)
-
-    // Auto-save the item
-    if (invoiceId && newItems[index].id) {
-      try {
-        const { error } = await supabase
-          .from('invoice_items')
-          .update({
-            [field]: value,
-            line_total: newItems[index].line_total
-          })
-          .eq('id', newItems[index].id)
-
-        if (error) throw error
-
-        // Update invoice totals
-        await updateInvoiceTotals(newItems)
-      } catch (error) {
-        console.error('Error updating item:', error)
-      }
-    }
-  }
-
-  const updateInvoiceTotals = async (updatedItems: InvoiceItem[]) => {
-    if (!invoice || !invoiceId) return
-
-    const subtotal = updatedItems.reduce((sum, item) => sum + Number(item.line_total), 0)
-    const taxAmount = subtotal * (Number(invoice.tax_rate) / 100)
-    const total = subtotal + taxAmount
-
-    try {
-      const { error } = await supabase
-        .from('invoices')
-        .update({
-          subtotal,
-          tax_amount: taxAmount,
-          total_amount: total
-        })
-        .eq('id', invoiceId)
-
-      if (error) throw error
-
-      setInvoice(prev => prev ? { ...prev, subtotal, tax_amount: taxAmount, total_amount: total } : null)
-    } catch (error) {
-      console.error('Error updating invoice totals:', error)
-    }
-  }
-
-  const updateInvoiceField = async (field: keyof Invoice, value: string) => {
-    if (!invoice || !invoiceId) return
-
-    try {
-      const { error } = await supabase
-        .from('invoices')
-        .update({ [field]: value })
-        .eq('id', invoiceId)
-
-      if (error) throw error
-
-      setInvoice(prev => prev ? { ...prev, [field]: value } : null)
-    } catch (error) {
-      console.error('Error updating invoice:', error)
-    }
-  }
-
-  const updateDueDate = async (date: Date) => {
-    if (!invoice || !invoiceId) return
-
-    try {
-      const { error } = await supabase
-        .from('invoices')
-        .update({ due_date: date.toISOString().split('T')[0] })
-        .eq('id', invoiceId)
-
-      if (error) throw error
-
-      setInvoice(prev => prev ? { ...prev, due_date: date.toISOString().split('T')[0] } : null)
-    } catch (error) {
-      console.error('Error updating due date:', error)
-    }
-  }
-
   const handlePrint = () => {
     window.print()
   }
@@ -242,6 +194,18 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ invoiceId, invoice: pro
     }
   }
 
+  const updateEditableText = (field: string, value: string) => {
+    setEditableText(prev => ({ ...prev, [field]: value }))
+  }
+
+  const updateSpacing = (field: string, value: number) => {
+    setSpacing(prev => ({ ...prev, [field]: value }))
+  }
+
+  const updateImagePreference = (field: string, value: boolean) => {
+    setImagePreferences(prev => ({ ...prev, [field]: value }))
+  }
+
   if (isLoading) {
     return <div className="flex justify-center items-center h-64">Loading...</div>
   }
@@ -276,168 +240,250 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ invoiceId, invoice: pro
         </div>
       </div>
 
+      {/* Image and Spacing Controls */}
+      <div className="print:hidden border rounded-lg p-4 space-y-4">
+        <div className="text-sm font-medium">Customization Options:</div>
+        
+        {/* Image Selection Controls */}
+        <div className="grid grid-cols-3 gap-4 text-xs">
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="useCustomHeader"
+              checked={imagePreferences.useCustomHeader}
+              onChange={(e) => updateImagePreference('useCustomHeader', e.target.checked)}
+              disabled={!profile?.header_image_url}
+            />
+            <label htmlFor="useCustomHeader" className={!profile?.header_image_url ? 'text-gray-400' : ''}>
+              Use Custom Header {!profile?.header_image_url && '(Not uploaded)'}
+            </label>
+          </div>
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="useCustomFooter"
+              checked={imagePreferences.useCustomFooter}
+              onChange={(e) => updateImagePreference('useCustomFooter', e.target.checked)}
+              disabled={!profile?.footer_image_url}
+            />
+            <label htmlFor="useCustomFooter" className={!profile?.footer_image_url ? 'text-gray-400' : ''}>
+              Use Custom Footer {!profile?.footer_image_url && '(Not uploaded)'}
+            </label>
+          </div>
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="useCustomSignature"
+              checked={imagePreferences.useCustomSignature}
+              onChange={(e) => updateImagePreference('useCustomSignature', e.target.checked)}
+              disabled={!profile?.signature_image_url}
+            />
+            <label htmlFor="useCustomSignature" className={!profile?.signature_image_url ? 'text-gray-400' : ''}>
+              Use Custom Signature {!profile?.signature_image_url && '(Not uploaded)'}
+            </label>
+          </div>
+        </div>
+        
+        {/* Spacing Controls */}
+        <div className="grid grid-cols-4 gap-2 text-xs">
+          <div className="flex items-center gap-1">
+            <label>Header:</label>
+            <input
+              type="range"
+              min="0"
+              max="12"
+              value={spacing.headerSpacing}
+              onChange={(e) => updateSpacing('headerSpacing', parseInt(e.target.value))}
+              className="w-12"
+            />
+            <span>{spacing.headerSpacing}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <label>Label:</label>
+            <input
+              type="range"
+              min="0"
+              max="12"
+              value={spacing.invoiceLabelSpacing}
+              onChange={(e) => updateSpacing('invoiceLabelSpacing', parseInt(e.target.value))}
+              className="w-12"
+            />
+            <span>{spacing.invoiceLabelSpacing}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <label>Details:</label>
+            <input
+              type="range"
+              min="0"
+              max="12"
+              value={spacing.detailsSpacing}
+              onChange={(e) => updateSpacing('detailsSpacing', parseInt(e.target.value))}
+              className="w-12"
+            />
+            <span>{spacing.detailsSpacing}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <label>Table:</label>
+            <input
+              type="range"
+              min="0"
+              max="12"
+              value={spacing.tableSpacing}
+              onChange={(e) => updateSpacing('tableSpacing', parseInt(e.target.value))}
+              className="w-12"
+            />
+            <span>{spacing.tableSpacing}</span>
+          </div>
+        </div>
+      </div>
+
       {/* Invoice Preview */}
       <Card>
         <CardContent className="p-0">
-          <div id="invoice-preview" className="min-h-[297mm] bg-white">
-            {/* Header Section with Company Logo/Info */}
-            <div className="p-8 border-b">
-              {profile?.header_image_url && (
-                <div className="mb-6">
+          <div id="invoice-preview" className="min-h-[297mm] bg-white p-8" style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: `${spacing.headerSpacing * 0.25}rem` 
+          }}>
+            {/* Header Section */}
+            <div className="relative">
+              {imagePreferences.useCustomHeader && profile?.header_image_url ? (
+                <div className="w-full rounded-lg overflow-hidden mb-6">
                   <img 
                     src={profile.header_image_url} 
                     alt="Header" 
-                    className="w-full h-24 object-contain"
+                    className="w-full h-auto max-h-32 object-contain"
                   />
                 </div>
-              )}
-              
-              <div className="flex justify-between items-start mb-6">
-                <div className="flex items-center space-x-4">
-                  {profile?.company_logo_url && (
-                    <img 
-                      src={profile.company_logo_url} 
-                      alt="Company Logo" 
-                      className="w-16 h-16 object-contain"
+              ) : (
+                <div className="bg-orange-600 text-foreground p-4 rounded-lg relative mb-6">
+                  {/* GST Number - Top Right */}
+                  <div className="absolute top-2 right-4">
+                    <Input
+                      value={editableText.gstNumber}
+                      onChange={(e) => updateEditableText('gstNumber', e.target.value)}
+                      className="font-bold bg-transparent border-0 p-0 text-foreground placeholder-foreground/70 text-right print:hidden"
                     />
-                  )}
-                  <div>
-                    <h1 className="text-3xl font-bold text-primary">
-                      {profile?.company_name || 'Your Company'}
-                    </h1>
-                    {profile?.company_slogan && (
-                      <p className="text-gray-600 mt-1">{profile.company_slogan}</p>
-                    )}
+                    <p className="hidden print:block font-bold">{editableText.gstNumber}</p>
                   </div>
-                </div>
-                <div className="text-right">
-                  <h2 className="text-2xl font-bold text-gray-800">INVOICE</h2>
-                  <p className="text-lg font-semibold text-primary mt-1">
-                    #{invoice.invoice_number}
-                  </p>
-                </div>
-              </div>
 
-              {/* Company and Customer Info */}
-              <div className="grid grid-cols-2 gap-8">
-                <div>
-                  <h3 className="font-semibold text-gray-800 mb-2">From:</h3>
-                  <div className="space-y-1 text-sm">
-                    <p className="font-medium">{profile?.company_name || 'Your Company'}</p>
-                    {profile?.company_address && (
-                      <p className="whitespace-pre-line">{profile.company_address}</p>
-                    )}
-                    {profile?.company_email && <p>Email: {profile.company_email}</p>}
-                    {profile?.company_phone && <p>Phone: {profile.company_phone}</p>}
-                    {profile?.gst_number && <p>GST: {profile.gst_number}</p>}
-                  </div>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-800 mb-2">Bill To:</h3>
-                  <div className="space-y-1 text-sm">
-                    <p className="font-medium">{customer?.name}</p>
-                    {customer?.address && (
-                      <p className="whitespace-pre-line">{customer.address}</p>
-                    )}
-                    {customer?.email && <p>Email: {customer.email}</p>}
-                    {customer?.phone && <p>Phone: {customer.phone}</p>}
-                  </div>
-                </div>
-              </div>
-
-              {/* Invoice Details */}
-              <div className="mt-6 grid grid-cols-2 gap-8">
-                <div>
-                  <h3 className="font-semibold text-gray-800 mb-2">Invoice Details:</h3>
-                  <div className="space-y-1 text-sm">
-                    {isEditing ? (
-                      <Input
-                        value={invoice.title}
-                        onChange={(e) => updateInvoiceField('title', e.target.value)}
-                        className="font-medium text-lg print:border-0 print:p-0 print:bg-transparent"
-                        onBlur={() => setIsEditing(false)}
-                        autoFocus
-                      />
-                    ) : (
-                      <p 
-                        className="font-medium text-lg cursor-pointer hover:bg-gray-50 p-1 print:p-0 print:hover:bg-transparent"
-                        onClick={() => setIsEditing(true)}
-                      >
-                        {invoice.title}
-                      </p>
-                    )}
-                    {invoice.description && (
-                      <Textarea
-                        value={invoice.description}
-                        onChange={(e) => updateInvoiceField('description', e.target.value)}
-                        className="text-sm border-0 p-1 print:border-0 print:p-0 print:bg-transparent resize-none"
-                        rows={2}
-                      />
-                    )}
-                  </div>
-                </div>
-                <div>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="font-medium">Issue Date:</span>
-                      <span>{format(new Date(invoice.issue_date), 'dd/MM/yyyy')}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="font-medium">Due Date:</span>
-                      <div className="print:hidden">
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              className="p-0 h-auto font-normal text-sm hover:bg-gray-50"
-                            >
-                              <CalendarIcon className="mr-1 h-3 w-3" />
-                              {invoice.due_date ? format(new Date(invoice.due_date), 'dd/MM/yyyy') : 'Not set'}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0">
-                            <Calendar
-                              mode="single"
-                              selected={invoice.due_date ? new Date(invoice.due_date) : undefined}
-                              onSelect={(date) => date && updateDueDate(date)}
-                              initialFocus
-                              className="p-3 pointer-events-auto"
-                            />
-                          </PopoverContent>
-                        </Popover>
+                  {/* Company Name and Logo - Center */}
+                  <div className="flex flex-col items-center justify-center pt-6 pb-4">
+                    <div className="flex items-center gap-4">
+                      {/* Company Logo */}
+                      {profile?.company_logo_url && (
+                        <img 
+                          src={profile.company_logo_url} 
+                          alt="Company Logo" 
+                          className="h-16 w-16 object-contain"
+                        />
+                      )}
+                      
+                      {/* Company Name */}
+                      <div className="text-center">
+                        <Input
+                          value={editableText.companyName || profile?.company_name || 'Your Company'}
+                          onChange={(e) => updateEditableText('companyName', e.target.value)}
+                          className="text-3xl font-bold bg-transparent border-0 p-0 text-center text-foreground placeholder-foreground/70 print:hidden"
+                        />
+                        <h1 className="hidden print:block text-3xl font-bold">{editableText.companyName}</h1>
+                        
+                        <Input
+                          value={editableText.tagline}
+                          onChange={(e) => updateEditableText('tagline', e.target.value)}
+                          className="text-sm bg-transparent border-0 p-0 text-center text-foreground/80 placeholder-foreground/70 print:hidden mt-1"
+                        />
+                        <p className="hidden print:block text-sm text-foreground/80 mt-1">{editableText.tagline}</p>
                       </div>
-                      <span className="hidden print:inline">
-                        {invoice.due_date ? format(new Date(invoice.due_date), 'dd/MM/yyyy') : 'Not set'}
-                      </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="font-medium">Status:</span>
-                      <span className={cn(
-                        "px-2 py-1 rounded text-xs font-medium",
-                        invoice.status === 'paid' && "bg-green-100 text-green-800",
-                        invoice.status === 'sent' && "bg-blue-100 text-blue-800",
-                        invoice.status === 'draft' && "bg-gray-100 text-gray-800",
-                        invoice.status === 'overdue' && "bg-red-100 text-red-800",
-                        invoice.status === 'cancelled' && "bg-gray-100 text-gray-600"
-                      )}>
-                        {invoice.status?.toUpperCase()}
-                      </span>
-                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Invoice Title - Bold and Underlined */}
+            <div className="text-center" style={{ marginBottom: `${spacing.invoiceLabelSpacing * 0.25}rem` }}>
+              <h2 className="text-4xl font-bold underline decoration-2 text-gray-800 mb-2">INVOICE</h2>
+              <p className="text-lg font-semibold text-primary">
+                #{invoice.invoice_number}
+              </p>
+            </div>
+
+            {/* Company and Customer Info */}
+            <div className="grid grid-cols-2 gap-8 mb-6" style={{ marginBottom: `${spacing.detailsSpacing * 0.25}rem` }}>
+              <div>
+                <h3 className="font-semibold text-gray-800 mb-2">From:</h3>
+                <div className="space-y-1 text-sm">
+                  <p className="font-medium">{profile?.company_name || 'Your Company'}</p>
+                  {profile?.company_address && (
+                    <p className="whitespace-pre-line">{profile.company_address}</p>
+                  )}
+                  {profile?.company_email && <p>Email: {profile.company_email}</p>}
+                  {profile?.company_phone && <p>Phone: {profile.company_phone}</p>}
+                  {profile?.gst_number && <p>GST: {profile.gst_number}</p>}
+                </div>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-800 mb-2">Bill To:</h3>
+                <div className="space-y-1 text-sm">
+                  <p className="font-medium">{customer?.name}</p>
+                  {customer?.address && (
+                    <p className="whitespace-pre-line">{customer.address}</p>
+                  )}
+                  {customer?.email && <p>Email: {customer.email}</p>}
+                  {customer?.phone && <p>Phone: {customer.phone}</p>}
+                </div>
+              </div>
+            </div>
+
+            {/* Invoice Details */}
+            <div className="grid grid-cols-2 gap-8 mb-6">
+              <div>
+                <h3 className="font-semibold text-gray-800 mb-2">Invoice Details:</h3>
+                <div className="space-y-1 text-sm">
+                  <p className="font-medium text-lg">{invoice.title}</p>
+                  {invoice.description && (
+                    <p className="text-sm text-gray-600">{invoice.description}</p>
+                  )}
+                </div>
+              </div>
+              <div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="font-medium">Issue Date:</span>
+                    <span>{format(new Date(invoice.issue_date), 'dd/MM/yyyy')}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium">Due Date:</span>
+                    <span>{invoice.due_date ? format(new Date(invoice.due_date), 'dd/MM/yyyy') : 'Not set'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium">Status:</span>
+                    <span className={cn(
+                      "px-2 py-1 rounded text-xs font-medium",
+                      invoice.status === 'paid' && "bg-green-100 text-green-800",
+                      invoice.status === 'sent' && "bg-blue-100 text-blue-800",
+                      invoice.status === 'draft' && "bg-gray-100 text-gray-800",
+                      invoice.status === 'overdue' && "bg-red-100 text-red-800",
+                      invoice.status === 'cancelled' && "bg-gray-100 text-gray-600"
+                    )}>
+                      {invoice.status?.toUpperCase()}
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Items Section */}
-            <div className="p-8 pb-4">
+            <div className="mb-6" style={{ marginBottom: `${spacing.tableSpacing * 0.25}rem` }}>
               <h3 className="font-semibold text-gray-800 mb-4">Invoice Items</h3>
               
-              {/* Desktop Table */}
-              <div className="hidden md:block overflow-x-auto">
+              <div className="overflow-x-auto">
                 <table className="w-full border-collapse border border-gray-300">
                   <thead>
                     <tr className="bg-gray-50">
                       <th className="border border-gray-300 p-3 text-left font-semibold">Description</th>
+                      <th className="border border-gray-300 p-3 text-center font-semibold w-20">HSN Code</th>
                       <th className="border border-gray-300 p-3 text-center font-semibold w-20">Qty</th>
                       <th className="border border-gray-300 p-3 text-right font-semibold w-24">Unit Price</th>
                       <th className="border border-gray-300 p-3 text-right font-semibold w-24">Total</th>
@@ -447,155 +493,127 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ invoiceId, invoice: pro
                     {items.map((item, index) => (
                       <tr key={item.id} className="hover:bg-gray-50">
                         <td className="border border-gray-300 p-3">
-                          <HoverCard>
-                            <HoverCardTrigger asChild>
-                              <Textarea
-                                value={item.description}
-                                onChange={(e) => updateItemField(index, 'description', e.target.value)}
-                                className="border-0 p-0 bg-transparent text-sm resize-none min-h-[40px] print:hidden cursor-pointer"
-                              />
-                            </HoverCardTrigger>
-                            {item.description && (
-                              <HoverCardContent className="w-80 max-w-sm">
-                                <div className="text-sm">
-                                  <p className="font-medium mb-2">Full Description:</p>
-                                  <p className="whitespace-pre-wrap break-words">{item.description}</p>
-                                </div>
-                              </HoverCardContent>
-                            )}
-                          </HoverCard>
-                          <div className="hidden print:block whitespace-pre-wrap">{item.description}</div>
+                          <div className="text-sm">{item.description}</div>
+                        </td>
+                        <td className="border border-gray-300 p-3 text-center text-sm">
+                          {(item as any).hsn_code || '-'}
                         </td>
                         <td className="border border-gray-300 p-3 text-center">
-                          <Input
-                            type="number"
-                            value={item.quantity}
-                            onChange={(e) => updateItemField(index, 'quantity', Number(e.target.value))}
-                            className="w-16 text-center border-0 print:border-0 print:bg-transparent"
-                            min="1"
-                          />
+                          {item.quantity}
                         </td>
                         <td className="border border-gray-300 p-3 text-right">
-                          <Input
-                            type="number"
-                            value={Number(item.unit_price)}
-                            onChange={(e) => updateItemField(index, 'unit_price', Number(e.target.value))}
-                            className="w-20 text-right border-0 print:border-0 print:bg-transparent"
-                            step="0.01"
-                          />
+                          ₹{Number(item.unit_price).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                         </td>
                         <td className="border border-gray-300 p-3 text-right font-medium">
-                          ${Number(item.line_total).toFixed(2)}
+                          ₹{Number(item.line_total).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-
-              {/* Mobile Layout */}
-              <div className="md:hidden space-y-4">
-                {items.map((item, index) => {
-                  return (
-                    <div key={item.id} className={`grid grid-cols-12 border-b text-sm p-3 ${index % 2 === 1 ? 'bg-gray-50' : ''}`}>
-                      <div className="col-span-5 pr-2">
-                        <HoverCard>
-                          <HoverCardTrigger asChild>
-                            <Textarea
-                              value={item.description}
-                              onChange={(e) => updateItemField(index, 'description', e.target.value)}
-                              className="border-0 p-0 bg-transparent text-sm resize-none min-h-[40px] print:hidden cursor-pointer"
-                            />
-                          </HoverCardTrigger>
-                          {item.description && (
-                            <HoverCardContent className="w-80 max-w-sm">
-                              <div className="text-sm">
-                                <p className="font-medium mb-2">Full Description:</p>
-                                <p className="whitespace-pre-wrap break-words">{item.description}</p>
-                              </div>
-                            </HoverCardContent>
-                          )}
-                        </HoverCard>
-                        <div className="hidden print:block whitespace-pre-wrap">{item.description}</div>
-                      </div>
-                      <div className="col-span-2">
-                        <Input
-                          type="number"
-                          value={item.quantity}
-                          onChange={(e) => updateItemField(index, 'quantity', Number(e.target.value))}
-                          className="text-center text-sm border-0 print:border-0 print:bg-transparent"
-                          min="1"
-                        />
-                      </div>
-                      <div className="col-span-2 px-1">
-                        <Input
-                          type="number"
-                          value={Number(item.unit_price)}
-                          onChange={(e) => updateItemField(index, 'unit_price', Number(e.target.value))}
-                          className="text-right text-sm border-0 print:border-0 print:bg-transparent"
-                          step="0.01"
-                        />
-                      </div>
-                      <div className="col-span-3 text-right font-medium self-center">
-                        ${Number(item.line_total).toFixed(2)}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
             </div>
 
             {/* Totals Section */}
-            <div className="px-8 pb-8">
-              <div className="flex justify-end">
-                <div className="w-80 space-y-2">
-                  <div className="flex justify-between pb-2">
-                    <span className="font-medium">Subtotal:</span>
-                    <span>${Number(invoice.subtotal).toFixed(2)}</span>
+            <div className="flex justify-end mb-6" style={{ marginBottom: `${spacing.totalSpacing * 0.25}rem` }}>
+              <div className="w-80">
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between py-1">
+                    <span>Subtotal:</span>
+                    <span>₹{Number(invoice.subtotal).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                   </div>
-                  <div className="flex justify-between pb-2">
-                    <span className="font-medium">Tax ({Number(invoice.tax_rate)}%):</span>
-                    <span>${Number(invoice.tax_amount).toFixed(2)}</span>
+                  <div className="flex justify-between py-1">
+                    <span>GST ({Number(invoice.tax_rate)}%):</span>
+                    <span>₹{Number(invoice.tax_amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                   </div>
-                  <div className="border-t-2 border-gray-300 pt-2">
-                    <div className="flex justify-between">
-                      <span className="text-lg font-bold">Total Amount:</span>
-                      <span className="text-lg font-bold">${Number(invoice.total_amount).toFixed(2)}</span>
+                  <div className="border-t border-gray-300 pt-2 mt-2">
+                    <div className="flex justify-between font-bold text-lg">
+                      <span>{editableText.totalText}:</span>
+                      <span>₹{Number(invoice.total_amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                     </div>
                   </div>
-                  <div className="text-sm text-gray-600 mt-2">
-                    <span className="font-medium">Amount in words: </span>
-                    <span className="italic">{totalInWords} dollars only</span>
+                  <div className="text-xs text-gray-600 mt-2">
+                    <strong>{editableText.grandTotalText}</strong><br />
+                    {totalInWords} only
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Footer Section */}
-            {(profile?.footer_image_url || profile?.signature_image_url) && (
-              <div className="border-t p-8 space-y-4">
-                {profile?.signature_image_url && (
-                  <div className="flex justify-end">
-                    <div className="text-center">
-                      <img 
-                        src={profile.signature_image_url} 
-                        alt="Signature" 
-                        className="h-16 mx-auto mb-2"
-                      />
-                      <div className="border-t border-gray-400 w-32 mx-auto"></div>
-                      <p className="text-sm text-gray-600 mt-1">Authorized Signature</p>
-                    </div>
-                  </div>
+            {/* Terms & Conditions */}
+            <div className="mb-6" style={{ marginBottom: `${spacing.termsSpacing * 0.25}rem` }}>
+              <Input
+                value={editableText.termsTitle}
+                onChange={(e) => updateEditableText('termsTitle', e.target.value)}
+                className="font-semibold text-gray-800 mb-3 bg-transparent border-0 p-0 print:hidden"
+              />
+              <h3 className="hidden print:block font-semibold text-gray-800 mb-3">{editableText.termsTitle}</h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+                <div>
+                  <Input
+                    value={editableText.paymentTerm}
+                    onChange={(e) => updateEditableText('paymentTerm', e.target.value)}
+                    className="bg-transparent border-0 p-0 text-sm print:hidden"
+                  />
+                  <p className="hidden print:block">{editableText.paymentTerm}</p>
+                </div>
+                <div>
+                  <Input
+                    value={editableText.gstTerm}
+                    onChange={(e) => updateEditableText('gstTerm', e.target.value)}
+                    className="bg-transparent border-0 p-0 text-sm print:hidden"
+                  />
+                  <p className="hidden print:block">{editableText.gstTerm}</p>
+                </div>
+                <div>
+                  <Input
+                    value={editableText.transportTerm}
+                    onChange={(e) => updateEditableText('transportTerm', e.target.value)}
+                    className="bg-transparent border-0 p-0 text-sm print:hidden"
+                  />
+                  <p className="hidden print:block">{editableText.transportTerm}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Signature Section */}
+            <div className="flex justify-end">
+              <div className="text-center">
+                {imagePreferences.useCustomSignature && profile?.signature_image_url ? (
+                  <img 
+                    src={profile.signature_image_url} 
+                    alt="Signature" 
+                    className="h-16 w-auto mx-auto mb-2"
+                  />
+                ) : (
+                  <div className="h-16 w-32 border-b border-gray-300 mb-2"></div>
                 )}
-                {profile?.footer_image_url && (
-                  <div className="mt-6">
-                    <img 
-                      src={profile.footer_image_url} 
-                      alt="Footer" 
-                      className="w-full h-16 object-contain"
-                    />
-                  </div>
-                )}
+                
+                <Input
+                  value={editableText.signatureRole1}
+                  onChange={(e) => updateEditableText('signatureRole1', e.target.value)}
+                  className="text-sm font-medium bg-transparent border-0 p-0 text-center print:hidden"
+                />
+                <p className="hidden print:block text-sm font-medium">{editableText.signatureRole1}</p>
+                
+                <Input
+                  value={editableText.signatureRole2}
+                  onChange={(e) => updateEditableText('signatureRole2', e.target.value)}
+                  className="text-xs text-gray-600 bg-transparent border-0 p-0 text-center print:hidden"
+                />
+                <p className="hidden print:block text-xs text-gray-600">{editableText.signatureRole2}</p>
+              </div>
+            </div>
+
+            {/* Footer */}
+            {imagePreferences.useCustomFooter && profile?.footer_image_url && (
+              <div className="mt-8 text-center" style={{ marginTop: `${spacing.footerSpacing * 0.25}rem` }}>
+                <img 
+                  src={profile.footer_image_url} 
+                  alt="Footer" 
+                  className="w-full h-auto max-h-24 object-contain"
+                />
               </div>
             )}
           </div>

@@ -19,6 +19,7 @@ import CustomerForm from './CustomerForm'
 interface QuotationItemForm {
   id?: string
   description: string
+  hsn_code: string
   quantity: number
   unit_price: number
   line_total: number
@@ -45,7 +46,7 @@ export default function QuotationBuilder({ quotationId, onSave, onCancel }: Quot
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [items, setItems] = useState<QuotationItemForm[]>([
-    { description: '', quantity: 1, unit_price: 0, line_total: 0 }
+    { description: '', hsn_code: '', quantity: 1, unit_price: 0, line_total: 0 }
   ])
   const [taxRate, setTaxRate] = useState(18) // Default GST rate for India
   const [validUntil, setValidUntil] = useState('')
@@ -131,6 +132,7 @@ Example: Complete website development for restaurant including design, developme
       setItems(quotationItems.map(item => ({
         id: item.id,
         description: item.description,
+        hsn_code: item.hsn_code || '',
         quantity: item.quantity,
         unit_price: item.unit_price,
         line_total: item.line_total
@@ -156,7 +158,7 @@ Example: Complete website development for restaurant including design, developme
   }
 
   const addItem = () => {
-    setItems([...items, { description: '', quantity: 1, unit_price: 0, line_total: 0 }])
+    setItems([...items, { description: '', hsn_code: '', quantity: 1, unit_price: 0, line_total: 0 }])
   }
 
   const removeItem = (index: number) => {
@@ -310,6 +312,7 @@ Example: Complete website development for restaurant including design, developme
       const itemsToInsert = items.map(item => ({
         quotation_id: savedQuotation.id,
         description: item.description,
+        hsn_code: item.hsn_code,
         quantity: item.quantity,
         unit_price: item.unit_price,
         line_total: item.line_total,
@@ -538,10 +541,11 @@ Example: Complete website development for restaurant including design, developme
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-[40%]">Description</TableHead>
-                      <TableHead className="w-[15%]">Quantity</TableHead>
-                      <TableHead className="w-[20%]">Unit Price</TableHead>
-                      <TableHead className="w-[20%]">Total</TableHead>
+                      <TableHead className="w-[35%]">Description</TableHead>
+                      <TableHead className="w-[12%]">HSN Code</TableHead>
+                      <TableHead className="w-[10%]">Qty</TableHead>
+                      <TableHead className="w-[15%]">Unit Price</TableHead>
+                      <TableHead className="w-[15%]">Total</TableHead>
                       <TableHead className="w-[5%]"></TableHead>
                     </TableRow>
                   </TableHeader>
@@ -578,6 +582,14 @@ Example: Complete website development for restaurant including design, developme
                               <Sparkles className={`w-4 h-4 ${aiLoading ? 'animate-spin' : ''}`} />
                             </Button>
                           </div>
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            value={item.hsn_code}
+                            onChange={(e) => updateItem(index, 'hsn_code', e.target.value)}
+                            placeholder="HSN Code"
+                            className="text-sm"
+                          />
                         </TableCell>
                         <TableCell>
                           <Input

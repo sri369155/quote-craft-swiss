@@ -19,6 +19,7 @@ import CustomerForm from '../quotations/CustomerForm'
 
 interface InvoiceItemForm {
   description: string
+  hsn_code: string
   quantity: number
   unitPrice: number
   lineTotal: number
@@ -26,12 +27,17 @@ interface InvoiceItemForm {
 
 interface InvoiceBuilderProps {
   invoiceId?: string
+  quotationData?: {
+    quotation: any
+    customer: any
+    items: any[]
+  }
   onSave?: (invoice: Invoice) => void
   onPreview?: (invoice: Invoice) => void
   onCancel?: () => void
 }
 
-const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, onSave, onPreview }) => {
+const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, quotationData, onSave, onPreview, onCancel }) => {
   const [customers, setCustomers] = useState<Customer[]>([])
   const [showCustomerForm, setShowCustomerForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -50,7 +56,7 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, onSave, onPr
   })
 
   const [items, setItems] = useState<InvoiceItemForm[]>([
-    { description: '', quantity: 1, unitPrice: 0, lineTotal: 0 }
+    { description: '', hsn_code: '', quantity: 1, unitPrice: 0, lineTotal: 0 }
   ])
 
   const subtotal = items.reduce((sum, item) => sum + item.lineTotal, 0)
@@ -61,10 +67,12 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, onSave, onPr
     fetchCustomers()
     if (invoiceId) {
       fetchInvoice()
+    } else if (quotationData) {
+      loadFromQuotation()
     } else {
       generateInvoiceNumber()
     }
-  }, [invoiceId])
+  }, [invoiceId, quotationData])
 
   const fetchCustomers = async () => {
     try {
@@ -147,6 +155,7 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, onSave, onPr
 
       setItems(invoiceItems.map(item => ({
         description: item.description,
+        hsn_code: item.hsn_code || '',
         quantity: item.quantity,
         unitPrice: Number(item.unit_price),
         lineTotal: Number(item.line_total)
@@ -164,8 +173,56 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, onSave, onPr
     }
   }
 
+  const loadFromQuotation = async () => {
+    if (!quotationData) return
+
+    try {
+      // Generate invoice number
+      const { data: lastInvoice } = await supabase
+        .from('invoices')
+        .select('invoice_number')
+        .order('created_at', { ascending: false })
+        .limit(1)
+
+      let nextNumber = 1
+      if (lastInvoice && lastInvoice.length > 0) {
+        const lastNumber = lastInvoice[0].invoice_number
+        const match = lastNumber.match(/INV-(\d+)/)
+        if (match) {
+          nextNumber = parseInt(match[1]) + 1
+        }
+      }
+
+      setInvoiceData({
+        invoiceNumber: `INV-${nextNumber.toString().padStart(4, '0')}`,
+        title: quotationData.quotation.title,
+        description: quotationData.quotation.description || '',
+        customerId: quotationData.quotation.customer_id,
+        issueDate: new Date(),
+        dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        taxRate: Number(quotationData.quotation.tax_rate),
+        status: 'draft'
+      })
+
+      setItems(quotationData.items.map((item: any) => ({
+        description: item.description,
+        hsn_code: item.hsn_code || '',
+        quantity: item.quantity,
+        unitPrice: Number(item.unit_price),
+        lineTotal: Number(item.line_total)
+      })))
+
+      toast({
+        title: "Success",
+        description: "Invoice pre-filled with quotation data",
+      })
+    } catch (error) {
+      console.error('Error loading quotation data:', error)
+    }
+  }
+
   const addItem = () => {
-    setItems([...items, { description: '', quantity: 1, unitPrice: 0, lineTotal: 0 }])
+    setItems([...items, { description: '', hsn_code: '', quantity: 1, unitPrice: 0, lineTotal: 0 }])
   }
 
   const removeItem = (index: number) => {
@@ -246,6 +303,7 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, onSave, onPr
       const itemsPayload = items.map(item => ({
         invoice_id: savedInvoice.id,
         description: item.description,
+        hsn_code: item.hsn_code,
         quantity: item.quantity,
         unit_price: item.unitPrice,
         line_total: item.lineTotal
@@ -318,6 +376,11 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, onSave, onPr
           {invoiceId ? 'Edit Invoice' : 'Create Invoice'}
         </h2>
         <div className="flex space-x-2">
+          {onCancel && (
+            <Button variant="outline" onClick={onCancel}>
+              Cancel
+            </Button>
+          )}
           <Button onClick={handlePreview} variant="outline">
             <Eye className="w-4 h-4 mr-2" />
             Preview
@@ -513,7 +576,8 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, onSave, onPr
             <TableHeader>
               <TableRow>
                 <TableHead>Description</TableHead>
-                <TableHead className="w-24">Quantity</TableHead>
+                <TableHead className="w-24">HSN Code</TableHead>
+                <TableHead className="w-20">Qty</TableHead>
                 <TableHead className="w-32">Unit Price</TableHead>
                 <TableHead className="w-32">Total</TableHead>
                 <TableHead className="w-16"></TableHead>
@@ -546,6 +610,14 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, onSave, onPr
                   </TableCell>
                   <TableCell>
                     <Input
+                      value={item.hsn_code}
+                      onChange={(e) => updateItem(index, 'hsn_code', e.target.value)}
+                      placeholder="HSN Code"
+                      className="text-sm"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
                       type="number"
                       value={item.quantity}
                       onChange={(e) => updateItem(index, 'quantity', Number(e.target.value))}
@@ -562,7 +634,7 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, onSave, onPr
                     />
                   </TableCell>
                   <TableCell>
-                    <span className="font-medium">${item.lineTotal.toFixed(2)}</span>
+                    <span className="font-medium">₹{item.lineTotal.toFixed(2)}</span>
                   </TableCell>
                   <TableCell>
                     <Button
