@@ -522,6 +522,25 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ invoiceId, invoice: pro
                     <span>Subtotal:</span>
                     <span>₹{Number(invoice.subtotal).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                   </div>
+                  {invoice.tax_rate > 0 && (
+                    <div className="flex justify-between py-1">
+                      <span>Tax ({invoice.tax_rate}%):</span>
+                      <span>₹{Number(invoice.tax_amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between py-1 border-t pt-2">
+                    <span>Total Amount:</span>
+                    <span>₹{Number(invoice.total_amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                  </div>
+                  <div className="flex justify-between py-1 font-bold text-lg">
+                    <Input
+                      value={editableText.roundedText}
+                      onChange={(e) => updateEditableText('roundedText', e.target.value)}
+                      className="border-0 p-0 bg-transparent text-lg font-bold print:hidden"
+                    />
+                    <span className="hidden print:block">{editableText.roundedText}</span>
+                    <span>₹{Math.round(Number(invoice.total_amount)).toLocaleString('en-IN')}</span>
+                  </div>
                   <div className="flex justify-between py-1">
                     <span>GST ({Number(invoice.tax_rate)}%):</span>
                     <span>₹{Number(invoice.tax_amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
