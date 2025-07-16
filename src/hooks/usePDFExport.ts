@@ -491,7 +491,7 @@ export function usePDFExport() {
     pdf.text('Rounded', pageMargin + summaryBoxWidth + 2, yPosition + 8)
     pdf.text('Total', pageMargin + summaryBoxWidth + 2, yPosition + 15)
     pdf.setFontSize(10)
-    const finalTotalText = `${Math.round(quotation.total_amount.toFixed(2))}`
+    const finalTotalText = `${Math.round(quotation.subtotal).toFixed(2)}`
     const finalTotalWidth = pdf.getTextWidth(finalTotalText)
     pdf.text(finalTotalText, pageMargin + summaryBoxWidth + totalBoxWidth - 2 - finalTotalWidth, yPosition + 12)
     
