@@ -483,7 +483,7 @@ export function usePDFExport() {
     pdf.setFontSize(8)
     pdf.text('Grand Total (in words):', pageMargin + 2, yPosition + 8)
     pdf.setFont('helvetica', 'normal')
-    const wordsText = numberToWords(Math.round(quotation.total_amount.toFixed(2)))
+    const wordsText = numberToWords(Math.round(Number(quotation.total_amount.toFixed(2))))
     const splitWordsText = pdf.splitTextToSize(wordsText, summaryBoxWidth - 4)
     pdf.text(splitWordsText, pageMargin + 2, yPosition + 15)
     
