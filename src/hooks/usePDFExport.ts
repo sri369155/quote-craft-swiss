@@ -465,7 +465,7 @@ export function usePDFExport() {
     const totalGstWidth = pdf.getTextWidth(totalGstText)
     pdf.text(totalGstText, colPositions[3] + (colWidths[3] / 2) - (totalGstWidth / 2), yPosition + 10)
     
-    const subtotalText = `${quotation.subtotal.toFixed(2)}`
+    const subtotalText = `${quotation.total_amount.toFixed(2)}`
     const subtotalWidth = pdf.getTextWidth(subtotalText)
     pdf.text(subtotalText, colPositions[4] + (colWidths[4] / 2) - (subtotalWidth / 2), yPosition + 10)
     
