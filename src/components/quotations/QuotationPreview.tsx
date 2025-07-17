@@ -642,7 +642,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
               />
               <div className="hidden print:block font-bold">{editableText.grandTotalText}</div>
               
-              <div className="text-sm">{numberToWords(Math.round(quotation.total_amount.toFixed(2)))}</div>
+              <div className="text-sm">{numberToWords(Math.round(quotation.total_amount))}</div>
             </div>
             <div className="p-3">
               <div className="flex justify-between">
