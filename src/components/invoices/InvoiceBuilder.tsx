@@ -6,9 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { CalendarIcon, Plus, Trash2, Save, Eye, FileText } from 'lucide-react'
+import { CalendarIcon, Plus, Trash2, Save, Eye, FileText, Edit, Smartphone } from 'lucide-react'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Checkbox } from '@/components/ui/checkbox'
 import { format } from 'date-fns'
 import { cn } from '@/lib/utils'
 import { supabase } from '@/integrations/supabase/client'
@@ -42,6 +44,9 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, quotationDat
   const [showCustomerForm, setShowCustomerForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [useSignature, setUseSignature] = useState(true)
+  const [editingField, setEditingField] = useState<string | null>(null)
+  const [tempValue, setTempValue] = useState('')
   const { toast } = useToast()
 
   const [invoiceData, setInvoiceData] = useState({
@@ -242,6 +247,73 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, quotationDat
     setItems(newItems)
   }
 
+  const generateHSNCode = async (description: string) => {
+    if (!description.trim()) return ''
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('openai-autofill', {
+        body: {
+          prompt: `Generate a 6-digit HSN (Harmonized System of Nomenclature) code for the product/service: "${description}". Return only the 6-digit numeric code without any explanation.`,
+          model: 'gpt-4o-mini'
+        }
+      })
+
+      if (error) {
+        console.error('Error generating HSN code:', error)
+        return ''
+      }
+
+      const hsnCode = data.generatedText?.trim().replace(/\D/g, '').substring(0, 6)
+      return hsnCode || ''
+    } catch (error) {
+      console.error('Error generating HSN code:', error)
+      return ''
+    }
+  }
+
+  const handleAutoGenerateHSN = async (index: number) => {
+    const item = items[index]
+    if (!item.description) {
+      toast({
+        title: "Error",
+        description: "Please enter a description first before generating HSN code",
+        variant: "destructive",
+      })
+      return
+    }
+
+    const hsnCode = await generateHSNCode(item.description)
+    if (hsnCode) {
+      updateItem(index, 'hsn_code', hsnCode)
+      toast({
+        title: "HSN Code Generated",
+        description: `Generated HSN code: ${hsnCode}`,
+      })
+    } else {
+      toast({
+        title: "Error",
+        description: "Failed to generate HSN code",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const openEditDialog = (field: string, currentValue: string) => {
+    setEditingField(field)
+    setTempValue(currentValue)
+  }
+
+  const saveEditedValue = () => {
+    if (editingField) {
+      const fieldPath = editingField.split('.')
+      if (fieldPath[0] === 'invoice') {
+        setInvoiceData(prev => ({ ...prev, [fieldPath[1]]: tempValue }))
+      }
+    }
+    setEditingField(null)
+    setTempValue('')
+  }
+
   const handleSave = async () => {
     if (!invoiceData.customerId || !invoiceData.title || items.some(item => !item.description)) {
       toast({
@@ -400,33 +472,112 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, quotationDat
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="invoiceNumber">Invoice Number</Label>
-              <Input
-                id="invoiceNumber"
-                value={invoiceData.invoiceNumber}
-                onChange={(e) => setInvoiceData(prev => ({ ...prev, invoiceNumber: e.target.value }))}
-                placeholder="INV-0001"
-              />
+              <div className="flex space-x-2">
+                <Input
+                  id="invoiceNumber"
+                  value={invoiceData.invoiceNumber}
+                  onChange={(e) => setInvoiceData(prev => ({ ...prev, invoiceNumber: e.target.value }))}
+                  placeholder="INV-0001"
+                  className="flex-1"
+                />
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm" className="md:hidden">
+                      <Smartphone className="w-4 h-4" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Edit Invoice Number</DialogTitle>
+                    </DialogHeader>
+                    <Input
+                      value={tempValue}
+                      onChange={(e) => setTempValue(e.target.value)}
+                      placeholder="INV-0001"
+                    />
+                    <Button onClick={() => {
+                      setInvoiceData(prev => ({ ...prev, invoiceNumber: tempValue }))
+                      setTempValue('')
+                    }}>
+                      Save
+                    </Button>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </div>
 
             <div>
               <Label htmlFor="title">Title *</Label>
-              <Input
-                id="title"
-                value={invoiceData.title}
-                onChange={(e) => setInvoiceData(prev => ({ ...prev, title: e.target.value }))}
-                placeholder="Invoice title"
-              />
+              <div className="flex space-x-2">
+                <Input
+                  id="title"
+                  value={invoiceData.title}
+                  onChange={(e) => setInvoiceData(prev => ({ ...prev, title: e.target.value }))}
+                  placeholder="Invoice title"
+                  className="flex-1"
+                />
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm" className="md:hidden">
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Edit Title</DialogTitle>
+                    </DialogHeader>
+                    <Input
+                      value={tempValue}
+                      onChange={(e) => setTempValue(e.target.value)}
+                      placeholder="Invoice title"
+                    />
+                    <Button onClick={() => {
+                      setInvoiceData(prev => ({ ...prev, title: tempValue }))
+                      setTempValue('')
+                    }}>
+                      Save
+                    </Button>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </div>
 
             <div>
               <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                value={invoiceData.description}
-                onChange={(e) => setInvoiceData(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Invoice description"
-                rows={3}
-              />
+              <div className="flex space-x-2">
+                <Textarea
+                  id="description"
+                  value={invoiceData.description}
+                  onChange={(e) => setInvoiceData(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Invoice description"
+                  rows={3}
+                  className="flex-1"
+                />
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm" className="md:hidden self-start">
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Edit Description</DialogTitle>
+                    </DialogHeader>
+                    <Textarea
+                      value={tempValue}
+                      onChange={(e) => setTempValue(e.target.value)}
+                      placeholder="Invoice description"
+                      rows={4}
+                    />
+                    <Button onClick={() => {
+                      setInvoiceData(prev => ({ ...prev, description: tempValue }))
+                      setTempValue('')
+                    }}>
+                      Save
+                    </Button>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </div>
 
             <div>
@@ -543,18 +694,29 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, quotationDat
               </Select>
             </div>
 
-            <div className="pt-4 border-t">
+            <div className="pt-4 border-t space-y-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="use-signature"
+                  checked={useSignature}
+                  onCheckedChange={(checked) => setUseSignature(checked === true)}
+                />
+                <Label htmlFor="use-signature" className="text-sm">
+                  Include signature in invoice
+                </Label>
+              </div>
+              
               <div className="flex justify-between mb-2">
                 <span>Subtotal:</span>
-                <span>${subtotal.toFixed(2)}</span>
+                <span>₹{subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between mb-2">
                 <span>Tax ({invoiceData.taxRate}%):</span>
-                <span>${taxAmount.toFixed(2)}</span>
+                <span>₹{taxAmount.toFixed(2)}</span>
               </div>
               <div className="flex justify-between font-bold text-lg">
                 <span>Total:</span>
-                <span>${total.toFixed(2)}</span>
+                <span>₹{total.toFixed(2)}</span>
               </div>
             </div>
           </CardContent>
@@ -609,12 +771,23 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, quotationDat
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Input
-                      value={item.hsn_code}
-                      onChange={(e) => updateItem(index, 'hsn_code', e.target.value)}
-                      placeholder="HSN Code"
-                      className="text-sm"
-                    />
+                    <div className="flex space-x-1">
+                      <Input
+                        value={item.hsn_code}
+                        onChange={(e) => updateItem(index, 'hsn_code', e.target.value)}
+                        placeholder="HSN Code"
+                        className="text-sm flex-1"
+                      />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleAutoGenerateHSN(index)}
+                        title="Auto-generate HSN code"
+                        className="px-2"
+                      >
+                        AI
+                      </Button>
+                    </div>
                   </TableCell>
                   <TableCell>
                     <Input
@@ -670,6 +843,31 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, quotationDat
           </div>
         </div>
       )}
+
+      {/* Edit Dialog for Mobile */}
+      <Dialog open={!!editingField} onOpenChange={() => setEditingField(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Field</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Textarea
+              value={tempValue}
+              onChange={(e) => setTempValue(e.target.value)}
+              placeholder="Enter value..."
+              rows={4}
+            />
+            <div className="flex space-x-2">
+              <Button onClick={saveEditedValue} className="flex-1">
+                Save
+              </Button>
+              <Button variant="outline" onClick={() => setEditingField(null)} className="flex-1">
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
