@@ -16,6 +16,11 @@ export interface Database {
           header_image_url: string | null
           footer_image_url: string | null
           signature_image_url: string | null
+          bank_name: string | null
+          bank_account_number: string | null
+          bank_ifsc_code: string | null
+          bank_branch: string | null
+          bank_account_type: string | null
           created_at: string
           updated_at: string
         }
@@ -33,6 +38,11 @@ export interface Database {
           header_image_url?: string | null
           footer_image_url?: string | null
           signature_image_url?: string | null
+          bank_name?: string | null
+          bank_account_number?: string | null
+          bank_ifsc_code?: string | null
+          bank_branch?: string | null
+          bank_account_type?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -50,6 +60,11 @@ export interface Database {
           header_image_url?: string | null
           footer_image_url?: string | null
           signature_image_url?: string | null
+          bank_name?: string | null
+          bank_account_number?: string | null
+          bank_ifsc_code?: string | null
+          bank_branch?: string | null
+          bank_account_type?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -141,6 +156,7 @@ export interface Database {
           id: string
           quotation_id: string
           description: string
+          hsn_code: string | null
           quantity: number
           unit_price: number
           line_total: number
@@ -150,6 +166,7 @@ export interface Database {
           id?: string
           quotation_id: string
           description: string
+          hsn_code?: string | null
           quantity?: number
           unit_price?: number
           line_total?: number
@@ -159,6 +176,7 @@ export interface Database {
           id?: string
           quotation_id?: string
           description?: string
+          hsn_code?: string | null
           quantity?: number
           unit_price?: number
           line_total?: number
@@ -180,6 +198,15 @@ export interface Database {
           total_amount: number
           issue_date: string | null
           due_date: string | null
+          order_number: string | null
+          order_date: string | null
+          delivery_number: string | null
+          delivery_date: string | null
+          consignee_name: string | null
+          consignee_address: string | null
+          consignee_gstin: string | null
+          consignee_email: string | null
+          consignee_phone: string | null
           created_at: string
           updated_at: string
         }
@@ -197,6 +224,15 @@ export interface Database {
           total_amount?: number
           issue_date?: string | null
           due_date?: string | null
+          order_number?: string | null
+          order_date?: string | null
+          delivery_number?: string | null
+          delivery_date?: string | null
+          consignee_name?: string | null
+          consignee_address?: string | null
+          consignee_gstin?: string | null
+          consignee_email?: string | null
+          consignee_phone?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -214,6 +250,15 @@ export interface Database {
           total_amount?: number
           issue_date?: string | null
           due_date?: string | null
+          order_number?: string | null
+          order_date?: string | null
+          delivery_number?: string | null
+          delivery_date?: string | null
+          consignee_name?: string | null
+          consignee_address?: string | null
+          consignee_gstin?: string | null
+          consignee_email?: string | null
+          consignee_phone?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -223,6 +268,7 @@ export interface Database {
           id: string
           invoice_id: string
           description: string
+          hsn_code: string | null
           quantity: number
           unit_price: number
           line_total: number
@@ -232,6 +278,7 @@ export interface Database {
           id?: string
           invoice_id: string
           description: string
+          hsn_code?: string | null
           quantity?: number
           unit_price?: number
           line_total?: number
@@ -241,6 +288,7 @@ export interface Database {
           id?: string
           invoice_id?: string
           description?: string
+          hsn_code?: string | null
           quantity?: number
           unit_price?: number
           line_total?: number

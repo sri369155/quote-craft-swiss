@@ -90,13 +90,22 @@ export type Database = {
       }
       invoices: {
         Row: {
+          consignee_address: string | null
+          consignee_email: string | null
+          consignee_gstin: string | null
+          consignee_name: string | null
+          consignee_phone: string | null
           created_at: string | null
           customer_id: string
+          delivery_date: string | null
+          delivery_number: string | null
           description: string | null
           due_date: string | null
           id: string
           invoice_number: string
           issue_date: string | null
+          order_date: string | null
+          order_number: string | null
           status: string | null
           subtotal: number
           tax_amount: number
@@ -107,13 +116,22 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          consignee_address?: string | null
+          consignee_email?: string | null
+          consignee_gstin?: string | null
+          consignee_name?: string | null
+          consignee_phone?: string | null
           created_at?: string | null
           customer_id: string
+          delivery_date?: string | null
+          delivery_number?: string | null
           description?: string | null
           due_date?: string | null
           id?: string
           invoice_number: string
           issue_date?: string | null
+          order_date?: string | null
+          order_number?: string | null
           status?: string | null
           subtotal?: number
           tax_amount?: number
@@ -124,13 +142,22 @@ export type Database = {
           user_id: string
         }
         Update: {
+          consignee_address?: string | null
+          consignee_email?: string | null
+          consignee_gstin?: string | null
+          consignee_name?: string | null
+          consignee_phone?: string | null
           created_at?: string | null
           customer_id?: string
+          delivery_date?: string | null
+          delivery_number?: string | null
           description?: string | null
           due_date?: string | null
           id?: string
           invoice_number?: string
           issue_date?: string | null
+          order_date?: string | null
+          order_number?: string | null
           status?: string | null
           subtotal?: number
           tax_amount?: number
@@ -144,6 +171,11 @@ export type Database = {
       }
       profiles: {
         Row: {
+          bank_account_number: string | null
+          bank_account_type: string | null
+          bank_branch: string | null
+          bank_ifsc_code: string | null
+          bank_name: string | null
           company_address: string | null
           company_email: string | null
           company_logo_url: string | null
@@ -161,6 +193,11 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          bank_account_number?: string | null
+          bank_account_type?: string | null
+          bank_branch?: string | null
+          bank_ifsc_code?: string | null
+          bank_name?: string | null
           company_address?: string | null
           company_email?: string | null
           company_logo_url?: string | null
@@ -178,6 +215,11 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          bank_account_number?: string | null
+          bank_account_type?: string | null
+          bank_branch?: string | null
+          bank_ifsc_code?: string | null
+          bank_name?: string | null
           company_address?: string | null
           company_email?: string | null
           company_logo_url?: string | null
