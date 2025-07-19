@@ -71,8 +71,8 @@ export default function InvoicePreview({ invoiceId, invoice: passedInvoice, onEd
         .eq('id', invoiceId)
         .single()
       if (error) throw error
-      setInvoice(data)
-      loadEditableData(data)
+      setInvoice(data as Invoice)
+      loadEditableData(data as Invoice)
       await fetchCustomer(data.customer_id)
       await fetchItems(data.id)
     } catch (error) {
