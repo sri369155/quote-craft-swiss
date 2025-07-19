@@ -57,6 +57,7 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, quotationDat
     issueDate: new Date(),
     dueDate: new Date(),
     taxRate: 0,
+    bankDetails: '',
     status: 'draft' as 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled'
   })
 
@@ -155,6 +156,7 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, quotationDat
         issueDate: new Date(invoice.issue_date),
         dueDate: new Date(invoice.due_date),
         taxRate: Number(invoice.tax_rate),
+        bankDetails: '',
         status: (invoice.status as 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled') || 'draft'
       })
 
@@ -206,6 +208,7 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, quotationDat
         issueDate: new Date(),
         dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
         taxRate: Number(quotationData.quotation.tax_rate),
+        bankDetails: '',
         status: 'draft'
       })
 
@@ -701,6 +704,18 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, quotationDat
                   <SelectItem value="cancelled">Cancelled</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="bankDetails">Bank Details</Label>
+              <Textarea
+                id="bankDetails"
+                value={invoiceData.bankDetails}
+                onChange={(e) => setInvoiceData(prev => ({ ...prev, bankDetails: e.target.value }))}
+                placeholder="Bank Name: &#10;IFSC Code: &#10;Account No: &#10;Branch: "
+                rows={4}
+                className="font-mono text-sm"
+              />
             </div>
 
             <div className="pt-4 border-t space-y-4">
