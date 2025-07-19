@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Slider } from '@/components/ui/slider'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { CalendarIcon, Download, Edit2, Save, ArrowLeft } from 'lucide-react'
+import { CalendarIcon, Download, Edit2, Save, ArrowLeft, Printer, Image } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Calendar } from '@/components/ui/calendar'
 import { format } from 'date-fns'
@@ -37,6 +37,10 @@ export default function InvoicePreview({ invoiceId, invoice: passedInvoice, onEd
   const [showSignature, setShowSignature] = useState(true)
   const [lineSpacing, setLineSpacing] = useState([1.2])
   const [isEditing, setIsEditing] = useState(false)
+  const [useHeaderImage, setUseHeaderImage] = useState(false)
+  const [useFooterImage, setUseFooterImage] = useState(false)
+  const [termsConditions, setTermsConditions] = useState('Terms of Payment: As Per Order')
+  const [showTerms, setShowTerms] = useState(true)
   
   const [editableInvoice, setEditableInvoice] = useState({
     orderNumber: '',
@@ -125,9 +129,16 @@ export default function InvoicePreview({ invoiceId, invoice: passedInvoice, onEd
     await exportToPDF(invoice, customer, items, profile, { showSignature, lineSpacing: lineSpacing[0] })
   }
 
+  const handlePrint = () => {
+    window.print()
+  }
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount)
   }
+
+  // Calculate tax amount for display
+  const taxAmount = invoice ? invoice.tax_amount : 0
 
   if (loading) return <div className="flex justify-center items-center h-64">Loading...</div>
   if (!invoice || !customer) return <div className="text-center text-gray-500">Invoice not found</div>
@@ -149,6 +160,9 @@ export default function InvoicePreview({ invoiceId, invoice: passedInvoice, onEd
               <Edit2 className="w-4 h-4 mr-2" />Edit
             </Button>
           )}
+          <Button variant="outline" onClick={handlePrint}>
+            <Printer className="w-4 h-4 mr-2" />Print
+          </Button>
           <Button onClick={handleExportPDF} disabled={pdfLoading}>
             <Download className="w-4 h-4 mr-2" />
             {pdfLoading ? 'Exporting...' : 'Download PDF'}
@@ -159,146 +173,215 @@ export default function InvoicePreview({ invoiceId, invoice: passedInvoice, onEd
       <Card>
         <CardHeader><CardTitle>Export Settings</CardTitle></CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center space-x-2">
-            <Checkbox id="signature" checked={showSignature} onCheckedChange={(checked) => setShowSignature(checked === true)} />
-            <Label htmlFor="signature">Include signature block</Label>
-          </div>
-          <div className="space-y-2">
-            <Label>Line Spacing: {lineSpacing[0].toFixed(1)}</Label>
-            <Slider value={lineSpacing} onValueChange={setLineSpacing} max={2} min={0.8} step={0.1} className="w-32" />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox id="signature" checked={showSignature} onCheckedChange={(checked) => setShowSignature(checked === true)} />
+                <Label htmlFor="signature">Include signature block</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="terms" checked={showTerms} onCheckedChange={(checked) => setShowTerms(checked === true)} />
+                <Label htmlFor="terms">Include terms & conditions</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="headerImg" checked={useHeaderImage} onCheckedChange={(checked) => setUseHeaderImage(checked === true)} />
+                <Label htmlFor="headerImg">Use profile header image</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="footerImg" checked={useFooterImage} onCheckedChange={(checked) => setUseFooterImage(checked === true)} />
+                <Label htmlFor="footerImg">Use profile footer image</Label>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Line Spacing: {lineSpacing[0].toFixed(1)}</Label>
+                <Slider value={lineSpacing} onValueChange={setLineSpacing} max={2} min={0.8} step={0.1} className="w-32" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="terms-input">Terms & Conditions</Label>
+                <Textarea
+                  id="terms-input"
+                  value={termsConditions}
+                  onChange={(e) => setTermsConditions(e.target.value)}
+                  placeholder="Enter terms and conditions..."
+                  className="h-20"
+                />
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      <Card className="p-8" style={{ lineHeight: lineSpacing[0] }}>
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">{profile?.company_name || 'Your Company'}</h1>
-          {profile?.company_slogan && <p className="text-gray-600 mb-2">{profile.company_slogan}</p>}
-          <div className="text-sm text-gray-600">
-            {profile?.company_address && <p>{profile.company_address}</p>}
-            <div className="flex justify-center space-x-4 mt-1">
-              {profile?.company_phone && <span>Ph: {profile.company_phone}</span>}
-              {profile?.company_email && <span>Email: {profile.company_email}</span>}
-              {profile?.gst_number && <span>GST: {profile.gst_number}</span>}
-            </div>
+      <Card className="p-8 bg-white text-black print:shadow-none" style={{ lineHeight: lineSpacing[0] }}>
+        {/* Header Section */}
+        {useHeaderImage && profile?.header_image_url ? (
+          <div className="mb-8 text-center">
+            <img src={profile.header_image_url} alt="Header" className="w-full max-h-32 object-contain" />
           </div>
-        </div>
-
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold">INVOICE</h2>
-        </div>
-
-        <div className="grid grid-cols-2 gap-8 mb-6">
-          <div className="space-y-3">
-            <div><strong>Invoice No:</strong> {invoice.invoice_number}</div>
-            <div><strong>Issue Date:</strong> {invoice.issue_date ? format(new Date(invoice.issue_date), 'dd/MM/yyyy') : 'N/A'}</div>
-            {invoice.due_date && <div><strong>Due Date:</strong> {format(new Date(invoice.due_date), 'dd/MM/yyyy')}</div>}
-          </div>
-          <div className="space-y-3">
-            {invoice.order_number && <div><strong>Order No:</strong> {invoice.order_number}</div>}
-            {invoice.order_date && <div><strong>Order Date:</strong> {format(new Date(invoice.order_date), 'dd/MM/yyyy')}</div>}
-            {invoice.delivery_number && <div><strong>Delivery No:</strong> {invoice.delivery_number}</div>}
-            {invoice.delivery_date && <div><strong>Delivery Date:</strong> {format(new Date(invoice.delivery_date), 'dd/MM/yyyy')}</div>}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-8 mb-6">
-          <div>
-            <h3 className="font-bold mb-2">Bill To:</h3>
-            <div className="text-sm">
-              <p className="font-medium">{customer.name}</p>
-              {customer.address && <p>{customer.address}</p>}
-              {customer.email && <p>Email: {customer.email}</p>}
-              {customer.phone && <p>Phone: {customer.phone}</p>}
-            </div>
-          </div>
-          <div>
-            <h3 className="font-bold mb-2">Ship To:</h3>
-            <div className="text-sm">
-              {invoice.consignee_name ? (
-                <>
-                  <p className="font-medium">{invoice.consignee_name}</p>
-                  {invoice.consignee_address && <p>{invoice.consignee_address}</p>}
-                  {invoice.consignee_gstin && <p>GSTIN: {invoice.consignee_gstin}</p>}
-                  {invoice.consignee_email && <p>Email: {invoice.consignee_email}</p>}
-                  {invoice.consignee_phone && <p>Phone: {invoice.consignee_phone}</p>}
-                </>
-              ) : (
-                <p className="text-gray-500 italic">Same as billing address</p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="mb-6">
-          <table className="w-full border-collapse border">
-            <thead>
-              <tr className="bg-gray-50">
-                <th className="border p-2 text-left">S.No</th>
-                <th className="border p-2 text-left">Description</th>
-                <th className="border p-2 text-left">HSN</th>
-                <th className="border p-2 text-center">Qty</th>
-                <th className="border p-2 text-right">Rate</th>
-                <th className="border p-2 text-right">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((item, index) => (
-                <tr key={item.id}>
-                  <td className="border p-2">{index + 1}</td>
-                  <td className="border p-2">{item.description}</td>
-                  <td className="border p-2">{item.hsn_code || '-'}</td>
-                  <td className="border p-2 text-center">{item.quantity}</td>
-                  <td className="border p-2 text-right">{formatCurrency(item.unit_price)}</td>
-                  <td className="border p-2 text-right">{formatCurrency(item.line_total)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="flex justify-end mb-6">
-          <div className="w-64">
-            <div className="flex justify-between mb-2">
-              <span>Subtotal:</span>
-              <span>{formatCurrency(invoice.subtotal)}</span>
-            </div>
-            {invoice.tax_rate > 0 && (
-              <div className="flex justify-between mb-2">
-                <span>GST ({invoice.tax_rate}%):</span>
-                <span>{formatCurrency(invoice.tax_amount)}</span>
-              </div>
-            )}
-            <div className="flex justify-between font-bold text-lg border-t pt-2">
-              <span>Total:</span>
-              <span>{formatCurrency(invoice.total_amount)}</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="mb-6">
-          <p><strong>Amount in words:</strong> {numberToWords(invoice.total_amount)} Rupees Only</p>
-        </div>
-
-        {showSignature && (
-          <div className="flex justify-end mt-12">
-            <div className="text-center">
-              <div className="mb-16"></div>
-              <div className="border-t border-gray-300 pt-2">
-                <p className="text-sm font-medium">Authorized Signature</p>
-                <p className="text-xs text-gray-600">{profile?.company_name || 'Company Name'}</p>
+        ) : (
+          <div className="mb-8 p-6 bg-gradient-to-r from-orange-500 to-amber-600 text-white text-center rounded-lg">
+            <h1 className="text-3xl font-bold mb-2">{profile?.company_name || 'BHAIRAVNEX'}</h1>
+            {profile?.company_slogan && <p className="text-orange-100 mb-2">"{profile.company_slogan}"</p>}
+            <div className="text-sm text-orange-100">
+              {profile?.company_address && <p>{profile.company_address}</p>}
+              <div className="flex justify-center space-x-4 mt-2">
+                {profile?.company_phone && <span>Ph: {profile.company_phone}</span>}
+                {profile?.company_email && <span>Email: {profile.company_email}</span>}
+                {profile?.gst_number && <span className="bg-orange-700 px-2 py-1 rounded text-xs">GST: {profile.gst_number}</span>}
               </div>
             </div>
           </div>
         )}
 
-        {(profile?.bank_name || profile?.bank_account_number) && (
-          <div className="mt-8 pt-4 border-t border-gray-200 text-center text-xs">
-            <p className="font-medium mb-1">Bank Details</p>
-            <div className="text-gray-600 space-x-4">
-              {profile?.bank_name && <span>Bank: {profile.bank_name}</span>}
-              {profile?.bank_account_number && <span>A/c: {profile.bank_account_number}</span>}
-              {profile?.bank_ifsc_code && <span>IFSC: {profile.bank_ifsc_code}</span>}
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-bold bg-black text-white py-2 px-4 inline-block">TAX INVOICE</h2>
+        </div>
+
+        <div className="grid grid-cols-2 gap-8 mb-6 border border-black">
+          <div className="p-4 border-r border-black">
+            <h3 className="font-bold mb-3 text-lg">Buyer</h3>
+            <div className="space-y-1">
+              <p className="font-semibold">{customer.name}</p>
+              {customer.address && <p className="text-sm">{customer.address}</p>}
+              {customer.email && <p className="text-sm">Email: {customer.email}</p>}
+              {customer.phone && <p className="text-sm">Contact No.: {customer.phone}</p>}
+            </div>
+          </div>
+          <div className="p-4 space-y-3">
+            <div className="space-y-1">
+              <div><strong>Seller GSTIN:</strong> {profile?.gst_number || 'N/A'}</div>
+              <div><strong>Invoice No:</strong> {invoice.invoice_number}</div>
+              <div><strong>Dated:</strong> {invoice.issue_date ? format(new Date(invoice.issue_date), 'dd/MM/yyyy') : 'N/A'}</div>
+            </div>
+            {(invoice.order_number || invoice.order_date) && (
+              <div className="space-y-1">
+                {invoice.order_number && <div><strong>Order No:</strong> {invoice.order_number}</div>}
+                {invoice.order_date && <div><strong>Dated:</strong> {format(new Date(invoice.order_date), 'dd/MM/yyyy')}</div>}
+              </div>
+            )}
+          </div>
+        </div>
+
+
+        <div className="mb-6">
+          <table className="w-full border-collapse border-2 border-black">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="border border-black p-3 text-left font-bold">Item (a)</th>
+                <th className="border border-black p-3 text-left font-bold">Description</th>
+                <th className="border border-black p-3 text-center font-bold">Unit</th>
+                <th className="border border-black p-3 text-center font-bold">Qty</th>
+                <th className="border border-black p-3 text-right font-bold">Rate(Rs)</th>
+                <th className="border border-black p-3 text-right font-bold">Total(Rs)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map((item, index) => (
+                <tr key={item.id} className="hover:bg-gray-50">
+                  <td className="border border-black p-3 text-center font-medium">({String.fromCharCode(97 + index)})</td>
+                  <td className="border border-black p-3">
+                    <div className="font-medium">{item.description}</div>
+                    {item.hsn_code && <div className="text-xs text-gray-600 mt-1">HSN: {item.hsn_code}</div>}
+                  </td>
+                  <td className="border border-black p-3 text-center">Nos</td>
+                  <td className="border border-black p-3 text-center font-medium">{item.quantity.toString().padStart(2, '0')}</td>
+                  <td className="border border-black p-3 text-right font-medium">{item.unit_price.toLocaleString('en-IN')}</td>
+                  <td className="border border-black p-3 text-right font-bold">{item.line_total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                </tr>
+              ))}
+              
+              {/* GST Row */}
+              {invoice.tax_rate > 0 && (
+                <tr className="bg-gray-50">
+                  <td className="border border-black p-3"></td>
+                  <td className="border border-black p-3 font-bold">GST@ {invoice.tax_rate}%</td>
+                  <td className="border border-black p-3"></td>
+                  <td className="border border-black p-3"></td>
+                  <td className="border border-black p-3 text-right font-bold">{invoice.tax_rate}%</td>
+                  <td className="border border-black p-3 text-right font-bold">{taxAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                </tr>
+              )}
+              
+              {/* Total Row */}
+              <tr className="bg-gray-100">
+                <td className="border border-black p-3"></td>
+                <td className="border border-black p-3 font-bold text-lg">TOTAL: {numberToWords(invoice.total_amount)} only</td>
+                <td className="border border-black p-3"></td>
+                <td className="border border-black p-3"></td>
+                <td className="border border-black p-3 text-right font-bold">Rounded to</td>
+                <td className="border border-black p-3 text-right font-bold text-lg">{Math.round(invoice.total_amount).toLocaleString('en-IN')}.00</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Terms and Bank Details Section */}
+        <div className="grid grid-cols-2 gap-6 mb-6">
+          {/* Terms of Payment */}
+          {showTerms && (
+            <div className="border border-black p-4">
+              <h3 className="font-bold mb-2">Terms of Payment:</h3>
+              <p className="text-sm whitespace-pre-wrap">{termsConditions}</p>
+              
+              {(profile?.bank_name || profile?.bank_account_number) && (
+                <div className="mt-4">
+                  <h4 className="font-bold mb-2">Account Details:</h4>
+                  <div className="text-sm space-y-1">
+                    {profile?.company_name && <p className="font-medium">{profile.company_name}</p>}
+                    {profile?.bank_account_number && <p>A/C No. {profile.bank_account_number}</p>}
+                    {profile?.bank_ifsc_code && <p>IFSC: {profile.bank_ifsc_code}</p>}
+                    {profile?.bank_branch && <p>Branch: {profile.bank_branch}</p>}
+                    {profile?.bank_name && <p>Bank: {profile.bank_name}</p>}
+                    {profile?.gst_number && <p>GST: {profile.gst_number}</p>}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* Signature Block */}
+          {showSignature && (
+            <div className="border border-black p-4 text-center">
+              <div className="mb-12">
+                {profile?.signature_image_url ? (
+                  <img src={profile.signature_image_url} alt="Signature" className="w-32 h-16 object-contain mx-auto" />
+                ) : (
+                  <div className="h-16 flex items-center justify-center text-gray-400">
+                    [Signature Space]
+                  </div>
+                )}
+              </div>
+              <div className="border-t border-black pt-2">
+                <p className="font-bold">Seal</p>
+                <p className="text-sm mt-1">Authorized Signatory</p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer Section */}
+        {useFooterImage && profile?.footer_image_url ? (
+          <div className="mt-8">
+            <img src={profile.footer_image_url} alt="Footer" className="w-full max-h-20 object-contain" />
+          </div>
+        ) : (
+          <div className="mt-8 pt-4 border-t-2 border-orange-500">
+            <div className="text-center text-sm bg-gradient-to-r from-orange-500 to-amber-600 text-white p-3 rounded">
+              <p className="font-bold mb-1">We look forward to associate with your organization.</p>
+              <div className="flex justify-between items-center mt-2">
+                <div className="flex items-center">
+                  <span className="mr-2">📍</span>
+                  <span>{profile?.company_address || 'Door No: 5-5, Vivekananda Nagar, Old Diary Form Post, Vishakaptnam 530040 AP.'}</span>
+                </div>
+                <div className="flex items-center">
+                  <span className="mr-2">📞</span>
+                  <div>
+                    <span>{profile?.company_phone || '+91 96032 79555'}</span>
+                    <br />
+                    <span>Email: {profile?.company_email || 'bhairavnex@gmail.com'}</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
