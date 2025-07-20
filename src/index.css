@@ -14,7 +14,7 @@
     --card-foreground: 15 23 42;
 
     --popover: 255 255 255;
-    --popover-foreground: 0 0 0;
+    --popover-foreground: 0 0 255;
 
     --primary: 239 68 68;                  /* Red-500 - vibrant primary */
     --primary-foreground: 255 255 255;
