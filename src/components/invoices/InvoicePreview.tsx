@@ -311,150 +311,230 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
         </div>
       </div>
 
-      {/* Invoice Content - Exact match to uploaded image */}
-      <div className="bg-white border border-gray-300 print:border-0" style={{ color: '#000000', backgroundColor: '#ffffff' }}>
+      {/* Invoice Content - Optimized layout with editable fields */}
+      <div className="bg-white border border-gray-300 print:border-0 leading-tight" style={{ 
+        color: '#000000', 
+        backgroundColor: '#ffffff',
+        fontSize: '12px',
+        lineHeight: '1.2'
+      }}>
         
-        {/* Header Section */}
+        {/* Header Section - Full width image */}
         {imagePreferences.useCustomHeader && profile?.header_image_url ? (
-          <div className="text-center border-b-2 border-black">
-            <img src={profile.header_image_url} alt="Header" className="w-full max-h-32 object-contain" />
+          <div className="border-b-2 border-black -mx-6 mb-4">
+            <img src={profile.header_image_url} alt="Header" className="w-full max-h-24 object-cover" style={{ width: '100vw', maxWidth: 'none' }} />
           </div>
         ) : (
-          <div className="bg-blue-800 text-white p-4 text-center">
-            <div className="flex justify-between items-center">
+          <div className="bg-blue-800 text-white p-3 -mx-6 mb-4" style={{ width: '100vw', maxWidth: 'none', marginLeft: '-1.5rem', marginRight: '-1.5rem' }}>
+            <div className="flex justify-between items-center px-6">
               <div className="text-left">
-                <h1 className="text-2xl font-bold text-white">{profile?.company_name || 'GUJARAT FREIGHT TOOLS'}</h1>
-                <p className="text-sm text-blue-100">Manufacturing & Supply of Precision Press Tool & Room Component</p>
-                <div className="text-xs mt-2">
+                <h1 className="text-lg font-bold text-white leading-tight">{profile?.company_name || 'GUJARAT FREIGHT TOOLS'}</h1>
+                <p className="text-xs text-blue-100 leading-tight">Manufacturing & Supply of Precision Press Tool & Room Component</p>
+                <div className="text-xs mt-1 leading-tight">
                   <p>64, Akshoy Industrial Estate</p>
-                  <p>Near New Cloth Market,</p>
-                  <p>Ahmedabad - 38562</p>
+                  <p>Near New Cloth Market, Ahmedabad - 38562</p>
                 </div>
               </div>
-              <div className="text-right text-sm">
+              <div className="text-right text-xs leading-tight">
                 <p>Tel : {profile?.company_phone || '079-25820309'}</p>
                 <p>Web : {profile?.company_email || 'www.gftools.com'}</p>
                 <p>Email : info@gftools.com</p>
               </div>
-              <div className="w-20 h-20 bg-teal-600 flex items-center justify-center">
-                <div className="text-white font-bold text-xs">LOGOTEXT</div>
+              <div className="w-16 h-16 bg-teal-600 flex items-center justify-center">
+                <div className="text-white font-bold text-xs">LOGO</div>
               </div>
             </div>
           </div>
         )}
 
-        <div className="p-6">
+        <div className="px-4 py-2">
           {/* GST and Invoice Header */}
-          <div className="grid grid-cols-3 mb-4">
+          <div className="grid grid-cols-3 mb-2 items-center">
             <div className="text-left">
-              <p className="font-bold">GSTIN : {profile?.gst_number || '24HDE7487RE5RT4'}</p>
+              <p className="font-bold text-xs">GSTIN : {profile?.gst_number || '24HDE7487RE5RT4'}</p>
             </div>
             <div className="text-center">
-              <h2 className="text-xl font-bold bg-black text-white py-1 px-4 inline-block">TAX INVOICE</h2>
+              <h2 className="text-lg font-bold bg-black text-white py-1 px-3 inline-block">TAX INVOICE</h2>
             </div>
             <div className="text-right">
-              <p className="font-bold">ORIGINAL FOR RECIPIENT</p>
+              <p className="font-bold text-xs">ORIGINAL FOR RECIPIENT</p>
             </div>
           </div>
 
-          {/* Customer and Invoice Details */}
-          <div className="grid grid-cols-2 gap-6 mb-6">
-            {/* Customer Detail */}
-            <div className="border-2 border-black">
-              <table className="w-full">
+          {/* Customer and Invoice Details - Editable */}
+          <div className="grid grid-cols-2 gap-3 mb-3">
+            {/* Customer Detail - Editable */}
+            <div className="border border-black">
+              <table className="w-full text-xs">
                 <thead>
                   <tr>
-                    <th className="bg-gray-200 border-b border-black p-2 text-left font-bold" colSpan={2}>Customer Detail</th>
+                    <th className="bg-gray-200 border-b border-black p-1 text-left font-bold text-xs" colSpan={2}>Customer Detail</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td className="border-b border-gray-300 p-2 font-semibold w-20">M/S</td>
-                    <td className="border-b border-gray-300 p-2">{customer.name}</td>
+                    <td className="border-b border-gray-300 p-1 font-semibold w-16 text-xs">M/S</td>
+                    <td className="border-b border-gray-300 p-1 text-xs">
+                      <Input 
+                        value={customer.name} 
+                        className="border-0 p-0 h-auto text-xs bg-transparent"
+                        style={{ fontSize: '12px' }}
+                      />
+                    </td>
                   </tr>
                   <tr>
-                    <td className="border-b border-gray-300 p-2 font-semibold">Address</td>
-                    <td className="border-b border-gray-300 p-2">{customer.address}</td>
+                    <td className="border-b border-gray-300 p-1 font-semibold text-xs">Address</td>
+                    <td className="border-b border-gray-300 p-1 text-xs">
+                      <Textarea 
+                        value={customer.address || ''} 
+                        className="border-0 p-0 h-auto text-xs bg-transparent resize-none min-h-0"
+                        style={{ fontSize: '12px' }}
+                        rows={2}
+                      />
+                    </td>
                   </tr>
                   <tr>
-                    <td className="border-b border-gray-300 p-2 font-semibold">PHONE</td>
-                    <td className="border-b border-gray-300 p-2">{customer.phone}</td>
+                    <td className="border-b border-gray-300 p-1 font-semibold text-xs">PHONE</td>
+                    <td className="border-b border-gray-300 p-1 text-xs">
+                      <Input 
+                        value={customer.phone || ''} 
+                        className="border-0 p-0 h-auto text-xs bg-transparent"
+                        style={{ fontSize: '12px' }}
+                      />
+                    </td>
                   </tr>
                   <tr>
-                    <td className="border-b border-gray-300 p-2 font-semibold">GSTIN</td>
-                    <td className="border-b border-gray-300 p-2">07AQLCC1206D1ZG</td>
+                    <td className="border-b border-gray-300 p-1 font-semibold text-xs">GSTIN</td>
+                    <td className="border-b border-gray-300 p-1 text-xs">
+                      <Input 
+                        value="07AQLCC1206D1ZG" 
+                        className="border-0 p-0 h-auto text-xs bg-transparent"
+                        style={{ fontSize: '12px' }}
+                      />
+                    </td>
                   </tr>
                   <tr>
-                    <td className="p-2 font-semibold">Place of Supply</td>
-                    <td className="p-2">{editableInvoiceData.placeOfSupply || 'Delhi ( 07 )'}</td>
+                    <td className="p-1 font-semibold text-xs">Place of Supply</td>
+                    <td className="p-1 text-xs">
+                      <Input 
+                        value={editableInvoiceData.placeOfSupply || 'Delhi ( 07 )'} 
+                        onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, placeOfSupply: e.target.value }))}
+                        className="border-0 p-0 h-auto text-xs bg-transparent"
+                        style={{ fontSize: '12px' }}
+                      />
+                    </td>
                   </tr>
                 </tbody>
               </table>
             </div>
 
-            {/* Invoice Details */}
+            {/* Invoice Details - Editable */}
             <div>
-              <table className="w-full border-2 border-black">
+              <table className="w-full border border-black text-xs">
                 <tbody>
                   <tr>
-                    <td className="border-b border-black p-2 font-semibold">Invoice No.</td>
-                    <td className="border-b border-black p-2">{invoice.invoice_number}</td>
-                    <td className="border-b border-black p-2 font-semibold">Invoice Date</td>
-                    <td className="border-b border-black p-2">{format(new Date(invoice.issue_date), 'dd-MMM-yyyy')}</td>
+                    <td className="border-b border-black p-1 font-semibold text-xs">Invoice No.</td>
+                    <td className="border-b border-black p-1 text-xs">
+                      <Input 
+                        value={invoice.invoice_number} 
+                        className="border-0 p-0 h-auto text-xs bg-transparent"
+                        style={{ fontSize: '12px' }}
+                      />
+                    </td>
+                    <td className="border-b border-black p-1 font-semibold text-xs">Invoice Date</td>
+                    <td className="border-b border-black p-1 text-xs">{format(new Date(invoice.issue_date), 'dd-MMM-yyyy')}</td>
                   </tr>
                   <tr>
-                    <td className="border-b border-black p-2 font-semibold">Challan No.</td>
-                    <td className="border-b border-black p-2">{editableInvoiceData.challanNumber}</td>
-                    <td className="border-b border-black p-2 font-semibold">Challan Date</td>
-                    <td className="border-b border-black p-2">{invoice.delivery_date ? format(new Date(invoice.delivery_date), 'dd-MMM-yyyy') : ''}</td>
+                    <td className="border-b border-black p-1 font-semibold text-xs">Challan No.</td>
+                    <td className="border-b border-black p-1 text-xs">
+                      <Input 
+                        value={editableInvoiceData.challanNumber} 
+                        onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, challanNumber: e.target.value }))}
+                        className="border-0 p-0 h-auto text-xs bg-transparent"
+                        style={{ fontSize: '12px' }}
+                      />
+                    </td>
+                    <td className="border-b border-black p-1 font-semibold text-xs">Challan Date</td>
+                    <td className="border-b border-black p-1 text-xs">{invoice.delivery_date ? format(new Date(invoice.delivery_date), 'dd-MMM-yyyy') : ''}</td>
                   </tr>
                   <tr>
-                    <td className="border-b border-black p-2 font-semibold">P.O. No.</td>
-                    <td className="border-b border-black p-2">{editableInvoiceData.poNumber}</td>
-                    <td className="border-b border-black p-2 font-semibold">Reverse Charge</td>
-                    <td className="border-b border-black p-2">{editableInvoiceData.reverseCharge}</td>
+                    <td className="border-b border-black p-1 font-semibold text-xs">P.O. No.</td>
+                    <td className="border-b border-black p-1 text-xs">
+                      <Input 
+                        value={editableInvoiceData.poNumber} 
+                        onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, poNumber: e.target.value }))}
+                        className="border-0 p-0 h-auto text-xs bg-transparent"
+                        style={{ fontSize: '12px' }}
+                      />
+                    </td>
+                    <td className="border-b border-black p-1 font-semibold text-xs">Reverse Charge</td>
+                    <td className="border-b border-black p-1 text-xs">
+                      <select 
+                        value={editableInvoiceData.reverseCharge} 
+                        onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, reverseCharge: e.target.value }))}
+                        className="border-0 p-0 h-auto text-xs bg-transparent w-full"
+                        style={{ fontSize: '12px' }}
+                      >
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                      </select>
+                    </td>
                   </tr>
                   <tr>
-                    <td className="border-b border-black p-2 font-semibold">DELIVERY DATE</td>
-                    <td className="border-b border-black p-2">{invoice.delivery_date ? format(new Date(invoice.delivery_date), 'dd-MMM-yyyy') : ''}</td>
-                    <td className="border-b border-black p-2 font-semibold">Due Date</td>
-                    <td className="border-b border-black p-2">{format(new Date(invoice.due_date), 'dd-MMM-yyyy')}</td>
+                    <td className="border-b border-black p-1 font-semibold text-xs">DELIVERY DATE</td>
+                    <td className="border-b border-black p-1 text-xs">{invoice.delivery_date ? format(new Date(invoice.delivery_date), 'dd-MMM-yyyy') : ''}</td>
+                    <td className="border-b border-black p-1 font-semibold text-xs">Due Date</td>
+                    <td className="border-b border-black p-1 text-xs">{format(new Date(invoice.due_date), 'dd-MMM-yyyy')}</td>
                   </tr>
                   <tr>
-                    <td className="border-b border-black p-2 font-semibold">L.R. No.</td>
-                    <td className="border-b border-black p-2">{editableInvoiceData.lrNumber}</td>
-                    <td className="p-2 font-semibold">E-Way No.</td>
-                    <td className="p-2">{editableInvoiceData.ewayNumber}</td>
+                    <td className="border-b border-black p-1 font-semibold text-xs">L.R. No.</td>
+                    <td className="border-b border-black p-1 text-xs">
+                      <Input 
+                        value={editableInvoiceData.lrNumber} 
+                        onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, lrNumber: e.target.value }))}
+                        className="border-0 p-0 h-auto text-xs bg-transparent"
+                        style={{ fontSize: '12px' }}
+                      />
+                    </td>
+                    <td className="p-1 font-semibold text-xs">E-Way No.</td>
+                    <td className="p-1 text-xs">
+                      <Input 
+                        value={editableInvoiceData.ewayNumber} 
+                        onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, ewayNumber: e.target.value }))}
+                        className="border-0 p-0 h-auto text-xs bg-transparent"
+                        style={{ fontSize: '12px' }}
+                      />
+                    </td>
                   </tr>
                 </tbody>
               </table>
             </div>
           </div>
 
-          {/* Items Table */}
-          <div className="mb-6">
-            <table className="w-full border-2 border-black border-collapse">
+          {/* Items Table - Compact and Optimized */}
+          <div className="mb-3" style={{ pageBreakInside: 'avoid' }}>
+            <table className="w-full border border-black border-collapse text-xs">
               <thead>
                 <tr className="bg-gray-200">
-                  <th className="border border-black p-2 text-left font-bold">Sr. No.</th>
-                  <th className="border border-black p-2 text-left font-bold">Name of Product / Service</th>
-                  <th className="border border-black p-2 text-center font-bold">HSN / SAC</th>
-                  <th className="border border-black p-2 text-center font-bold">Qty</th>
-                  <th className="border border-black p-2 text-right font-bold">Rate</th>
-                  <th className="border border-black p-2 text-right font-bold">Taxable Value</th>
-                  <th className="border border-black p-2 text-center font-bold" colSpan={2}>IGST</th>
-                  <th className="border border-black p-2 text-right font-bold">Total</th>
+                  <th className="border border-black p-1 text-left font-bold text-xs">Sr. No.</th>
+                  <th className="border border-black p-1 text-left font-bold text-xs">Name of Product / Service</th>
+                  <th className="border border-black p-1 text-center font-bold text-xs">HSN / SAC</th>
+                  <th className="border border-black p-1 text-center font-bold text-xs">Qty</th>
+                  <th className="border border-black p-1 text-right font-bold text-xs">Rate</th>
+                  <th className="border border-black p-1 text-right font-bold text-xs">Taxable Value</th>
+                  <th className="border border-black p-1 text-center font-bold text-xs" colSpan={2}>IGST</th>
+                  <th className="border border-black p-1 text-right font-bold text-xs">Total</th>
                 </tr>
                 <tr className="bg-gray-200">
-                  <th className="border border-black p-1"></th>
-                  <th className="border border-black p-1"></th>
-                  <th className="border border-black p-1"></th>
-                  <th className="border border-black p-1"></th>
-                  <th className="border border-black p-1"></th>
-                  <th className="border border-black p-1"></th>
-                  <th className="border border-black p-1 text-center font-bold">%</th>
-                  <th className="border border-black p-1 text-center font-bold">Amount</th>
-                  <th className="border border-black p-1"></th>
+                  <th className="border border-black py-0 px-1"></th>
+                  <th className="border border-black py-0 px-1"></th>
+                  <th className="border border-black py-0 px-1"></th>
+                  <th className="border border-black py-0 px-1"></th>
+                  <th className="border border-black py-0 px-1"></th>
+                  <th className="border border-black py-0 px-1"></th>
+                  <th className="border border-black py-0 px-1 text-center font-bold text-xs">%</th>
+                  <th className="border border-black py-0 px-1 text-center font-bold text-xs">Amount</th>
+                  <th className="border border-black py-0 px-1"></th>
                 </tr>
               </thead>
               <tbody>
@@ -464,139 +544,146 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                   const itemTotal = itemSubtotal + itemGst
                   
                   return (
-                    <tr key={item.id}>
-                      <td className="border border-black p-2 text-center">{index + 1}</td>
-                      <td className="border border-black p-2">
-                        <div className="font-medium">{item.description}</div>
+                    <tr key={item.id} className="leading-tight">
+                      <td className="border border-black p-1 text-center text-xs">{index + 1}</td>
+                      <td className="border border-black p-1 text-xs">
+                        <Input 
+                          value={item.description} 
+                          className="border-0 p-0 h-auto text-xs bg-transparent font-medium"
+                          style={{ fontSize: '11px' }}
+                        />
                       </td>
-                      <td className="border border-black p-2 text-center">{item.hsn_code || '8202'}</td>
-                      <td className="border border-black p-2 text-center">{item.quantity.toFixed(2)} PCS</td>
-                      <td className="border border-black p-2 text-right">{item.unit_price.toFixed(2)}</td>
-                      <td className="border border-black p-2 text-right">{itemSubtotal.toFixed(2)}</td>
-                      <td className="border border-black p-2 text-center">{invoice.tax_rate.toFixed(1)}</td>
-                      <td className="border border-black p-2 text-right">{itemGst.toFixed(2)}</td>
-                      <td className="border border-black p-2 text-right font-bold">{itemTotal.toFixed(2)}</td>
+                      <td className="border border-black p-1 text-center text-xs">
+                        <Input 
+                          value={item.hsn_code || '8202'} 
+                          className="border-0 p-0 h-auto text-xs bg-transparent text-center"
+                          style={{ fontSize: '11px' }}
+                        />
+                      </td>
+                      <td className="border border-black p-1 text-center text-xs">{item.quantity.toFixed(2)} PCS</td>
+                      <td className="border border-black p-1 text-right text-xs">{item.unit_price.toFixed(2)}</td>
+                      <td className="border border-black p-1 text-right text-xs">{itemSubtotal.toFixed(2)}</td>
+                      <td className="border border-black p-1 text-center text-xs">{invoice.tax_rate.toFixed(1)}</td>
+                      <td className="border border-black p-1 text-right text-xs">{itemGst.toFixed(2)}</td>
+                      <td className="border border-black p-1 text-right font-bold text-xs">{itemTotal.toFixed(2)}</td>
                     </tr>
                   )
                 })}
-                
-                {/* Empty rows for spacing */}
-                {Array.from({ length: Math.max(0, 6 - items.length) }).map((_, index) => (
-                  <tr key={`empty-${index}`}>
-                    <td className="border border-black p-4">&nbsp;</td>
-                    <td className="border border-black p-4">&nbsp;</td>
-                    <td className="border border-black p-4">&nbsp;</td>
-                    <td className="border border-black p-4">&nbsp;</td>
-                    <td className="border border-black p-4">&nbsp;</td>
-                    <td className="border border-black p-4">&nbsp;</td>
-                    <td className="border border-black p-4">&nbsp;</td>
-                    <td className="border border-black p-4">&nbsp;</td>
-                    <td className="border border-black p-4">&nbsp;</td>
-                  </tr>
-                ))}
 
                 {/* Total Row */}
-                <tr className="font-bold">
-                  <td className="border border-black p-2 text-center" colSpan={3}>Total</td>
-                  <td className="border border-black p-2 text-center">{items.reduce((sum, item) => sum + item.quantity, 0).toFixed(2)}</td>
-                  <td className="border border-black p-2">&nbsp;</td>
-                  <td className="border border-black p-2 text-right">{subtotal.toFixed(2)}</td>
-                  <td className="border border-black p-2">&nbsp;</td>
-                  <td className="border border-black p-2 text-right">{taxAmount.toFixed(2)}</td>
-                  <td className="border border-black p-2 text-right">{grandTotal.toFixed(2)}</td>
+                <tr className="font-bold leading-tight">
+                  <td className="border border-black p-1 text-center text-xs" colSpan={3}>Total</td>
+                  <td className="border border-black p-1 text-center text-xs">{items.reduce((sum, item) => sum + item.quantity, 0).toFixed(2)}</td>
+                  <td className="border border-black p-1">&nbsp;</td>
+                  <td className="border border-black p-1 text-right text-xs">{subtotal.toFixed(2)}</td>
+                  <td className="border border-black p-1">&nbsp;</td>
+                  <td className="border border-black p-1 text-right text-xs">{taxAmount.toFixed(2)}</td>
+                  <td className="border border-black p-1 text-right text-xs">{grandTotal.toFixed(2)}</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          {/* Totals Section */}
-          <div className="grid grid-cols-2 gap-6 mb-6">
+          {/* Totals Section - Compact */}
+          <div className="grid grid-cols-2 gap-3 mb-3">
             {/* Total in words */}
-            <div className="border-2 border-black p-4">
-              <h3 className="font-bold mb-2">Total in words</h3>
-              <p className="font-bold text-lg">{numberToWords(grandTotal).toUpperCase()} ONLY</p>
+            <div className="border border-black p-2">
+              <h3 className="font-bold mb-1 text-xs">Total in words</h3>
+              <p className="font-bold text-sm leading-tight">{numberToWords(grandTotal).toUpperCase()} ONLY</p>
             </div>
             
             {/* Amount breakdown */}
             <div>
-              <table className="w-full border-2 border-black">
+              <table className="w-full border border-black text-xs">
                 <tbody>
                   <tr>
-                    <td className="border-b border-black p-2 font-semibold">Taxable Amount</td>
-                    <td className="border-b border-black p-2 text-right">{subtotal.toFixed(2)}</td>
+                    <td className="border-b border-black p-1 font-semibold text-xs">Taxable Amount</td>
+                    <td className="border-b border-black p-1 text-right text-xs">{subtotal.toFixed(2)}</td>
                   </tr>
                   <tr>
-                    <td className="border-b border-black p-2 font-semibold">Add : IGST</td>
-                    <td className="border-b border-black p-2 text-right">{taxAmount.toFixed(2)}</td>
+                    <td className="border-b border-black p-1 font-semibold text-xs">Add : IGST</td>
+                    <td className="border-b border-black p-1 text-right text-xs">{taxAmount.toFixed(2)}</td>
                   </tr>
                   <tr>
-                    <td className="border-b border-black p-2 font-semibold">Total Tax</td>
-                    <td className="border-b border-black p-2 text-right">{taxAmount.toFixed(2)}</td>
+                    <td className="border-b border-black p-1 font-semibold text-xs">Total Tax</td>
+                    <td className="border-b border-black p-1 text-right text-xs">{taxAmount.toFixed(2)}</td>
                   </tr>
                   <tr>
-                    <td className="border-b border-black p-2 font-bold text-lg">Total Amount After Tax</td>
-                    <td className="border-b border-black p-2 text-right font-bold text-lg">₹ {grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                    <td className="border-b border-black p-1 font-bold text-sm">Total Amount After Tax</td>
+                    <td className="border-b border-black p-1 text-right font-bold text-sm">₹ {grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
                   </tr>
                   <tr>
-                    <td className="p-2 font-semibold"></td>
-                    <td className="p-2 text-right text-sm">(E & O.E.)</td>
+                    <td className="p-1 font-semibold text-xs"></td>
+                    <td className="p-1 text-right text-xs">(E & O.E.)</td>
                   </tr>
                   <tr>
-                    <td className="border-b border-black p-2 font-semibold">GST Payable on Reverse Charge</td>
-                    <td className="border-b border-black p-2 text-right">N.A.</td>
+                    <td className="border-b border-black p-1 font-semibold text-xs">GST Payable on Reverse Charge</td>
+                    <td className="border-b border-black p-1 text-right text-xs">N.A.</td>
                   </tr>
                 </tbody>
               </table>
             </div>
           </div>
 
-          {/* Bank Details and Terms */}
-          <div className="grid grid-cols-2 gap-6 mb-6">
-            {/* Bank Details */}
-            <div className="border-2 border-black">
-              <h3 className="font-bold bg-gray-200 p-2 border-b border-black">Bank Details</h3>
-              <div className="p-4">
-                <div className="whitespace-pre-wrap text-sm">{editableBankDetails}</div>
+          {/* Bank Details and Terms - Compact with page break control */}
+          <div className="grid grid-cols-2 gap-3 mb-3" style={{ pageBreakInside: 'avoid' }}>
+            {/* Bank Details - Editable */}
+            <div className="border border-black">
+              <h3 className="font-bold bg-gray-200 p-1 border-b border-black text-xs">Bank Details</h3>
+              <div className="p-2">
+                <Textarea 
+                  value={editableBankDetails}
+                  onChange={(e) => setEditableBankDetails(e.target.value)}
+                  className="border-0 p-0 h-auto text-xs bg-transparent resize-none min-h-0 w-full"
+                  style={{ fontSize: '10px' }}
+                  rows={4}
+                />
               </div>
             </div>
 
             {/* Signature */}
-            <div className="border-2 border-black">
-              <h3 className="font-bold bg-gray-200 p-2 border-b border-black">For {profile?.company_name || 'Gujarat Freight Tools'}</h3>
-              <div className="p-4 text-center h-32 flex flex-col justify-between">
+            <div className="border border-black">
+              <h3 className="font-bold bg-gray-200 p-1 border-b border-black text-xs">For {profile?.company_name || 'Gujarat Freight Tools'}</h3>
+              <div className="p-2 text-center h-20 flex flex-col justify-between">
                 {imagePreferences.useCustomSignature && profile?.signature_image_url ? (
-                  <img src={profile.signature_image_url} alt="Signature" className="w-32 h-16 object-contain mx-auto" />
+                  <img src={profile.signature_image_url} alt="Signature" className="w-24 h-12 object-contain mx-auto" />
                 ) : (
-                  <div className="text-center text-gray-500 text-xs">
+                  <div className="text-center text-gray-500 text-xs leading-tight">
                     This is computer generated<br/>
                     invoice no signature required.
                   </div>
                 )}
-                <div className="border-t border-black pt-2 mt-4">
-                  <p className="font-bold">Authorised Signatory</p>
+                <div className="border-t border-black pt-1 mt-2">
+                  <p className="font-bold text-xs">Authorised Signatory</p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Terms and Conditions */}
-          <div className="border-2 border-black">
-            <h3 className="font-bold bg-gray-200 p-2 border-b border-black">Terms and Conditions</h3>
-            <div className="p-4">
-              <div className="whitespace-pre-wrap text-sm">{termsConditions}</div>
-              <div className="mt-4 text-center text-sm font-semibold">
+          {/* Terms and Conditions - Editable with page break at 0.5 inch above footer */}
+          <div className="border border-black" style={{ marginBottom: '0.5in', pageBreakInside: 'avoid' }}>
+            <h3 className="font-bold bg-gray-200 p-1 border-b border-black text-xs">Terms and Conditions</h3>
+            <div className="p-2">
+              <Textarea 
+                value={termsConditions}
+                onChange={(e) => setTermsConditions(e.target.value)}
+                className="border-0 p-0 h-auto text-xs bg-transparent resize-none min-h-0 w-full"
+                style={{ fontSize: '10px' }}
+                rows={3}
+              />
+              <div className="mt-2 text-center text-xs font-semibold">
                 Certified that the particulars given above are true and correct.
               </div>
             </div>
           </div>
 
-          {/* Footer */}
+          {/* Footer - Full width image with page break control */}
           {imagePreferences.useCustomFooter && profile?.footer_image_url ? (
-            <div className="mt-6 border-t-2 border-black pt-4">
-              <img src={profile.footer_image_url} alt="Footer" className="w-full max-h-20 object-contain" />
+            <div className="border-t-2 border-black pt-2 -mx-4" style={{ pageBreakInside: 'avoid', width: '100vw', maxWidth: 'none', marginLeft: '-1rem', marginRight: '-1rem' }}>
+              <img src={profile.footer_image_url} alt="Footer" className="w-full max-h-16 object-cover" style={{ width: '100vw', maxWidth: 'none' }} />
             </div>
           ) : (
-            <div className="mt-6 text-center text-xs text-gray-600 border-t border-gray-300 pt-2">
+            <div className="text-center text-xs text-gray-600 border-t border-gray-300 pt-1" style={{ pageBreakInside: 'avoid' }}>
               Generated on {format(new Date(), 'dd/MM/yyyy HH:mm')} | Thank you for your business
             </div>
           )}
