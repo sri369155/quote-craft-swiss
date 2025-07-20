@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
-import { Checkbox } from '@/components/ui/checkbox'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Download, Edit2, ArrowLeft, Printer } from 'lucide-react'
 import { format } from 'date-fns'
@@ -30,10 +29,22 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
   const [customer, setCustomer] = useState<Customer | null>(null)
   const [items, setItems] = useState<InvoiceItem[]>([])
   const [loading, setLoading] = useState(false)
+  const [frequentAddresses, setFrequentAddresses] = useState<any[]>([])
   
-  // Editable bank details
+  // Editable fields
   const [editableBankDetails, setEditableBankDetails] = useState('')
-  const [termsConditions, setTermsConditions] = useState('Payment Terms: Net 30 days\nDelivery: As per schedule\nGST: As indicated')
+  const [termsConditions, setTermsConditions] = useState('1. Subject to Ahmedabad Jurisdiction.\n2. Our responsibility ceases as soon as the goods leave our premises.\n3. Goods once sold will not be taken back.\n4. Delivery ex-premises.')
+  const [editableInvoiceData, setEditableInvoiceData] = useState({
+    challanNumber: '',
+    lrNumber: '',
+    ewayNumber: '',
+    reverseCharge: 'No',
+    placeOfSupply: '',
+    senderAddress: '',
+    senderGstin: '',
+    senderPhone: '',
+    poNumber: ''
+  })
   
   // Image preference controls
   const [imagePreferences, setImagePreferences] = useState({
@@ -57,10 +68,27 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
     
     // Initialize bank details from profile
     if (profile) {
-      const bankDetails = `Bank Name: ${profile.bank_name || ''}\nIFSC Code: ${profile.bank_ifsc_code || ''}\nAccount No: ${profile.bank_account_number || ''}\nBranch: ${profile.bank_branch || ''}`
+      const bankDetails = `Bank Name: ${profile.bank_name || 'State Bank of India'}\nBranch Name: ${profile.bank_branch || 'RAF CAMP'}\nBank Account Number: ${profile.bank_account_number || '20000000004512'}\nBank Branch IFSC: ${profile.bank_ifsc_code || 'SBIN0000488'}`
       setEditableBankDetails(bankDetails)
     }
+
+    fetchFrequentAddresses()
   }, [invoiceId, passedInvoice, profile])
+
+  const fetchFrequentAddresses = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('frequent_addresses')
+        .select('*')
+        .order('usage_count', { ascending: false })
+        .limit(5)
+      
+      if (error) throw error
+      setFrequentAddresses(data || [])
+    } catch (error) {
+      console.error('Error fetching frequent addresses:', error)
+    }
+  }
 
   const fetchInvoice = async () => {
     if (!invoiceId) return
@@ -75,6 +103,19 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
       setInvoice(data as Invoice)
       await fetchCustomer(data.customer_id)
       await fetchItems(data.id)
+
+      // Set editable invoice data
+      setEditableInvoiceData({
+        challanNumber: data.challan_number || '',
+        lrNumber: data.lr_number || '',
+        ewayNumber: data.eway_number || '',
+        reverseCharge: data.reverse_charge ? 'Yes' : 'No',
+        placeOfSupply: data.place_of_supply || '',
+        senderAddress: data.sender_address || '',
+        senderGstin: data.sender_gstin || '',
+        senderPhone: data.sender_phone || '',
+        poNumber: data.po_number || ''
+      })
     } catch (error) {
       console.error('Error fetching invoice:', error)
       toast({ title: 'Error', description: 'Failed to fetch invoice', variant: 'destructive' })
@@ -109,7 +150,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
       return
     }
     
-    // Create modified profile with image preferences and bank details
+    // Create modified profile with image preferences and editable data
     const modifiedProfile = profile ? {
       ...profile,
       header_image_url: imagePreferences.useCustomHeader ? profile.header_image_url : null,
@@ -117,59 +158,53 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
       signature_image_url: imagePreferences.useCustomSignature ? profile.signature_image_url : null
     } : undefined
     
-    await exportToPDF(invoice, customer, items, modifiedProfile)
+    const modifiedInvoice = {
+      ...invoice,
+      ...editableInvoiceData,
+      reverse_charge: editableInvoiceData.reverseCharge === 'Yes'
+    }
+    
+    await exportToPDF(modifiedInvoice as Invoice, customer, items, modifiedProfile, { 
+      bankDetails: editableBankDetails, 
+      termsConditions 
+    })
   }
 
   const handlePrint = () => {
     window.print()
   }
 
-  // Calculate tax amount for display
+  // Calculate totals
+  const subtotal = items.reduce((sum, item) => sum + item.line_total, 0)
   const taxAmount = invoice ? invoice.tax_amount : 0
+  const grandTotal = invoice ? invoice.total_amount : 0
 
   if (loading) return <div className="flex justify-center items-center h-64">Loading...</div>
   if (!invoice || !customer) return <div className="text-center text-gray-500">Invoice not found</div>
 
   return (
-    <div className="max-w-6xl mx-auto bg-white print:shadow-none">
+    <div className="max-w-6xl mx-auto print:shadow-none" style={{ backgroundColor: '#ffffff' }}>
       {/* Controls Section */}
       <div className="flex justify-between items-start mb-8 print:hidden bg-gray-50 p-4 rounded-lg">
         <h1 className="text-3xl font-bold text-primary">Invoice Preview</h1>
         <div className="flex space-x-2">
           {onBack && (
-            <Button
-              onClick={onBack}
-              variant="outline"
-              size="sm"
-            >
+            <Button onClick={onBack} variant="outline" size="sm">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back
             </Button>
           )}
           {onEdit && (
-            <Button
-              onClick={onEdit}
-              variant="outline"
-              size="sm"
-            >
+            <Button onClick={onEdit} variant="outline" size="sm">
               <Edit2 className="w-4 h-4 mr-2" />
               Edit
             </Button>
           )}
-          <Button
-            onClick={handlePrint}
-            variant="outline"
-            size="sm"
-          >
+          <Button onClick={handlePrint} variant="outline" size="sm">
             <Printer className="w-4 h-4 mr-2" />
             Print
           </Button>
-          <Button
-            onClick={handleExportPDF}
-            disabled={pdfLoading}
-            size="sm"
-            className="bg-primary hover:bg-primary/90"
-          >
+          <Button onClick={handleExportPDF} disabled={pdfLoading} size="sm" className="bg-primary hover:bg-primary/90">
             <Download className="w-4 h-4 mr-2" />
             {pdfLoading ? 'Exporting...' : 'Download PDF'}
           </Button>
@@ -219,195 +254,353 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
         </div>
       </div>
 
-      {/* Editable Terms and Bank Details */}
+      {/* Editable Fields */}
       <div className="print:hidden bg-gray-50 p-4 rounded-lg mb-6 space-y-4">
-        <div>
-          <Label htmlFor="terms">Terms & Conditions</Label>
-          <Textarea
-            id="terms"
-            value={termsConditions}
-            onChange={(e) => setTermsConditions(e.target.value)}
-            className="font-mono text-sm"
-            rows={3}
-          />
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="terms">Terms & Conditions</Label>
+            <Textarea
+              id="terms"
+              value={termsConditions}
+              onChange={(e) => setTermsConditions(e.target.value)}
+              className="font-mono text-sm"
+              rows={4}
+            />
+          </div>
+          <div>
+            <Label htmlFor="bankDetails">Bank Details</Label>
+            <Textarea
+              id="bankDetails"
+              value={editableBankDetails}
+              onChange={(e) => setEditableBankDetails(e.target.value)}
+              className="font-mono text-sm"
+              rows={4}
+            />
+          </div>
         </div>
-        <div>
-          <Label htmlFor="bankDetails">Bank Details</Label>
-          <Textarea
-            id="bankDetails"
-            value={editableBankDetails}
-            onChange={(e) => setEditableBankDetails(e.target.value)}
-            className="font-mono text-sm"
-            rows={4}
-          />
+
+        {/* Additional Invoice Fields */}
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <Label htmlFor="challanNumber">Challan No.</Label>
+            <Input
+              id="challanNumber"
+              value={editableInvoiceData.challanNumber}
+              onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, challanNumber: e.target.value }))}
+              placeholder="865"
+            />
+          </div>
+          <div>
+            <Label htmlFor="lrNumber">L.R. No.</Label>
+            <Input
+              id="lrNumber"
+              value={editableInvoiceData.lrNumber}
+              onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, lrNumber: e.target.value }))}
+              placeholder="958"
+            />
+          </div>
+          <div>
+            <Label htmlFor="ewayNumber">E-Way No.</Label>
+            <Input
+              id="ewayNumber"
+              value={editableInvoiceData.ewayNumber}
+              onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, ewayNumber: e.target.value }))}
+              placeholder="EWB54864584"
+            />
+          </div>
         </div>
       </div>
 
-      {/* Invoice Content */}
-      <div className="bg-white p-8 border border-gray-200 print:border-0"
-           style={{ color: '#000000', backgroundColor: '#ffffff' }}>
+      {/* Invoice Content - Exact match to uploaded image */}
+      <div className="bg-white border border-gray-300 print:border-0" style={{ color: '#000000', backgroundColor: '#ffffff' }}>
         
         {/* Header Section */}
         {imagePreferences.useCustomHeader && profile?.header_image_url ? (
-          <div className="mb-8 text-center">
+          <div className="text-center border-b-2 border-black">
             <img src={profile.header_image_url} alt="Header" className="w-full max-h-32 object-contain" />
           </div>
         ) : (
-          <div className="mb-8 p-6 bg-gradient-to-r from-orange-500 to-amber-600 text-white text-center rounded-lg">
-            <h1 className="text-3xl font-bold mb-2">{profile?.company_name || 'BHAIRAVNEX'}</h1>
-            {profile?.company_slogan && <p className="text-orange-100 mb-2">"{profile.company_slogan}"</p>}
-            <div className="text-sm text-orange-100">
-              {profile?.company_address && <p>{profile.company_address}</p>}
-              <div className="flex justify-center space-x-4 mt-2">
-                {profile?.company_phone && <span>Ph: {profile.company_phone}</span>}
-                {profile?.company_email && <span>Email: {profile.company_email}</span>}
-                {profile?.gst_number && <span className="bg-orange-700 px-2 py-1 rounded text-xs">GST: {profile.gst_number}</span>}
+          <div className="bg-blue-800 text-white p-4 text-center">
+            <div className="flex justify-between items-center">
+              <div className="text-left">
+                <h1 className="text-2xl font-bold text-white">{profile?.company_name || 'GUJARAT FREIGHT TOOLS'}</h1>
+                <p className="text-sm text-blue-100">Manufacturing & Supply of Precision Press Tool & Room Component</p>
+                <div className="text-xs mt-2">
+                  <p>64, Akshoy Industrial Estate</p>
+                  <p>Near New Cloth Market,</p>
+                  <p>Ahmedabad - 38562</p>
+                </div>
+              </div>
+              <div className="text-right text-sm">
+                <p>Tel : {profile?.company_phone || '079-25820309'}</p>
+                <p>Web : {profile?.company_email || 'www.gftools.com'}</p>
+                <p>Email : info@gftools.com</p>
+              </div>
+              <div className="w-20 h-20 bg-teal-600 flex items-center justify-center">
+                <div className="text-white font-bold text-xs">LOGOTEXT</div>
               </div>
             </div>
           </div>
         )}
 
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold bg-black text-white py-2 px-4 inline-block">TAX INVOICE</h2>
-        </div>
-
-        <div className="grid grid-cols-2 gap-8 mb-6 border-2 border-black">
-          <div className="p-4 border-r-2 border-black">
-            <h3 className="font-bold mb-3 text-lg bg-gray-100 p-2 border-b border-black">Buyer</h3>
-            <div className="space-y-1">
-              <p className="font-semibold">{customer.name}</p>
-              {customer.address && <p className="text-sm">{customer.address}</p>}
-              {customer.email && <p className="text-sm">Email: {customer.email}</p>}
-              {customer.phone && <p className="text-sm">Contact No.: {customer.phone}</p>}
+        <div className="p-6">
+          {/* GST and Invoice Header */}
+          <div className="grid grid-cols-3 mb-4">
+            <div className="text-left">
+              <p className="font-bold">GSTIN : {profile?.gst_number || '24HDE7487RE5RT4'}</p>
+            </div>
+            <div className="text-center">
+              <h2 className="text-xl font-bold bg-black text-white py-1 px-4 inline-block">TAX INVOICE</h2>
+            </div>
+            <div className="text-right">
+              <p className="font-bold">ORIGINAL FOR RECIPIENT</p>
             </div>
           </div>
-          <div className="p-4 space-y-3">
-            <div className="space-y-1">
-              <div><strong>Seller GSTIN:</strong> {profile?.gst_number || 'N/A'}</div>
-              <div><strong>Invoice No:</strong> {invoice.invoice_number}</div>
-              <div><strong>Dated:</strong> {invoice.issue_date ? format(new Date(invoice.issue_date), 'dd/MM/yyyy') : 'N/A'}</div>
-              <div><strong>Due Date:</strong> {invoice.due_date ? format(new Date(invoice.due_date), 'dd/MM/yyyy') : 'N/A'}</div>
-            </div>
-          </div>
-        </div>
 
-        {/* Items Table */}
-        <div className="mb-6">
-          <table className="w-full border-collapse border-2 border-black">
-            <thead>
-              <tr className="bg-gray-200">
-                <th className="border-2 border-black p-3 text-left font-bold">S.No</th>
-                <th className="border-2 border-black p-3 text-left font-bold">Description & HSN Code</th>
-                <th className="border-2 border-black p-3 text-center font-bold">Qty</th>
-                <th className="border-2 border-black p-3 text-right font-bold">Rate(₹)</th>
-                <th className="border-2 border-black p-3 text-right font-bold">GST Amount(₹)</th>
-                <th className="border-2 border-black p-3 text-right font-bold">Total(₹)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((item, index) => {
-                const itemSubtotal = item.quantity * item.unit_price
-                const itemGst = (itemSubtotal * invoice.tax_rate) / 100
-                const itemTotal = itemSubtotal + itemGst
-                
-                return (
-                  <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="border border-black p-3 text-center font-medium">{index + 1}</td>
-                    <td className="border border-black p-3">
-                      <div className="font-medium">{item.description}</div>
-                      {item.hsn_code && <div className="text-xs text-gray-600 mt-1">HSN: {item.hsn_code}</div>}
-                    </td>
-                    <td className="border border-black p-3 text-center font-medium">{item.quantity}</td>
-                    <td className="border border-black p-3 text-right font-medium">{item.unit_price.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                    <td className="border border-black p-3 text-right font-medium">{itemGst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                    <td className="border border-black p-3 text-right font-bold">{itemTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+          {/* Customer and Invoice Details */}
+          <div className="grid grid-cols-2 gap-6 mb-6">
+            {/* Customer Detail */}
+            <div className="border-2 border-black">
+              <table className="w-full">
+                <thead>
+                  <tr>
+                    <th className="bg-gray-200 border-b border-black p-2 text-left font-bold" colSpan={2}>Customer Detail</th>
                   </tr>
-                )
-              })}
-              
-              {/* Subtotal Row */}
-              <tr className="bg-gray-100">
-                <td className="border-2 border-black p-3 font-bold" colSpan={5}>Sub Total</td>
-                <td className="border-2 border-black p-3 text-right font-bold">{invoice.subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-              </tr>
-              
-              {/* GST Row */}
-              {invoice.tax_rate > 0 && (
-                <tr className="bg-gray-100">
-                  <td className="border-2 border-black p-3 font-bold" colSpan={5}>Total GST @ {invoice.tax_rate}%</td>
-                  <td className="border-2 border-black p-3 text-right font-bold">{taxAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="border-b border-gray-300 p-2 font-semibold w-20">M/S</td>
+                    <td className="border-b border-gray-300 p-2">{customer.name}</td>
+                  </tr>
+                  <tr>
+                    <td className="border-b border-gray-300 p-2 font-semibold">Address</td>
+                    <td className="border-b border-gray-300 p-2">{customer.address}</td>
+                  </tr>
+                  <tr>
+                    <td className="border-b border-gray-300 p-2 font-semibold">PHONE</td>
+                    <td className="border-b border-gray-300 p-2">{customer.phone}</td>
+                  </tr>
+                  <tr>
+                    <td className="border-b border-gray-300 p-2 font-semibold">GSTIN</td>
+                    <td className="border-b border-gray-300 p-2">07AQLCC1206D1ZG</td>
+                  </tr>
+                  <tr>
+                    <td className="p-2 font-semibold">Place of Supply</td>
+                    <td className="p-2">{editableInvoiceData.placeOfSupply || 'Delhi ( 07 )'}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            {/* Invoice Details */}
+            <div>
+              <table className="w-full border-2 border-black">
+                <tbody>
+                  <tr>
+                    <td className="border-b border-black p-2 font-semibold">Invoice No.</td>
+                    <td className="border-b border-black p-2">{invoice.invoice_number}</td>
+                    <td className="border-b border-black p-2 font-semibold">Invoice Date</td>
+                    <td className="border-b border-black p-2">{format(new Date(invoice.issue_date), 'dd-MMM-yyyy')}</td>
+                  </tr>
+                  <tr>
+                    <td className="border-b border-black p-2 font-semibold">Challan No.</td>
+                    <td className="border-b border-black p-2">{editableInvoiceData.challanNumber}</td>
+                    <td className="border-b border-black p-2 font-semibold">Challan Date</td>
+                    <td className="border-b border-black p-2">{invoice.delivery_date ? format(new Date(invoice.delivery_date), 'dd-MMM-yyyy') : ''}</td>
+                  </tr>
+                  <tr>
+                    <td className="border-b border-black p-2 font-semibold">P.O. No.</td>
+                    <td className="border-b border-black p-2">{editableInvoiceData.poNumber}</td>
+                    <td className="border-b border-black p-2 font-semibold">Reverse Charge</td>
+                    <td className="border-b border-black p-2">{editableInvoiceData.reverseCharge}</td>
+                  </tr>
+                  <tr>
+                    <td className="border-b border-black p-2 font-semibold">DELIVERY DATE</td>
+                    <td className="border-b border-black p-2">{invoice.delivery_date ? format(new Date(invoice.delivery_date), 'dd-MMM-yyyy') : ''}</td>
+                    <td className="border-b border-black p-2 font-semibold">Due Date</td>
+                    <td className="border-b border-black p-2">{format(new Date(invoice.due_date), 'dd-MMM-yyyy')}</td>
+                  </tr>
+                  <tr>
+                    <td className="border-b border-black p-2 font-semibold">L.R. No.</td>
+                    <td className="border-b border-black p-2">{editableInvoiceData.lrNumber}</td>
+                    <td className="p-2 font-semibold">E-Way No.</td>
+                    <td className="p-2">{editableInvoiceData.ewayNumber}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Items Table */}
+          <div className="mb-6">
+            <table className="w-full border-2 border-black border-collapse">
+              <thead>
+                <tr className="bg-gray-200">
+                  <th className="border border-black p-2 text-left font-bold">Sr. No.</th>
+                  <th className="border border-black p-2 text-left font-bold">Name of Product / Service</th>
+                  <th className="border border-black p-2 text-center font-bold">HSN / SAC</th>
+                  <th className="border border-black p-2 text-center font-bold">Qty</th>
+                  <th className="border border-black p-2 text-right font-bold">Rate</th>
+                  <th className="border border-black p-2 text-right font-bold">Taxable Value</th>
+                  <th className="border border-black p-2 text-center font-bold" colSpan={2}>IGST</th>
+                  <th className="border border-black p-2 text-right font-bold">Total</th>
                 </tr>
-              )}
-              
-              {/* Grand Total Row */}
-              <tr className="bg-black text-white">
-                <td className="border-2 border-black p-3 font-bold text-lg" colSpan={5}>
-                  GRAND TOTAL: {numberToWords(invoice.total_amount)} only
-                </td>
-                <td className="border-2 border-black p-3 text-right font-bold text-lg">
-                  ₹{invoice.total_amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+                <tr className="bg-gray-200">
+                  <th className="border border-black p-1"></th>
+                  <th className="border border-black p-1"></th>
+                  <th className="border border-black p-1"></th>
+                  <th className="border border-black p-1"></th>
+                  <th className="border border-black p-1"></th>
+                  <th className="border border-black p-1"></th>
+                  <th className="border border-black p-1 text-center font-bold">%</th>
+                  <th className="border border-black p-1 text-center font-bold">Amount</th>
+                  <th className="border border-black p-1"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((item, index) => {
+                  const itemSubtotal = item.quantity * item.unit_price
+                  const itemGst = (itemSubtotal * invoice.tax_rate) / 100
+                  const itemTotal = itemSubtotal + itemGst
+                  
+                  return (
+                    <tr key={item.id}>
+                      <td className="border border-black p-2 text-center">{index + 1}</td>
+                      <td className="border border-black p-2">
+                        <div className="font-medium">{item.description}</div>
+                      </td>
+                      <td className="border border-black p-2 text-center">{item.hsn_code || '8202'}</td>
+                      <td className="border border-black p-2 text-center">{item.quantity.toFixed(2)} PCS</td>
+                      <td className="border border-black p-2 text-right">{item.unit_price.toFixed(2)}</td>
+                      <td className="border border-black p-2 text-right">{itemSubtotal.toFixed(2)}</td>
+                      <td className="border border-black p-2 text-center">{invoice.tax_rate.toFixed(1)}</td>
+                      <td className="border border-black p-2 text-right">{itemGst.toFixed(2)}</td>
+                      <td className="border border-black p-2 text-right font-bold">{itemTotal.toFixed(2)}</td>
+                    </tr>
+                  )
+                })}
+                
+                {/* Empty rows for spacing */}
+                {Array.from({ length: Math.max(0, 6 - items.length) }).map((_, index) => (
+                  <tr key={`empty-${index}`}>
+                    <td className="border border-black p-4">&nbsp;</td>
+                    <td className="border border-black p-4">&nbsp;</td>
+                    <td className="border border-black p-4">&nbsp;</td>
+                    <td className="border border-black p-4">&nbsp;</td>
+                    <td className="border border-black p-4">&nbsp;</td>
+                    <td className="border border-black p-4">&nbsp;</td>
+                    <td className="border border-black p-4">&nbsp;</td>
+                    <td className="border border-black p-4">&nbsp;</td>
+                    <td className="border border-black p-4">&nbsp;</td>
+                  </tr>
+                ))}
 
-        {/* Terms and Bank Details Section */}
-        <div className="grid grid-cols-2 gap-6 mb-6">
-          {/* Terms of Payment */}
-          <div className="border-2 border-black p-4">
-            <h3 className="font-bold mb-2 bg-gray-100 p-2 -m-4 mb-2 border-b border-black">Terms & Conditions:</h3>
-            <div className="text-sm whitespace-pre-wrap mb-4">{termsConditions}</div>
+                {/* Total Row */}
+                <tr className="font-bold">
+                  <td className="border border-black p-2 text-center" colSpan={3}>Total</td>
+                  <td className="border border-black p-2 text-center">{items.reduce((sum, item) => sum + item.quantity, 0).toFixed(2)}</td>
+                  <td className="border border-black p-2">&nbsp;</td>
+                  <td className="border border-black p-2 text-right">{subtotal.toFixed(2)}</td>
+                  <td className="border border-black p-2">&nbsp;</td>
+                  <td className="border border-black p-2 text-right">{taxAmount.toFixed(2)}</td>
+                  <td className="border border-black p-2 text-right">{grandTotal.toFixed(2)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          {/* Totals Section */}
+          <div className="grid grid-cols-2 gap-6 mb-6">
+            {/* Total in words */}
+            <div className="border-2 border-black p-4">
+              <h3 className="font-bold mb-2">Total in words</h3>
+              <p className="font-bold text-lg">{numberToWords(grandTotal).toUpperCase()} ONLY</p>
+            </div>
             
-            <h4 className="font-bold mb-2 border-t border-black pt-2">Bank Details:</h4>
-            <div className="text-sm whitespace-pre-wrap font-mono">{editableBankDetails}</div>
-          </div>
-          
-          {/* Signature Block */}
-          <div className="border-2 border-black p-4 text-center">
-            <h3 className="font-bold mb-2 bg-gray-100 p-2 -m-4 mb-4 border-b border-black">For {profile?.company_name || 'BHAIRAVNEX'}</h3>
-            <div className="mb-8">
-              {imagePreferences.useCustomSignature && profile?.signature_image_url ? (
-                <img src={profile.signature_image_url} alt="Signature" className="w-32 h-16 object-contain mx-auto" />
-              ) : (
-                <div className="h-16 flex items-center justify-center text-gray-400 border border-dashed border-gray-300">
-                  [Signature Space]
-                </div>
-              )}
+            {/* Amount breakdown */}
+            <div>
+              <table className="w-full border-2 border-black">
+                <tbody>
+                  <tr>
+                    <td className="border-b border-black p-2 font-semibold">Taxable Amount</td>
+                    <td className="border-b border-black p-2 text-right">{subtotal.toFixed(2)}</td>
+                  </tr>
+                  <tr>
+                    <td className="border-b border-black p-2 font-semibold">Add : IGST</td>
+                    <td className="border-b border-black p-2 text-right">{taxAmount.toFixed(2)}</td>
+                  </tr>
+                  <tr>
+                    <td className="border-b border-black p-2 font-semibold">Total Tax</td>
+                    <td className="border-b border-black p-2 text-right">{taxAmount.toFixed(2)}</td>
+                  </tr>
+                  <tr>
+                    <td className="border-b border-black p-2 font-bold text-lg">Total Amount After Tax</td>
+                    <td className="border-b border-black p-2 text-right font-bold text-lg">₹ {grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                  </tr>
+                  <tr>
+                    <td className="p-2 font-semibold"></td>
+                    <td className="p-2 text-right text-sm">(E & O.E.)</td>
+                  </tr>
+                  <tr>
+                    <td className="border-b border-black p-2 font-semibold">GST Payable on Reverse Charge</td>
+                    <td className="border-b border-black p-2 text-right">N.A.</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-            <div className="border-t-2 border-black pt-2">
-              <p className="font-bold">Seal & Signature</p>
-              <p className="text-sm mt-1">Authorized Signatory</p>
-            </div>
           </div>
-        </div>
 
-        {/* Footer Section */}
-        {imagePreferences.useCustomFooter && profile?.footer_image_url ? (
-          <div className="mt-8">
-            <img src={profile.footer_image_url} alt="Footer" className="w-full max-h-20 object-contain" />
-          </div>
-        ) : (
-          <div className="mt-8 pt-4 border-t-2 border-orange-500">
-            <div className="text-center text-sm bg-gradient-to-r from-orange-500 to-amber-600 text-white p-3 rounded">
-              <p className="font-bold mb-1">Thank you for your business!</p>
-              <div className="flex justify-between items-center mt-2">
-                <div className="flex items-center">
-                  <span className="mr-2">📍</span>
-                  <span>{profile?.company_address || 'Company Address'}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="mr-2">📞</span>
-                  <div>
-                    <span>{profile?.company_phone || 'Phone'}</span>
-                    <br />
-                    <span>Email: {profile?.company_email || 'email@company.com'}</span>
+          {/* Bank Details and Terms */}
+          <div className="grid grid-cols-2 gap-6 mb-6">
+            {/* Bank Details */}
+            <div className="border-2 border-black">
+              <h3 className="font-bold bg-gray-200 p-2 border-b border-black">Bank Details</h3>
+              <div className="p-4">
+                <div className="whitespace-pre-wrap text-sm">{editableBankDetails}</div>
+              </div>
+            </div>
+
+            {/* Signature */}
+            <div className="border-2 border-black">
+              <h3 className="font-bold bg-gray-200 p-2 border-b border-black">For {profile?.company_name || 'Gujarat Freight Tools'}</h3>
+              <div className="p-4 text-center h-32 flex flex-col justify-between">
+                {imagePreferences.useCustomSignature && profile?.signature_image_url ? (
+                  <img src={profile.signature_image_url} alt="Signature" className="w-32 h-16 object-contain mx-auto" />
+                ) : (
+                  <div className="text-center text-gray-500 text-xs">
+                    This is computer generated<br/>
+                    invoice no signature required.
                   </div>
+                )}
+                <div className="border-t border-black pt-2 mt-4">
+                  <p className="font-bold">Authorised Signatory</p>
                 </div>
               </div>
             </div>
           </div>
-        )}
+
+          {/* Terms and Conditions */}
+          <div className="border-2 border-black">
+            <h3 className="font-bold bg-gray-200 p-2 border-b border-black">Terms and Conditions</h3>
+            <div className="p-4">
+              <div className="whitespace-pre-wrap text-sm">{termsConditions}</div>
+              <div className="mt-4 text-center text-sm font-semibold">
+                Certified that the particulars given above are true and correct.
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          {imagePreferences.useCustomFooter && profile?.footer_image_url ? (
+            <div className="mt-6 border-t-2 border-black pt-4">
+              <img src={profile.footer_image_url} alt="Footer" className="w-full max-h-20 object-contain" />
+            </div>
+          ) : (
+            <div className="mt-6 text-center text-xs text-gray-600 border-t border-gray-300 pt-2">
+              Generated on {format(new Date(), 'dd/MM/yyyy HH:mm')} | Thank you for your business
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

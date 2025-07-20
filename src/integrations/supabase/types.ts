@@ -47,6 +47,48 @@ export type Database = {
         }
         Relationships: []
       }
+      frequent_addresses: {
+        Row: {
+          address: string
+          address_type: string
+          created_at: string | null
+          email: string | null
+          gstin: string | null
+          id: string
+          name: string
+          phone: string | null
+          updated_at: string | null
+          usage_count: number | null
+          user_id: string
+        }
+        Insert: {
+          address: string
+          address_type: string
+          created_at?: string | null
+          email?: string | null
+          gstin?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          updated_at?: string | null
+          usage_count?: number | null
+          user_id: string
+        }
+        Update: {
+          address?: string
+          address_type?: string
+          created_at?: string | null
+          email?: string | null
+          gstin?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          updated_at?: string | null
+          usage_count?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       invoice_items: {
         Row: {
           created_at: string | null
@@ -90,6 +132,7 @@ export type Database = {
       }
       invoices: {
         Row: {
+          challan_number: string | null
           consignee_address: string | null
           consignee_email: string | null
           consignee_gstin: string | null
@@ -101,11 +144,19 @@ export type Database = {
           delivery_number: string | null
           description: string | null
           due_date: string | null
+          eway_number: string | null
           id: string
           invoice_number: string
           issue_date: string | null
+          lr_number: string | null
           order_date: string | null
           order_number: string | null
+          place_of_supply: string | null
+          po_number: string | null
+          reverse_charge: boolean | null
+          sender_address: string | null
+          sender_gstin: string | null
+          sender_phone: string | null
           status: string | null
           subtotal: number
           tax_amount: number
@@ -116,6 +167,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          challan_number?: string | null
           consignee_address?: string | null
           consignee_email?: string | null
           consignee_gstin?: string | null
@@ -127,11 +179,19 @@ export type Database = {
           delivery_number?: string | null
           description?: string | null
           due_date?: string | null
+          eway_number?: string | null
           id?: string
           invoice_number: string
           issue_date?: string | null
+          lr_number?: string | null
           order_date?: string | null
           order_number?: string | null
+          place_of_supply?: string | null
+          po_number?: string | null
+          reverse_charge?: boolean | null
+          sender_address?: string | null
+          sender_gstin?: string | null
+          sender_phone?: string | null
           status?: string | null
           subtotal?: number
           tax_amount?: number
@@ -142,6 +202,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          challan_number?: string | null
           consignee_address?: string | null
           consignee_email?: string | null
           consignee_gstin?: string | null
@@ -153,11 +214,19 @@ export type Database = {
           delivery_number?: string | null
           description?: string | null
           due_date?: string | null
+          eway_number?: string | null
           id?: string
           invoice_number?: string
           issue_date?: string | null
+          lr_number?: string | null
           order_date?: string | null
           order_number?: string | null
+          place_of_supply?: string | null
+          po_number?: string | null
+          reverse_charge?: boolean | null
+          sender_address?: string | null
+          sender_gstin?: string | null
+          sender_phone?: string | null
           status?: string | null
           subtotal?: number
           tax_amount?: number

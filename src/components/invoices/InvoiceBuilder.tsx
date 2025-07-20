@@ -56,8 +56,19 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, quotationDat
     customerId: '',
     issueDate: new Date(),
     dueDate: new Date(),
+    orderDate: null as Date | null,
+    deliveryDate: null as Date | null,
     taxRate: 0,
     bankDetails: '',
+    challanNumber: '',
+    lrNumber: '',
+    ewayNumber: '',
+    reverseCharge: false,
+    placeOfSupply: '',
+    senderAddress: '',
+    senderGstin: '',
+    senderPhone: '',
+    poNumber: '',
     status: 'draft' as 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled'
   })
 
@@ -155,8 +166,19 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, quotationDat
         customerId: invoice.customer_id,
         issueDate: new Date(invoice.issue_date),
         dueDate: new Date(invoice.due_date),
+        orderDate: invoice.order_date ? new Date(invoice.order_date) : null,
+        deliveryDate: invoice.delivery_date ? new Date(invoice.delivery_date) : null,
         taxRate: Number(invoice.tax_rate),
         bankDetails: '',
+        challanNumber: invoice.challan_number || '',
+        lrNumber: invoice.lr_number || '',
+        ewayNumber: invoice.eway_number || '',
+        reverseCharge: invoice.reverse_charge || false,
+        placeOfSupply: invoice.place_of_supply || '',
+        senderAddress: invoice.sender_address || '',
+        senderGstin: invoice.sender_gstin || '',
+        senderPhone: invoice.sender_phone || '',
+        poNumber: invoice.po_number || '',
         status: (invoice.status as 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled') || 'draft'
       })
 
@@ -207,8 +229,19 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, quotationDat
         customerId: quotationData.quotation.customer_id,
         issueDate: new Date(),
         dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        orderDate: null,
+        deliveryDate: null,
         taxRate: Number(quotationData.quotation.tax_rate),
         bankDetails: '',
+        challanNumber: '',
+        lrNumber: '',
+        ewayNumber: '',
+        reverseCharge: false,
+        placeOfSupply: '',
+        senderAddress: '',
+        senderGstin: '',
+        senderPhone: '',
+        poNumber: '',
         status: 'draft'
       })
 
