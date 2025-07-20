@@ -23,7 +23,7 @@
     --secondary-foreground: 30 41 59;      /* Slate-700 */
 
     --muted: 231 249 212;                  /* Very very light yellow background */
-    --muted-foreground: 188 8 93;             /* Black text for muted elements */
+    --muted-foreground: 0 250 0;             /* Black text for muted elements */
 
     --accent: 59 130 246;                  /* Blue-500 - vibrant accent */
     --accent-foreground: 255 255 255;
