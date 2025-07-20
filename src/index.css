@@ -17,7 +17,7 @@
     --popover-foreground: 15 23 42;
 
     --primary: 239 68 68;                  /* Red-500 - vibrant primary */
-    --primary-foreground: 255 255 255;
+    --primary-foreground: 0 0 255;
 
     --secondary: 248 250 252;              /* Slate-50 - subtle background */
     --secondary-foreground: 30 41 59;      /* Slate-700 */
