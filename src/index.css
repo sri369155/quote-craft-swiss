@@ -17,12 +17,12 @@
     --popover-foreground: 15 23 42;
 
     --primary: 239 68 68;                  /* Red-500 - vibrant primary */
-    --primary-foreground: 0 0 255;
+    --primary-foreground: 255 255 255;
 
     --secondary: 248 250 252;              /* Slate-50 - subtle background */
     --secondary-foreground: 30 41 59;      /* Slate-700 */
 
-    --muted: 231 249 212;                  /* Very very light yellow background */
+    --muted: 0 0 212;                  /* Very very light yellow background */
     --muted-foreground: 188 8 93;             /* Black text for muted elements */
 
     --accent: 59 130 246;                  /* Blue-500 - vibrant accent */
