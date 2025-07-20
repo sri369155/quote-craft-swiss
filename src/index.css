@@ -11,7 +11,7 @@
     --foreground: 15 23 42;                /* Slate-800 - deep contrast */
 
     --card: 255 255 255;                   /* Pure white cards */
-    --card-foreground: 15 23 42;
+    --card-foreground: 0 0 255;
 
     --popover: 255 255 255;
     --popover-foreground: 15 23 42;
@@ -22,7 +22,7 @@
     --secondary: 248 250 252;              /* Slate-50 - subtle background */
     --secondary-foreground: 30 41 59;      /* Slate-700 */
 
-    --muted: 0 0 212;                  /* Very very light yellow background */
+    --muted: 231 249 212;                  /* Very very light yellow background */
     --muted-foreground: 188 8 93;             /* Black text for muted elements */
 
     --accent: 59 130 246;                  /* Blue-500 - vibrant accent */
