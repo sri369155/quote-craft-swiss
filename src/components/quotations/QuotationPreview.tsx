@@ -712,7 +712,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                 <div className="hidden print:block">{editableText.signatureText}</div>
                 
                 <div className="font-bold text-foreground">
-                  For {editableText.companyName || profile?.company_name || 'BHAIRAVNEX'}
+                  For {editableText.companyName || profile?.company_name || ''}
                 </div>
                 
                 {imagePreferences.useCustomSignature && profile?.signature_image_url ? (
