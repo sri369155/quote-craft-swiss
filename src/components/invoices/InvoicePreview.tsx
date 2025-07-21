@@ -280,7 +280,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
         </div>
 
         {/* Additional Invoice Fields */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <div>
             <Label htmlFor="challanNumber">Challan No.</Label>
             <Input
@@ -291,7 +291,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
             />
           </div>
           <div>
-            <Label htmlFor="lrNumber">L.R. No.</Label>
+            <Label htmlFor="lrNumber">Delivery No & Date</Label>
             <Input
               id="lrNumber"
               value={editableInvoiceData.lrNumber}
@@ -299,14 +299,42 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
               placeholder="958"
             />
           </div>
-          <div>
-            <Label htmlFor="ewayNumber">E-Way No.</Label>
-            <Input
-              id="ewayNumber"
-              value={editableInvoiceData.ewayNumber}
-              onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, ewayNumber: e.target.value }))}
-              placeholder="EWB54864584"
-            />
+        </div>
+
+        {/* Additional Data Fields with Checkbox */}
+        <div className="space-y-2">
+          <div className="flex items-center space-x-2">
+            <input type="checkbox" id="showAdditionalFields" />
+            <Label htmlFor="showAdditionalFields">Add Additional Invoice Data Fields</Label>
+          </div>
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <Label htmlFor="poNumber">P.O. Number</Label>
+              <Input
+                id="poNumber"
+                value={editableInvoiceData.poNumber}
+                onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, poNumber: e.target.value }))}
+                placeholder="PO-123"
+              />
+            </div>
+            <div>
+              <Label htmlFor="senderGstin">Sender GSTIN</Label>
+              <Input
+                id="senderGstin"
+                value={editableInvoiceData.senderGstin}
+                onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, senderGstin: e.target.value }))}
+                placeholder="24AABCG1234H1Z5"
+              />
+            </div>
+            <div>
+              <Label htmlFor="senderPhone">Sender Phone</Label>
+              <Input
+                id="senderPhone"
+                value={editableInvoiceData.senderPhone}
+                onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, senderPhone: e.target.value }))}
+                placeholder="+91 98765 43210"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -321,12 +349,12 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
         
         {/* Header Section - Full width image */}
         {imagePreferences.useCustomHeader && profile?.header_image_url ? (
-          <div className="border-b-2 border-black -mx-6 mb-4">
-            <img src={profile.header_image_url} alt="Header" className="w-full max-h-24 object-cover" style={{ width: '100vw', maxWidth: 'none' }} />
+          <div className="border-b-2 border-black" style={{ margin: '0 -100vw', width: '100vw', position: 'relative', left: '50%', right: '50%', marginLeft: '-50vw', marginRight: '-50vw' }}>
+            <img src={profile.header_image_url} alt="Header" className="w-full max-h-24 object-cover" style={{ width: '100%', maxWidth: 'none' }} />
           </div>
         ) : (
-          <div className="bg-blue-800 text-white p-3 -mx-6 mb-4" style={{ width: '100vw', maxWidth: 'none', marginLeft: '-1.5rem', marginRight: '-1.5rem' }}>
-            <div className="flex justify-between items-center px-6">
+          <div className="bg-blue-800 text-white p-3" style={{ margin: '0 -100vw', width: '100vw', position: 'relative', left: '50%', right: '50%', marginLeft: '-50vw', marginRight: '-50vw' }}>
+            <div className="flex justify-between items-center" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 1.5rem' }}>
               <div className="text-left">
                 <h1 className="text-lg font-bold text-white leading-tight">{profile?.company_name || 'GUJARAT FREIGHT TOOLS'}</h1>
                 <p className="text-xs text-blue-100 leading-tight">Manufacturing & Supply of Precision Press Tool & Room Component</p>

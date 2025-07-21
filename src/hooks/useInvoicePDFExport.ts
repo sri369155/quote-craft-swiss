@@ -134,7 +134,7 @@ export function useInvoicePDFExport() {
         ['Challan No.', (invoice as any).challan_number || '865', 'Challan Date', invoice.delivery_date ? format(new Date(invoice.delivery_date), 'dd-MMM-yyyy') : ''],
         ['P.O. No.', (invoice as any).po_number || '', 'Reverse Charge', (invoice as any).reverse_charge ? 'Yes' : 'No'],
         ['DELIVERY DATE', invoice.delivery_date ? format(new Date(invoice.delivery_date), 'dd-MMM-yyyy') : '', 'Due Date', format(new Date(invoice.due_date), 'dd-MMM-yyyy')],
-        ['L.R. No.', (invoice as any).lr_number || '', 'E-Way No.', (invoice as any).eway_number || '']
+        ['Delivery No & Date', (invoice as any).lr_number || '', '', '']
       ]
       
       pdf.rect(105, rightYPos, 95, invoiceDetails.length * 4)
@@ -267,12 +267,25 @@ export function useInvoicePDFExport() {
       
       yPos += 10
       
-      // Total in words section - more compact
+      // Total in words section with terms - more compact
       pdf.setFont('helvetica', 'bold')
       pdf.setFontSize(6)
       pdf.text('Total in words', 10, yPos)
       pdf.setFont('helvetica', 'normal')
       pdf.text(numberToWords(invoice.total_amount).toUpperCase() + ' ONLY', 10, yPos + 5)
+      
+      // Terms and Conditions in same section
+      pdf.setFont('helvetica', 'bold')
+      pdf.setFontSize(5)
+      pdf.text('Terms and Conditions:', 10, yPos + 12)
+      
+      pdf.setFont('helvetica', 'normal')
+      const terms = options?.termsConditions || '1. Subject to Ahmedabad Jurisdiction.\n2. Our responsibility ceases as soon as the goods leave our premises.\n3. Goods once sold will not be taken back.\n4. Delivery ex-premises.'
+      const termLines = terms.split('\n')
+      
+      termLines.forEach((line, index) => {
+        pdf.text(line, 10, yPos + 16 + (index * 3))
+      })
       
       // Amount breakdown (right side) - more compact
       const breakdown = [
@@ -293,7 +306,7 @@ export function useInvoicePDFExport() {
         breakdownY += 4
       })
       
-      yPos += 20
+      yPos += 25 + (termLines.length * 3)
       
       // Check if we need a page break (0.5 inch = 36 points from bottom)
       const needPageBreak = yPos > (pageHeight - 50)
@@ -334,35 +347,22 @@ export function useInvoicePDFExport() {
       pdf.setFont('helvetica', 'bold')
       pdf.text('Authorised Signatory', 110, yPos + 18)
       
-      yPos += 25
+      yPos += 15
       
-      // Terms and Conditions - compact with page break control
-      pdf.setFont('helvetica', 'bold')
-      pdf.setFontSize(6)
-      pdf.text('Terms and Conditions', 10, yPos)
-      
-      pdf.setFont('helvetica', 'normal')
-      pdf.setFontSize(5)
-      
-      const terms = options?.termsConditions || '1. Subject to Ahmedabad Jurisdiction.\n2. Our responsibility ceases as soon as the goods leave our premises.\n3. Goods once sold will not be taken back.\n4. Delivery ex-premises.'
-      const termLines = terms.split('\n')
-      
-      termLines.forEach((line, index) => {
-        pdf.text(line, 10, yPos + 5 + (index * 3))
-      })
-      
-      pdf.text('Certified that the particulars given above are true and correct.', pageWidth/2, yPos + 5 + (termLines.length * 3) + 3, { align: 'center' })
+      // Certification text
+      pdf.text('Certified that the particulars given above are true and correct.', pageWidth/2, yPos, { align: 'center' })
       
       // Footer with page break control - full width
-      yPos += 15 + (termLines.length * 3)
+      yPos += 10
       
       if (userProfile?.footer_image_url) {
-        // Custom footer image - full width
+        // Custom footer image - full width, no margins
         try {
           pdf.setDrawColor(0, 0, 0)
           pdf.setLineWidth(1)
           pdf.line(0, yPos, pageWidth, yPos)
           pdf.text('FOOTER IMAGE PLACEHOLDER', pageWidth/2, yPos + 8, { align: 'center' })
+          pdf.line(0, yPos + 15, pageWidth, yPos + 15)
         } catch (error) {
           console.error('Error adding footer image:', error)
         }
