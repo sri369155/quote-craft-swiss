@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Download, Edit2, ArrowLeft, Printer } from 'lucide-react'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Download, Edit2, ArrowLeft, Printer, Edit3 } from 'lucide-react'
 import { format } from 'date-fns'
 import { numberToWords } from '@/lib/utils'
 import { supabase } from '@/integrations/supabase/client'
@@ -37,7 +38,6 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
   const [editableInvoiceData, setEditableInvoiceData] = useState({
     challanNumber: '',
     lrNumber: '',
-    ewayNumber: '',
     reverseCharge: 'No',
     placeOfSupply: '',
     senderAddress: '',
@@ -108,7 +108,6 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
       setEditableInvoiceData({
         challanNumber: data.challan_number || '',
         lrNumber: data.lr_number || '',
-        ewayNumber: data.eway_number || '',
         reverseCharge: data.reverse_charge ? 'Yes' : 'No',
         placeOfSupply: data.place_of_supply || '',
         senderAddress: data.sender_address || '',
@@ -515,20 +514,11 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                     <td className="border-b border-black p-1 text-xs">{format(new Date(invoice.due_date), 'dd-MMM-yyyy')}</td>
                   </tr>
                   <tr>
-                    <td className="border-b border-black p-1 font-semibold text-xs">L.R. No.</td>
-                    <td className="border-b border-black p-1 text-xs">
+                    <td className="p-1 font-semibold text-xs" colSpan={2}>Delivery No & Date</td>
+                    <td className="p-1 text-xs" colSpan={2}>
                       <Input 
                         value={editableInvoiceData.lrNumber} 
                         onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, lrNumber: e.target.value }))}
-                        className="border-0 p-0 h-auto text-xs bg-transparent"
-                        style={{ fontSize: '12px' }}
-                      />
-                    </td>
-                    <td className="p-1 font-semibold text-xs">E-Way No.</td>
-                    <td className="p-1 text-xs">
-                      <Input 
-                        value={editableInvoiceData.ewayNumber} 
-                        onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, ewayNumber: e.target.value }))}
                         className="border-0 p-0 h-auto text-xs bg-transparent"
                         style={{ fontSize: '12px' }}
                       />
@@ -575,11 +565,31 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                     <tr key={item.id} className="leading-tight">
                       <td className="border border-black p-1 text-center text-xs">{index + 1}</td>
                       <td className="border border-black p-1 text-xs">
-                        <Input 
-                          value={item.description} 
-                          className="border-0 p-0 h-auto text-xs bg-transparent font-medium"
-                          style={{ fontSize: '11px' }}
-                        />
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <div className="flex items-center space-x-1 cursor-pointer">
+                              <Input 
+                                value={item.description} 
+                                className="border-0 p-0 h-auto text-xs bg-transparent font-medium"
+                                style={{ fontSize: '11px' }}
+                                readOnly
+                              />
+                              <Edit3 className="h-3 w-3 text-gray-400 hover:text-gray-600" />
+                            </div>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-80">
+                            <div className="space-y-2">
+                              <Label htmlFor="description">Edit Item Description</Label>
+                              <Textarea
+                                id="description"
+                                defaultValue={item.description}
+                                className="min-h-[100px]"
+                                placeholder="Enter detailed item description..."
+                              />
+                              <Button size="sm" className="w-full">Update Description</Button>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
                       </td>
                       <td className="border border-black p-1 text-center text-xs">
                         <Input 
@@ -618,6 +628,23 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
             <div className="border border-black p-2">
               <h3 className="font-bold mb-1 text-xs">Total in words</h3>
               <p className="font-bold text-sm leading-tight">{numberToWords(grandTotal).toUpperCase()} ONLY</p>
+              
+              {/* Terms and Conditions moved here */}
+              <div className="mt-3 border-t border-gray-300 pt-2">
+                <h4 className="font-bold mb-1 text-xs">Terms and Conditions</h4>
+                <div className="space-y-1">
+                  <Textarea 
+                    value={termsConditions}
+                    onChange={(e) => setTermsConditions(e.target.value)}
+                    className="border-0 p-0 h-auto text-xs bg-transparent resize-none min-h-0 w-full"
+                    style={{ fontSize: '9px' }}
+                    rows={4}
+                  />
+                  <div className="text-center text-xs font-semibold pt-1 border-t border-gray-200">
+                    Certified that the particulars given above are true and correct.
+                  </div>
+                </div>
+              </div>
             </div>
             
             {/* Amount breakdown */}
@@ -688,33 +715,19 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
             </div>
           </div>
 
-          {/* Terms and Conditions - Editable with page break at 0.5 inch above footer */}
-          <div className="border border-black" style={{ marginBottom: '0.5in', pageBreakInside: 'avoid' }}>
-            <h3 className="font-bold bg-gray-200 p-1 border-b border-black text-xs">Terms and Conditions</h3>
-            <div className="p-2">
-              <Textarea 
-                value={termsConditions}
-                onChange={(e) => setTermsConditions(e.target.value)}
-                className="border-0 p-0 h-auto text-xs bg-transparent resize-none min-h-0 w-full"
-                style={{ fontSize: '10px' }}
-                rows={3}
-              />
-              <div className="mt-2 text-center text-xs font-semibold">
-                Certified that the particulars given above are true and correct.
-              </div>
-            </div>
-          </div>
 
-          {/* Footer - Full width image with page break control */}
-          {imagePreferences.useCustomFooter && profile?.footer_image_url ? (
-            <div className="border-t-2 border-black pt-2 -mx-4" style={{ pageBreakInside: 'avoid', width: '100vw', maxWidth: 'none', marginLeft: '-1rem', marginRight: '-1rem' }}>
-              <img src={profile.footer_image_url} alt="Footer" className="w-full max-h-16 object-cover" style={{ width: '100vw', maxWidth: 'none' }} />
-            </div>
-          ) : (
-            <div className="text-center text-xs text-gray-600 border-t border-gray-300 pt-1" style={{ pageBreakInside: 'avoid' }}>
-              Generated on {format(new Date(), 'dd/MM/yyyy HH:mm')} | Thank you for your business
-            </div>
-          )}
+          {/* Footer - Full width image with page break control at 0.5 inch above */}
+          <div style={{ marginTop: '0.5in', pageBreakInside: 'avoid' }}>
+            {imagePreferences.useCustomFooter && profile?.footer_image_url ? (
+              <div className="border-t-2 border-black pt-2 -mx-4" style={{ width: '100vw', maxWidth: 'none', marginLeft: '-1rem', marginRight: '-1rem' }}>
+                <img src={profile.footer_image_url} alt="Footer" className="w-full max-h-16 object-cover" style={{ width: '100vw', maxWidth: 'none', marginTop: '0', marginBottom: '0' }} />
+              </div>
+            ) : (
+              <div className="text-center text-xs text-gray-600 border-t border-gray-300 pt-1">
+                Generated on {format(new Date(), 'dd/MM/yyyy HH:mm')} | Thank you for your business
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

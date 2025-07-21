@@ -287,6 +287,11 @@ export function useInvoicePDFExport() {
         pdf.text(line, 10, yPos + 16 + (index * 3))
       })
       
+      // Certification text within terms section  
+      pdf.setFont('helvetica', 'bold')
+      pdf.setFontSize(5)
+      pdf.text('Certified that the particulars given above are true and correct.', 10, yPos + 20 + (termLines.length * 3))
+      
       // Amount breakdown (right side) - more compact
       const breakdown = [
         ['Taxable Amount', invoice.subtotal.toFixed(2)],
@@ -348,9 +353,6 @@ export function useInvoicePDFExport() {
       pdf.text('Authorised Signatory', 110, yPos + 18)
       
       yPos += 15
-      
-      // Certification text
-      pdf.text('Certified that the particulars given above are true and correct.', pageWidth/2, yPos, { align: 'center' })
       
       // Footer with page break control - full width
       yPos += 10
