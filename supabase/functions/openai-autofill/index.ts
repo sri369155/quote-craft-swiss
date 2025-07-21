@@ -55,14 +55,14 @@ serve(async (req) => {
 
       if (lines.length > 1) {
         // Multiline bulk input — Use AI to generate items with title and description
-        systemPrompt = 'You are an expert quotation assistant. Generate a professional quotation with appropriate title, description, and line items with quantities and unit prices.'
+        systemPrompt = 'You are an expert quotation assistant. Generate a professional quotation with appropriate title, description, and line items with quantities and unit prices. IMPORTANT: Do NOT include GST, tax, or any tax-related items as separate line items. Only include the actual goods/services being quoted.'
         prompt = `Based on this multi-line project description:
 ${lines.join('\n')}
 
 Generate a complete quotation with:
 1. A professional quotation title
 2. A brief project description
-3. Line items with quantities and unit prices
+3. Line items with quantities and unit prices (DO NOT include GST or tax as separate line items)
 
 Respond in this exact JSON format:
 {
@@ -131,10 +131,10 @@ Respond in this exact JSON format:
 }`
         } else {
           // No specific pricing info - let AI decide
-          systemPrompt = 'Generate a complete quotation with professional title, description, and appropriate pricing for the service/item.'
+          systemPrompt = 'Generate a complete quotation with professional title, description, and appropriate pricing for the service/item. IMPORTANT: Do NOT include GST, tax, or any tax-related items as separate line items.'
           prompt = `For this service/item: "${text}"
 
-Generate a complete quotation with title, description, and appropriate pricing.
+Generate a complete quotation with title, description, and appropriate pricing. Do NOT include GST or tax as separate line items.
 
 Respond in this exact JSON format:
 {
@@ -152,10 +152,10 @@ Respond in this exact JSON format:
       }
     } else {
       // Single item description - generate title, description and pricing
-      systemPrompt = 'Generate a complete quotation with professional title, description, and appropriate pricing for the single item.'
+      systemPrompt = 'Generate a complete quotation with professional title, description, and appropriate pricing for the single item. IMPORTANT: Do NOT include GST, tax, or any tax-related items as separate line items.'
       prompt = `For this ONE specific item: "${description}"
 
-Generate a complete quotation with professional title, description, and appropriate pricing for this single item.
+Generate a complete quotation with professional title, description, and appropriate pricing for this single item. Do NOT include GST or tax as separate line items.
 
 Respond in this exact JSON format:
 {
