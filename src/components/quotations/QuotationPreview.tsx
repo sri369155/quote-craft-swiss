@@ -205,6 +205,11 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
     setQuotation({ ...quotation, [field]: value })
   }
 
+  const formatScopeOfWork = (scopeOfWork: string) => {
+    if (!scopeOfWork) return []
+    return scopeOfWork.split('\n').filter(line => line.trim().length > 0)
+  }
+
   const updateItemField = (index: number, field: keyof QuotationItem, value: any) => {
     const updatedItems = [...items]
     updatedItems[index] = { ...updatedItems[index], [field]: value }
@@ -544,6 +549,20 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
             <p className="hidden print:block"><strong>Sub: {quotation.title}</strong></p>
             </div>
           </div>
+
+          {/* Scope of Work Section */}
+          {quotation.scope_of_work && (
+            <div className="border border-gray-300 p-4" style={{ marginTop: `${spacing.tableSpacing * 0.25}rem` }}>
+              <div className="mb-3">
+                <h3 className="font-bold text-base underline">Scope of Work / Specifications</h3>
+              </div>
+              <div className="text-sm space-y-1">
+                {formatScopeOfWork(quotation.scope_of_work).map((point, index) => (
+                  <div key={index} className="whitespace-pre-wrap">{point}</div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Items Table */}
           <div className="border border-gray-300" style={{ marginTop: `${spacing.tableSpacing * 0.25}rem` }}>

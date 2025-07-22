@@ -67,7 +67,7 @@ Generate a complete quotation with:
 Respond in this exact JSON format:
 {
   "title": "Professional quotation title",
-  "description": "Brief project description",
+  "scope_of_work": "• Point 1: Description\n• Point 2: Description\n• Point 3: Description",
   "items": [
     {
       "description": "item description",
@@ -151,9 +151,22 @@ Respond in this exact JSON format:
         }
       }
     } else {
-      // Single item description - generate title, description and pricing
-      systemPrompt = 'Generate a complete quotation with professional title, description, and appropriate pricing for the single item. IMPORTANT: Do NOT include GST, tax, or any tax-related items as separate line items.'
-      prompt = `For this ONE specific item: "${description}"
+      // Check if this is a scope of work generation request
+      if (description.includes('Generate detailed scope of work for:')) {
+        const projectTitle = description.replace('Generate detailed scope of work for:', '').trim()
+        systemPrompt = 'Generate a detailed scope of work in point-wise format for the given project.'
+        prompt = `For this project: "${projectTitle}"
+
+Generate a detailed scope of work in point-wise format. Each point should be clear and specific.
+
+Respond in this exact JSON format:
+{
+  "scope_of_work": "• Point 1: Description\n• Point 2: Description\n• Point 3: Description\n• Point 4: Description\n• Point 5: Description"
+}`
+      } else {
+        // Single item description - generate title, description and pricing
+        systemPrompt = 'Generate a complete quotation with professional title, description, and appropriate pricing for the single item. IMPORTANT: Do NOT include GST, tax, or any tax-related items as separate line items.'
+        prompt = `For this ONE specific item: "${description}"
 
 Generate a complete quotation with professional title, description, and appropriate pricing for this single item. Do NOT include GST or tax as separate line items.
 
@@ -165,6 +178,7 @@ Respond in this exact JSON format:
   "unit_price": number,
   "reasoning": "brief explanation for pricing"
 }`
+      }
     }
 
     console.log('Making request to OpenAI API')
@@ -233,7 +247,7 @@ Respond in this exact JSON format:
       // Return full quotation structure for bulk descriptions
       result = {
         title: suggestion.title || 'Quotation',
-        description: suggestion.description || 'Auto-generated quotation',
+        scope_of_work: suggestion.scope_of_work || 'Auto-generated scope of work',
         items: suggestion.items || [
           {
             description: suggestion.description || description,
@@ -243,10 +257,10 @@ Respond in this exact JSON format:
         ]
       }
     } else {
-      // Return single item structure for individual item descriptions
+      // Return single item structure for individual item descriptions or scope of work
       result = {
         title: suggestion.title || 'Quotation',
-        description: suggestion.description || 'Auto-generated quotation',
+        scope_of_work: suggestion.scope_of_work,
         quantity: suggestion.quantity || 1,
         unit_price: suggestion.unit_price || 0,
         reasoning: suggestion.reasoning || 'AI suggestion'

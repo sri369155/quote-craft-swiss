@@ -9,6 +9,7 @@ interface AIAutofillResult {
   unit_price: number
   reasoning?: string
   title?: string
+  scope_of_work?: string
 }
 
 export function useOpenAI() {

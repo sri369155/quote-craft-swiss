@@ -109,6 +109,7 @@ export interface Database {
           quotation_number: string
           title: string
           description: string | null
+          scope_of_work: string | null
           status: 'draft' | 'sent' | 'accepted' | 'rejected'
           subtotal: number
           tax_rate: number
@@ -125,6 +126,7 @@ export interface Database {
           quotation_number: string
           title: string
           description?: string | null
+          scope_of_work?: string | null
           status?: 'draft' | 'sent' | 'accepted' | 'rejected'
           subtotal?: number
           tax_rate?: number
@@ -141,6 +143,7 @@ export interface Database {
           quotation_number?: string
           title?: string
           description?: string | null
+          scope_of_work?: string | null
           status?: 'draft' | 'sent' | 'accepted' | 'rejected'
           subtotal?: number
           tax_rate?: number

@@ -44,7 +44,7 @@ export default function QuotationBuilder({ quotationId, onSave, onCancel }: Quot
   // Form state
   const [selectedCustomerId, setSelectedCustomerId] = useState('')
   const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
+  const [scopeOfWork, setScopeOfWork] = useState('')
   const [items, setItems] = useState<QuotationItemForm[]>([
     { description: '', hsn_code: '', quantity: 1, unit_price: 0, line_total: 0 }
   ])
@@ -124,7 +124,7 @@ Example: Complete website development for restaurant including design, developme
       // Populate form with existing data
       setSelectedCustomerId(quotation.customer_id)
       setTitle(quotation.title)
-      setDescription(quotation.description || '')
+      setScopeOfWork(quotation.scope_of_work || '')
       setTaxRate(quotation.tax_rate)
       setValidUntil(quotation.valid_until || '')
       setStatus(quotation.status as 'draft' | 'sent' | 'accepted' | 'rejected')
@@ -195,7 +195,7 @@ Example: Complete website development for restaurant including design, developme
     if (result) {
       // Fill basic information
       if (result.title) setTitle(result.title)
-      if (result.description) setDescription(result.description)
+      if (result.scope_of_work) setScopeOfWork(result.scope_of_work)
       
       // Fill line items with proper calculation
       if (result.items && result.items.length > 0) {
@@ -232,9 +232,9 @@ Example: Complete website development for restaurant including design, developme
 
     const result = await autofillItem(item.description)
     if (result) {
-      // If result has title and description, fill those too (for single items)
+      // If result has title and scope_of_work, fill those too (for single items)
       if (result.title && !title.trim()) setTitle(result.title)
-      if (result.description && !description.trim()) setDescription(result.description)
+      if (result.scope_of_work && !scopeOfWork.trim()) setScopeOfWork(result.scope_of_work)
       
       // Update item with proper calculation
       updateItem(itemIndex, 'quantity', result.quantity)
@@ -264,7 +264,7 @@ Example: Complete website development for restaurant including design, developme
         customer_id: selectedCustomerId,
         quotation_number: quotationId ? undefined : generateQuotationNumber(),
         title,
-        description,
+        scope_of_work: scopeOfWork,
         status,
         subtotal,
         tax_rate: taxRate,
@@ -340,6 +340,26 @@ Example: Complete website development for restaurant including design, developme
       })
     } finally {
       setSaving(false)
+    }
+  }
+
+  const generateScopeOfWork = async () => {
+    if (!title.trim()) {
+      toast({
+        title: 'Add project title first',
+        description: 'Please add a project title before generating scope of work.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    const result = await autofillItem(`Generate detailed scope of work for: ${title}`)
+    if (result && result.scope_of_work) {
+      setScopeOfWork(result.scope_of_work)
+      toast({
+        title: 'Scope of Work Generated',
+        description: 'AI has generated a detailed scope of work for your project.',
+      })
     }
   }
 
@@ -484,14 +504,27 @@ Example: Complete website development for restaurant including design, developme
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Additional details about this quotation..."
-                  rows={3}
-                />
+                <Label htmlFor="scopeOfWork">Scope of Work / Specifications</Label>
+                <div className="flex gap-2">
+                  <Textarea
+                    id="scopeOfWork"
+                    value={scopeOfWork}
+                    onChange={(e) => setScopeOfWork(e.target.value)}
+                    placeholder="Enter scope of work in point-wise format:&#10;• Point 1&#10;• Point 2&#10;• Point 3..."
+                    rows={6}
+                    className="flex-1"
+                  />
+                  <Button 
+                    onClick={() => generateScopeOfWork()} 
+                    disabled={aiLoading || !title.trim()}
+                    variant="outline"
+                    size="sm"
+                    className="bg-gradient-to-r from-pink-400 to-blue-400 hover:from-pink-500 hover:to-blue-500 text-white border-0"
+                  >
+                    <Sparkles className={`w-4 h-4 ${aiLoading ? 'animate-spin' : 'animate-bounce-gentle'}`} />
+                    {aiLoading ? 'Generating...' : 'AI Generate'}
+                  </Button>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

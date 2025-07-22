@@ -355,6 +355,7 @@ export type Database = {
           description: string | null
           id: string
           quotation_number: string
+          scope_of_work: string | null
           status: string | null
           subtotal: number
           tax_amount: number
@@ -371,6 +372,7 @@ export type Database = {
           description?: string | null
           id?: string
           quotation_number: string
+          scope_of_work?: string | null
           status?: string | null
           subtotal?: number
           tax_amount?: number
@@ -387,6 +389,7 @@ export type Database = {
           description?: string | null
           id?: string
           quotation_number?: string
+          scope_of_work?: string | null
           status?: string | null
           subtotal?: number
           tax_amount?: number
