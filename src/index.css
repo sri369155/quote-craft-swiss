@@ -22,8 +22,8 @@
     --secondary: 248 250 252;              /* Slate-50 - subtle background */
     --secondary-foreground: 30 41 59;      /* Slate-700 */
 
-    --muted: 219 234 254;                  /* Very light blue background */
-    --muted-foreground: 30 58 138;           /* Dark blue text for muted elements */
+    --muted: 231 249 212;                  /* Very very light yellow background */
+    --muted-foreground: 0 250 0;             /* Black text for muted elements */
 
     --accent: 59 130 246;                  /* Blue-500 - vibrant accent */
     --accent-foreground: 255 255 255;
@@ -37,7 +37,7 @@
     --destructive-foreground: 255 255 255;
 
     --border: 226 232 240;                 /* Slate-200 - clean borders */
-    --input: 219 234 254;                  /* Very light blue input backgrounds */
+    --input: 100 90 245;                  /* Very very light yellow input backgrounds */
     --ring: 59 130 246;                    /* Blue-500 - focus rings */
 
     --radius: 0.75rem;
@@ -219,7 +219,7 @@
     color: hsl(var(--muted-foreground)) !important;
   }
 
-  /* Ensure all inputs have light blue background without animation */
+  /* Ensure all inputs have light yellow background without animation */
   input,
   textarea,
   select,
