@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { CalendarIcon, Plus, Trash2, Save, Eye, FileText, Edit, Smartphone, Edit3 } from 'lucide-react'
+import { CalendarIcon, Plus, Trash2, Save, Eye, FileText, Edit, Smartphone } from 'lucide-react'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -804,36 +804,24 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, quotationDat
                 <TableRow key={index}>
                   <TableCell>
                     <div className="flex space-x-2">
-                      <Input
-                        value={item.description}
-                        onChange={(e) => updateItem(index, 'description', e.target.value)}
-                        placeholder="Item description"
-                        className="flex-1"
-                      />
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button variant="outline" size="sm" className="px-2">
-                            <Edit3 className="w-4 h-4" />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-80">
-                          <div className="space-y-3">
-                            <div>
-                              <Label className="text-sm font-medium">Edit Item Description</Label>
+                      <HoverCard>
+                        <HoverCardTrigger asChild>
+                          <Input
+                            value={item.description}
+                            onChange={(e) => updateItem(index, 'description', e.target.value)}
+                            placeholder="Item description"
+                            className="flex-1"
+                          />
+                        </HoverCardTrigger>
+                        {item.description && (
+                          <HoverCardContent className="w-80 max-w-sm">
+                            <div className="text-sm">
+                              <p className="font-medium mb-2">Full Description:</p>
+                              <p className="whitespace-pre-wrap break-words">{item.description}</p>
                             </div>
-                            <Textarea
-                              value={item.description}
-                              onChange={(e) => updateItem(index, 'description', e.target.value)}
-                              placeholder="Enter detailed item description..."
-                              rows={4}
-                              className="resize-none"
-                            />
-                            <div className="text-xs text-muted-foreground">
-                              Edit the full description for this line item
-                            </div>
-                          </div>
-                        </PopoverContent>
-                      </Popover>
+                          </HoverCardContent>
+                        )}
+                      </HoverCard>
                     </div>
                   </TableCell>
                   <TableCell>

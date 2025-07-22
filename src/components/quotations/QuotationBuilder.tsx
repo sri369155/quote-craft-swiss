@@ -9,12 +9,11 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Plus, Trash2, Save, FileText, Sparkles, Users, Edit3 } from 'lucide-react'
+import { Plus, Trash2, Save, FileText, Sparkles, Users } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { useToast } from '@/hooks/use-toast'
 import { Customer, Quotation, QuotationItem } from '@/types/database'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import CustomerForm from './CustomerForm'
 
 interface QuotationItemForm {
@@ -555,36 +554,24 @@ Example: Complete website development for restaurant including design, developme
                       <TableRow key={index}>
                         <TableCell>
                           <div className="flex space-x-2">
-                            <Input
-                              value={item.description}
-                              onChange={(e) => updateItem(index, 'description', e.target.value)}
-                              placeholder="Item description"
-                              className="flex-1"
-                            />
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <Button variant="outline" size="sm" className="px-2">
-                                  <Edit3 className="w-4 h-4" />
-                                </Button>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-80">
-                                <div className="space-y-3">
-                                  <div>
-                                    <Label className="text-sm font-medium">Edit Item Description</Label>
+                            <HoverCard>
+                              <HoverCardTrigger asChild>
+                                <Input
+                                  value={item.description}
+                                  onChange={(e) => updateItem(index, 'description', e.target.value)}
+                                  placeholder="Item description"
+                                  className="flex-1"
+                                />
+                              </HoverCardTrigger>
+                              {item.description && (
+                                <HoverCardContent className="w-80 max-w-sm">
+                                  <div className="text-sm">
+                                    <p className="font-medium mb-2">Full Description:</p>
+                                    <p className="whitespace-pre-wrap break-words">{item.description}</p>
                                   </div>
-                                  <Textarea
-                                    value={item.description}
-                                    onChange={(e) => updateItem(index, 'description', e.target.value)}
-                                    placeholder="Enter detailed item description..."
-                                    rows={4}
-                                    className="resize-none"
-                                  />
-                                  <div className="text-xs text-muted-foreground">
-                                    Edit the full description for this line item
-                                  </div>
-                                </div>
-                              </PopoverContent>
-                            </Popover>
+                                </HoverCardContent>
+                              )}
+                            </HoverCard>
                             <Button
                               variant="outline"
                               size="sm"

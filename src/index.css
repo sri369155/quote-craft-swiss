@@ -22,8 +22,8 @@
     --secondary: 248 250 252;              /* Slate-50 - subtle background */
     --secondary-foreground: 30 41 59;      /* Slate-700 */
 
-    --muted: 240 249 255;                  /* Very pale light blue background */
-    --muted-foreground: 51 65 85;           /* Slate-600 - readable text for muted elements */
+    --muted: 231 249 212;                  /* Very very light yellow background */
+    --muted-foreground: 0 250 0;             /* Black text for muted elements */
 
     --accent: 59 130 246;                  /* Blue-500 - vibrant accent */
     --accent-foreground: 255 255 255;
@@ -37,7 +37,7 @@
     --destructive-foreground: 255 255 255;
 
     --border: 226 232 240;                 /* Slate-200 - clean borders */
-    --input: 239 246 255;                  /* Very pale light blue input backgrounds */
+    --input: 100 90 245;                  /* Very very light yellow input backgrounds */
     --ring: 59 130 246;                    /* Blue-500 - focus rings */
 
     --radius: 0.75rem;
@@ -209,13 +209,13 @@
     }
   }
 
-  /* Apply soft pulse animation to all muted text elements */
+  /* Apply flashing animation to all muted text elements */
   .text-muted-foreground,
   [class*="text-muted"],
   .muted,
   p.text-xs,
   .text-sm.text-muted-foreground {
-    animation: pulse-soft 4s ease-in-out infinite !important;
+    animation: flash-slow 4s ease-in-out infinite !important;
     color: hsl(var(--muted-foreground)) !important;
   }
 
