@@ -381,7 +381,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
               <p className="font-bold text-xs">GSTIN : {profile?.gst_number || '24HDE7487RE5RT4'}</p>
             </div>
             <div className="text-center">
-              <h2 className="text-lg font-bold bg-black text-white py-1 px-3 inline-block">TAX INVOICE</h2>
+              <h2 className="text-lg font-bold text-blue-900 py-1 px-3 inline-block border border-blue-900">TAX INVOICE</h2>
             </div>
             <div className="text-right">
               <p className="font-bold text-xs">ORIGINAL FOR RECIPIENT</p>
@@ -404,7 +404,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                     <td className="border-b border-gray-300 p-1 text-xs">
                       <Input 
                         value={customer.name} 
-                        className="border-0 p-0 h-auto text-xs bg-transparent"
+                        className="border-0 p-0 h-auto text-xs bg-pink-50/30"
                         style={{ fontSize: '12px' }}
                       />
                     </td>
@@ -414,7 +414,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                     <td className="border-b border-gray-300 p-1 text-xs">
                       <Textarea 
                         value={customer.address || ''} 
-                        className="border-0 p-0 h-auto text-xs bg-transparent resize-none min-h-0"
+                        className="border-0 p-0 h-auto text-xs bg-pink-50/30 resize-none min-h-0"
                         style={{ fontSize: '12px' }}
                         rows={2}
                       />
@@ -425,7 +425,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                     <td className="border-b border-gray-300 p-1 text-xs">
                       <Input 
                         value={customer.phone || ''} 
-                        className="border-0 p-0 h-auto text-xs bg-transparent"
+                        className="border-0 p-0 h-auto text-xs bg-pink-50/30"
                         style={{ fontSize: '12px' }}
                       />
                     </td>
@@ -435,7 +435,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                     <td className="border-b border-gray-300 p-1 text-xs">
                       <Input 
                         value="07AQLCC1206D1ZG" 
-                        className="border-0 p-0 h-auto text-xs bg-transparent"
+                        className="border-0 p-0 h-auto text-xs bg-pink-50/30"
                         style={{ fontSize: '12px' }}
                       />
                     </td>
@@ -446,7 +446,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                       <Input 
                         value={editableInvoiceData.placeOfSupply || 'Delhi ( 07 )'} 
                         onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, placeOfSupply: e.target.value }))}
-                        className="border-0 p-0 h-auto text-xs bg-transparent"
+                        className="border-0 p-0 h-auto text-xs bg-pink-50/30"
                         style={{ fontSize: '12px' }}
                       />
                     </td>
@@ -464,7 +464,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                     <td className="border-b border-black p-1 text-xs">
                       <Input 
                         value={invoice.invoice_number} 
-                        className="border-0 p-0 h-auto text-xs bg-transparent"
+                        className="border-0 p-0 h-auto text-xs bg-pink-50/30"
                         style={{ fontSize: '12px' }}
                       />
                     </td>
@@ -477,7 +477,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                       <Input 
                         value={editableInvoiceData.challanNumber} 
                         onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, challanNumber: e.target.value }))}
-                        className="border-0 p-0 h-auto text-xs bg-transparent"
+                        className="border-0 p-0 h-auto text-xs bg-pink-50/30"
                         style={{ fontSize: '12px' }}
                       />
                     </td>
@@ -490,7 +490,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                       <Input 
                         value={editableInvoiceData.poNumber} 
                         onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, poNumber: e.target.value }))}
-                        className="border-0 p-0 h-auto text-xs bg-transparent"
+                        className="border-0 p-0 h-auto text-xs bg-pink-50/30"
                         style={{ fontSize: '12px' }}
                       />
                     </td>
@@ -499,7 +499,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                       <select 
                         value={editableInvoiceData.reverseCharge} 
                         onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, reverseCharge: e.target.value }))}
-                        className="border-0 p-0 h-auto text-xs bg-transparent w-full"
+                        className="border-0 p-0 h-auto text-xs bg-pink-50/30 w-full"
                         style={{ fontSize: '12px' }}
                       >
                         <option value="Yes">Yes</option>
@@ -519,7 +519,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                       <Input 
                         value={editableInvoiceData.lrNumber} 
                         onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, lrNumber: e.target.value }))}
-                        className="border-0 p-0 h-auto text-xs bg-transparent"
+                        className="border-0 p-0 h-auto text-xs bg-pink-50/30"
                         style={{ fontSize: '12px' }}
                       />
                     </td>
@@ -570,7 +570,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                             <div className="flex items-center space-x-1 cursor-pointer">
                               <Input 
                                 value={item.description} 
-                                className="border-0 p-0 h-auto text-xs bg-transparent font-medium"
+                                className="border-0 p-0 h-auto text-xs bg-pink-50/30 font-medium"
                                 style={{ fontSize: '11px' }}
                                 readOnly
                               />
@@ -594,7 +594,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                       <td className="border border-black p-1 text-center text-xs">
                         <Input 
                           value={item.hsn_code || '8202'} 
-                          className="border-0 p-0 h-auto text-xs bg-transparent text-center"
+                          className="border-0 p-0 h-auto text-xs bg-pink-50/30 text-center"
                           style={{ fontSize: '11px' }}
                         />
                       </td>
@@ -636,13 +636,10 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                   <Textarea 
                     value={termsConditions}
                     onChange={(e) => setTermsConditions(e.target.value)}
-                    className="border-0 p-0 h-auto text-xs bg-transparent resize-none min-h-0 w-full"
+                    className="border-0 p-0 h-auto text-xs bg-pink-50/30 resize-none min-h-0 w-full"
                     style={{ fontSize: '9px' }}
                     rows={4}
                   />
-                  <div className="text-center text-xs font-semibold pt-1 border-t border-gray-200">
-                    Certified that the particulars given above are true and correct.
-                  </div>
                 </div>
               </div>
             </div>
@@ -667,14 +664,6 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                     <td className="border-b border-black p-1 font-bold text-sm">Total Amount After Tax</td>
                     <td className="border-b border-black p-1 text-right font-bold text-sm">₹ {grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
                   </tr>
-                  <tr>
-                    <td className="p-1 font-semibold text-xs"></td>
-                    <td className="p-1 text-right text-xs">(E & O.E.)</td>
-                  </tr>
-                  <tr>
-                    <td className="border-b border-black p-1 font-semibold text-xs">GST Payable on Reverse Charge</td>
-                    <td className="border-b border-black p-1 text-right text-xs">N.A.</td>
-                  </tr>
                 </tbody>
               </table>
             </div>
@@ -689,7 +678,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                 <Textarea 
                   value={editableBankDetails}
                   onChange={(e) => setEditableBankDetails(e.target.value)}
-                  className="border-0 p-0 h-auto text-xs bg-transparent resize-none min-h-0 w-full"
+                  className="border-0 p-0 h-auto text-xs bg-pink-50/30 resize-none min-h-0 w-full"
                   style={{ fontSize: '10px' }}
                   rows={4}
                 />
@@ -715,6 +704,11 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
             </div>
           </div>
 
+
+          {/* Certification Statement */}
+          <div className="text-center text-xs font-semibold pt-2 border-t border-gray-200 mb-2">
+            Certified that the particulars given above are true and correct.
+          </div>
 
           {/* Footer - Full width image with page break control at 0.5 inch above */}
           <div style={{ marginTop: '0.5in', pageBreakInside: 'avoid' }}>

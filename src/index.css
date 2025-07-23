@@ -22,8 +22,8 @@
     --secondary: 248 250 252;              /* Slate-50 - subtle background */
     --secondary-foreground: 30 41 59;      /* Slate-700 */
 
-    --muted: 231 249 212;                  /* Very very light yellow background */
-    --muted-foreground: 0 250 0;             /* Black text for muted elements */
+    --muted: 224 242 254;                  /* Very very light blue background */
+    --muted-foreground: 71 85 105;             /* Slate-600 for better readability */
 
     --accent: 59 130 246;                  /* Blue-500 - vibrant accent */
     --accent-foreground: 255 255 255;
@@ -37,7 +37,7 @@
     --destructive-foreground: 255 255 255;
 
     --border: 226 232 240;                 /* Slate-200 - clean borders */
-    --input: 100 90 245;                  /* Very very light yellow input backgrounds */
+    --input: 253 242 248;                  /* Very very light pink input backgrounds */
     --ring: 59 130 246;                    /* Blue-500 - focus rings */
 
     --radius: 0.75rem;
@@ -209,14 +209,14 @@
     }
   }
 
-  /* Apply flashing animation to all muted text elements */
+  /* Remove flashing animation and use soft pulse instead */
   .text-muted-foreground,
   [class*="text-muted"],
   .muted,
   p.text-xs,
   .text-sm.text-muted-foreground {
-    animation: flash-slow 4s ease-in-out infinite !important;
-    color: hsl(var(--muted-foreground)) !important;
+    animation: pulse-soft 3s ease-in-out infinite;
+    color: hsl(var(--muted-foreground));
   }
 
   /* Ensure all inputs have light yellow background without animation */
