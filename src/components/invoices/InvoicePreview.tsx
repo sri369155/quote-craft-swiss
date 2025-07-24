@@ -341,7 +341,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
       {/* Invoice Content - Optimized layout with editable fields */}
       <div className="bg-white border border-gray-300 print:border-0 leading-tight" style={{ 
         color: '#000000', 
-        backgroundColor: '#ffffff',
+        backgroundColor: '#fff5f5',
         fontSize: '12px',
         lineHeight: '1.2'
       }}>
