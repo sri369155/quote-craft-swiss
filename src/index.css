@@ -22,8 +22,8 @@
     --secondary: 248 250 252;              /* Slate-50 - subtle background */
     --secondary-foreground: 30 41 59;      /* Slate-700 */
 
-    --muted: 224 242 254;                  /* Very very light blue background */
-    --muted-foreground: 71 85 105;             /* Slate-600 for better readability */
+    --muted: 224 242 212;                  /* Very very light blue background */
+    --muted-foreground: 100 180 0;             /* Slate-600 for better readability */
 
     --accent: 59 130 246;                  /* Blue-500 - vibrant accent */
     --accent-foreground: 255 255 255;
@@ -215,7 +215,7 @@
   .muted,
   p.text-xs,
   .text-sm.text-muted-foreground {
-    animation: pulse-soft 3s ease-in-out infinite;
+    animation: flash-slow 3s ease-in-out infinite;
     color: hsl(var(--muted-foreground));
   }
 
