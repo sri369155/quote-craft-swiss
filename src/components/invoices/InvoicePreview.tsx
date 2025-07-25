@@ -106,14 +106,15 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
 
       // Set editable invoice data
       setEditableInvoiceData({
-        challanNumber: data.challan_number || '',
-        lrNumber: data.lr_number || '',
-        reverseCharge: data.reverse_charge ? 'Yes' : 'No',
+        DC Number: data.delivery_challan_number || '',
+        Delivery Date: data.delivery_challan_date || '',
+        EWayNumber: data.eway_lr_number || '',
         placeOfSupply: data.place_of_supply || '',
         senderAddress: data.sender_address || '',
         senderGstin: data.sender_gstin || '',
         senderPhone: data.sender_phone || '',
-        poNumber: data.po_number || ''
+        OrderNumber: data.Order_number || '',
+        OrderDate: data.Order_Date || '',
       })
     } catch (error) {
       console.error('Error fetching invoice:', error)
@@ -308,12 +309,22 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
           </div>
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <Label htmlFor="poNumber">P.O. Number</Label>
+              <Label htmlFor="order_number">Order Number</Label>
               <Input
                 id="poNumber"
-                value={editableInvoiceData.poNumber}
+                value={editableInvoiceData.order_number}
                 onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, poNumber: e.target.value }))}
                 placeholder="PO-123"
+              />
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+            <div>
+              <Label htmlFor="order_date">Order Date</Label>
+              <Input
+                id="order_date"
+                value={editableInvoiceData.order_date}
+                onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, poNumber: e.target.value }))}
+                placeholder="Order_date"
               />
             </div>
             <div>
@@ -463,7 +474,8 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                     <td className="border-b border-black p-1 font-semibold text-xs">Invoice No.</td>
                     <td className="border-b border-black p-1 text-xs">
                       <Input 
-                        value={invoice.invoice_number} 
+                        value={editableInvoiceData.invoice_number}
+                        onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, delivery_challan_Number: e.target.value }))}
                         className="border-0 p-0 h-auto text-xs bg-pink-50/30"
                         style={{ fontSize: '12px' }}
                       />
@@ -472,49 +484,52 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                     <td className="border-b border-black p-1 text-xs">{format(new Date(invoice.issue_date), 'dd-MMM-yyyy')}</td>
                   </tr>
                   <tr>
-                    <td className="border-b border-black p-1 font-semibold text-xs">Challan No.</td>
+                    <td className="border-b border-black p-1 font-semibold text-xs">DC No.</td>
                     <td className="border-b border-black p-1 text-xs">
                       <Input 
-                        value={editableInvoiceData.challanNumber} 
-                        onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, challanNumber: e.target.value }))}
+                        value={editableInvoiceData.delivery_challan_number} 
+                        onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, delivery_challan_Number: e.target.value }))}
                         className="border-0 p-0 h-auto text-xs bg-pink-50/30"
                         style={{ fontSize: '12px' }}
                       />
                     </td>
-                    <td className="border-b border-black p-1 font-semibold text-xs">Challan Date</td>
-                    <td className="border-b border-black p-1 text-xs">{invoice.delivery_date ? format(new Date(invoice.delivery_date), 'dd-MMM-yyyy') : ''}</td>
+                    <td className="border-b border-black p-1 font-semibold text-xs">DC Date</td>
+                    <td className="border-b border-black p-1 text-xs">{invoice.delivery_challan_date ? format(new Date(invoice.delivery_challan_date), 'dd-MMM-yyyy') : ''}
+                      <Input 
+                        value={editableInvoiceData.invoice.delivery_challan_date} 
+                        onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, delivery_challan_date: e.target.value }))}
+                        className="border-0 p-0 h-auto text-xs bg-pink-50/30"
+                        style={{ fontSize: '12px' }}
+                      />
+                      </td>
                   </tr>
                   <tr>
-                    <td className="border-b border-black p-1 font-semibold text-xs">P.O. No.</td>
+                    <td className="border-b border-black p-1 font-semibold text-xs">Order No.</td>
                     <td className="border-b border-black p-1 text-xs">
                       <Input 
-                        value={editableInvoiceData.poNumber} 
-                        onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, poNumber: e.target.value }))}
+                        value={editableInvoiceData.order_Number} 
+                        onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, order_Number: e.target.value }))}
                         className="border-0 p-0 h-auto text-xs bg-pink-50/30"
                         style={{ fontSize: '12px' }}
                       />
                     </td>
-                    <td className="border-b border-black p-1 font-semibold text-xs">Reverse Charge</td>
+                    <td className="border-b border-black p-1 font-semibold text-xs">Order Date</td>
                     <td className="border-b border-black p-1 text-xs">
-                      <select 
-                        value={editableInvoiceData.reverseCharge} 
-                        onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, reverseCharge: e.target.value }))}
+                      <Input 
+                        value={editableInvoiceData.Order_date} 
+                        onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, order_date: e.target.value }))}
                         className="border-0 p-0 h-auto text-xs bg-pink-50/30 w-full"
                         style={{ fontSize: '12px' }}
-                      >
-                        <option value="Yes">Yes</option>
-                        <option value="No">No</option>
-                      </select>
-                    </td>
+                      />
+                  </td>
                   </tr>
                   <tr>
-                    <td className="border-b border-black p-1 font-semibold text-xs">DELIVERY DATE</td>
-                    <td className="border-b border-black p-1 text-xs">{invoice.delivery_date ? format(new Date(invoice.delivery_date), 'dd-MMM-yyyy') : ''}</td>
+                   
                     <td className="border-b border-black p-1 font-semibold text-xs">Due Date</td>
                     <td className="border-b border-black p-1 text-xs">{format(new Date(invoice.due_date), 'dd-MMM-yyyy')}</td>
                   </tr>
                   <tr>
-                    <td className="p-1 font-semibold text-xs" colSpan={2}>Delivery No & Date</td>
+                    <td className="p-1 font-semibold text-xs" colSpan={2}>Misc Invoice Data</td>
                     <td className="p-1 text-xs" colSpan={2}>
                       <Input 
                         value={editableInvoiceData.lrNumber} 
