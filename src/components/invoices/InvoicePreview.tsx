@@ -98,10 +98,35 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ invoiceId, invoice, onE
 
   useEffect(() => {
     if (currentInvoice) {
-      // Ensure status is properly typed
+      // Properly type the invoice to match our Invoice interface
       const typedInvoice: Invoice = {
-        ...currentInvoice,
-        status: currentInvoice.status as 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled'
+        id: currentInvoice.id,
+        user_id: currentInvoice.user_id,
+        customer_id: currentInvoice.customer_id,
+        invoice_number: currentInvoice.invoice_number,
+        title: currentInvoice.title,
+        description: currentInvoice.description,
+        status: (currentInvoice.status || 'draft') as 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled',
+        subtotal: currentInvoice.subtotal,
+        tax_rate: currentInvoice.tax_rate,
+        tax_amount: currentInvoice.tax_amount,
+        total_amount: currentInvoice.total_amount,
+        issue_date: currentInvoice.issue_date,
+        due_date: currentInvoice.due_date,
+        order_number: currentInvoice.order_number,
+        order_date: currentInvoice.order_date,
+        delivery_number: currentInvoice.delivery_number,
+        delivery_date: currentInvoice.delivery_date,
+        delivery_challan_number: currentInvoice.delivery_challan_number,
+        delivery_challan_date: currentInvoice.delivery_challan_date,
+        eway_lr_number: currentInvoice.eway_lr_number,
+        consignee_name: currentInvoice.consignee_name,
+        consignee_address: currentInvoice.consignee_address,
+        consignee_gstin: currentInvoice.consignee_gstin,
+        consignee_email: currentInvoice.consignee_email,
+        consignee_phone: currentInvoice.consignee_phone,
+        created_at: currentInvoice.created_at,
+        updated_at: currentInvoice.updated_at
       }
       setEditableInvoice(typedInvoice)
     }

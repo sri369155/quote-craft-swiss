@@ -33,7 +33,7 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, quotationDat
     delivery_challan_date: '',
     eway_lr_number: '',
     tax_rate: 18,
-    status: 'draft' as const,
+    status: 'draft' as 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled',
   })
   const [items, setItems] = useState<InvoiceItem[]>([])
   const navigate = useNavigate()
@@ -99,7 +99,7 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, quotationDat
         delivery_challan_date: invoiceData.delivery_challan_date || '',
         eway_lr_number: invoiceData.eway_lr_number || '',
         tax_rate: invoiceData.tax_rate,
-        status: invoiceData.status as 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled',
+        status: (invoiceData.status || 'draft') as 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled',
       })
     }
   }, [invoiceData])
