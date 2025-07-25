@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/integrations/supabase/client'
@@ -99,7 +98,12 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ invoiceId, invoice, onE
 
   useEffect(() => {
     if (currentInvoice) {
-      setEditableInvoice(currentInvoice)
+      // Ensure status is properly typed
+      const typedInvoice: Invoice = {
+        ...currentInvoice,
+        status: currentInvoice.status as 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled'
+      }
+      setEditableInvoice(typedInvoice)
     }
   }, [currentInvoice])
 
@@ -197,16 +201,19 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ invoiceId, invoice, onE
       const taxAmount = (subtotal * editableInvoice.tax_rate) / 100
       const totalAmount = subtotal + taxAmount
 
-      // Update invoice
+      // Update invoice - ensure status is properly typed
+      const updateData = {
+        ...editableInvoice,
+        subtotal,
+        tax_amount: taxAmount,
+        total_amount: totalAmount,
+        updated_at: new Date().toISOString(),
+        status: editableInvoice.status as 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled'
+      }
+
       await supabase
         .from('invoices')
-        .update({
-          ...editableInvoice,
-          subtotal,
-          tax_amount: taxAmount,
-          total_amount: totalAmount,
-          updated_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('id', editableInvoice.id)
 
       // Update items

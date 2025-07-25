@@ -99,7 +99,7 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ invoiceId, quotationDat
         delivery_challan_date: invoiceData.delivery_challan_date || '',
         eway_lr_number: invoiceData.eway_lr_number || '',
         tax_rate: invoiceData.tax_rate,
-        status: invoiceData.status,
+        status: invoiceData.status as 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled',
       })
     }
   }, [invoiceData])
