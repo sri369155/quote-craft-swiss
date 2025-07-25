@@ -1,3 +1,4 @@
+
 export interface Database {
   public: {
     Tables: {
@@ -205,6 +206,9 @@ export interface Database {
           order_date: string | null
           delivery_number: string | null
           delivery_date: string | null
+          delivery_challan_number: string | null
+          delivery_challan_date: string | null
+          eway_lr_number: string | null
           consignee_name: string | null
           consignee_address: string | null
           consignee_gstin: string | null
@@ -231,6 +235,9 @@ export interface Database {
           order_date?: string | null
           delivery_number?: string | null
           delivery_date?: string | null
+          delivery_challan_number?: string | null
+          delivery_challan_date?: string | null
+          eway_lr_number?: string | null
           consignee_name?: string | null
           consignee_address?: string | null
           consignee_gstin?: string | null
@@ -257,6 +264,9 @@ export interface Database {
           order_date?: string | null
           delivery_number?: string | null
           delivery_date?: string | null
+          delivery_challan_number?: string | null
+          delivery_challan_date?: string | null
+          eway_lr_number?: string | null
           consignee_name?: string | null
           consignee_address?: string | null
           consignee_gstin?: string | null

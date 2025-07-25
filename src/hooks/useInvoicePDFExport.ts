@@ -1,3 +1,4 @@
+
 import { useState } from 'react'
 import { jsPDF } from 'jspdf'
 import { useToast } from '@/hooks/use-toast'
@@ -82,12 +83,17 @@ export function useInvoicePDFExport() {
       pdf.setFont('helvetica', 'bold')
       pdf.text(`GSTIN : ${userProfile?.gst_number || '24HDE7487RE5RT4'}`, 8, yPos)
       
-      // TAX INVOICE centered - smaller
-      pdf.setFillColor(0, 0, 0)
-      pdf.rect(pageWidth/2 - 20, yPos - 4, 40, 8, 'F')
-      pdf.setTextColor(255, 255, 255)
+      // TAX INVOICE centered with navy blue color and underline - no background fill
+      pdf.setDrawColor(25, 65, 139) // Navy blue
+      pdf.setLineWidth(2)
+      pdf.rect(pageWidth/2 - 20, yPos - 4, 40, 8, 'D') // Draw border only
+      pdf.setTextColor(25, 65, 139) // Navy blue text
       pdf.setFontSize(9)
       pdf.text('TAX INVOICE', pageWidth/2, yPos, { align: 'center' })
+      
+      // Add underline
+      const taxInvoiceWidth = pdf.getTextWidth('TAX INVOICE')
+      pdf.line(pageWidth/2 - taxInvoiceWidth/2, yPos + 1, pageWidth/2 + taxInvoiceWidth/2, yPos + 1)
       
       pdf.setTextColor(0, 0, 0)
       pdf.setFontSize(7)
@@ -113,8 +119,8 @@ export function useInvoicePDFExport() {
         ['M/S', customer.name],
         ['Address', customer.address || ''],
         ['PHONE', customer.phone || ''],
-        ['GSTIN', '07AQLCC1206D1ZG'],
-        ['Place of Supply', (invoice as any).place_of_supply || 'Delhi ( 07 )']
+        ['GSTIN', invoice.consignee_gstin || '07AQLCC1206D1ZG'],
+        ['Place of Supply', 'Delhi ( 07 )']
       ]
       
       customerDetails.forEach(([label, value], index) => {
@@ -126,15 +132,15 @@ export function useInvoicePDFExport() {
         yPos += 4
       })
       
-      // Invoice details (right side) - more compact
+      // Invoice details (right side) - more compact with updated fields
       let rightYPos = yPos - (customerDetails.length * 4) - 8
       
       const invoiceDetails = [
         ['Invoice No.', invoice.invoice_number, 'Invoice Date', format(new Date(invoice.issue_date), 'dd-MMM-yyyy')],
-        ['Challan No.', (invoice as any).challan_number || '865', 'Challan Date', invoice.delivery_date ? format(new Date(invoice.delivery_date), 'dd-MMM-yyyy') : ''],
-        ['P.O. No.', (invoice as any).po_number || '', 'Reverse Charge', (invoice as any).reverse_charge ? 'Yes' : 'No'],
-        ['DELIVERY DATE', invoice.delivery_date ? format(new Date(invoice.delivery_date), 'dd-MMM-yyyy') : '', 'Due Date', format(new Date(invoice.due_date), 'dd-MMM-yyyy')],
-        ['Delivery No & Date', (invoice as any).lr_number || '', '', '']
+        ['Delivery Challan No.', invoice.delivery_challan_number || '', 'Delivery Date', invoice.delivery_challan_date ? format(new Date(invoice.delivery_challan_date), 'dd-MMM-yyyy') : ''],
+        ['Order No.', invoice.order_number || '', 'Order Date', invoice.order_date ? format(new Date(invoice.order_date), 'dd-MMM-yyyy') : ''],
+        ['E-Way/LR No.', invoice.eway_lr_number || '', 'Due Date', format(new Date(invoice.due_date), 'dd-MMM-yyyy')],
+        ['Reverse Charge', 'No', '', '']
       ]
       
       pdf.rect(105, rightYPos, 95, invoiceDetails.length * 4)
@@ -280,26 +286,19 @@ export function useInvoicePDFExport() {
       pdf.text('Terms and Conditions:', 10, yPos + 12)
       
       pdf.setFont('helvetica', 'normal')
-      const terms = options?.termsConditions || '1. Subject to Ahmedabad Jurisdiction.\n2. Our responsibility ceases as soon as the goods leave our premises.\n3. Goods once sold will not be taken back.\n4. Delivery ex-premises.'
+      const terms = options?.termsConditions || invoice.description || '1. Subject to Ahmedabad Jurisdiction.\n2. Our responsibility ceases as soon as the goods leave our premises.\n3. Goods once sold will not be taken back.\n4. Delivery ex-premises.'
       const termLines = terms.split('\n')
       
       termLines.forEach((line, index) => {
         pdf.text(line, 10, yPos + 16 + (index * 3))
       })
       
-      // Certification text within terms section  
-      pdf.setFont('helvetica', 'bold')
-      pdf.setFontSize(5)
-      pdf.text('Certified that the particulars given above are true and correct.', 10, yPos + 20 + (termLines.length * 3))
-      
       // Amount breakdown (right side) - more compact
       const breakdown = [
         ['Taxable Amount', invoice.subtotal.toFixed(2)],
         ['Add : IGST', invoice.tax_amount.toFixed(2)],
         ['Total Tax', invoice.tax_amount.toFixed(2)],
-        ['Total Amount After Tax', `₹ ${invoice.total_amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`],
-        ['', '(E & O.E.)'],
-        ['GST Payable on Reverse Charge', 'N.A.']
+        ['Total Amount After Tax', `₹ ${invoice.total_amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`]
       ]
       
       let breakdownY = yPos
@@ -336,7 +335,7 @@ export function useInvoicePDFExport() {
         pdf.text(line, 10, yPos + 5 + (index * 3))
       })
       
-      // Signature section - compact
+      // Signature section - compact (removed the "no signature required" text)
       if (userProfile?.signature_image_url) {
         try {
           // Note: In real implementation, convert image to base64 and add
@@ -344,19 +343,14 @@ export function useInvoicePDFExport() {
         } catch (error) {
           console.error('Error adding signature image:', error)
         }
-      } else {
-        pdf.text('This is computer generated', 110, yPos + 8)
-        pdf.text('invoice no signature required.', 110, yPos + 11)
       }
       
       pdf.setFont('helvetica', 'bold')
       pdf.text('Authorised Signatory', 110, yPos + 18)
       
-      yPos += 15
+      yPos += 25
       
       // Footer with page break control - full width
-      yPos += 10
-      
       if (userProfile?.footer_image_url) {
         // Custom footer image - full width, no margins
         try {
@@ -372,6 +366,10 @@ export function useInvoicePDFExport() {
         pdf.setFontSize(4)
         pdf.text(`Generated on ${format(new Date(), 'dd/MM/yyyy HH:mm')} | Thank you for your business`, pageWidth/2, yPos + 5, { align: 'center' })
       }
+      
+      // Certification text at bottom
+      pdf.setFontSize(4)
+      pdf.text('Certified that the particulars given above are true and correct.', pageWidth/2, yPos + 12, { align: 'center' })
       
       // Save PDF
       pdf.save(`invoice-${invoice.invoice_number}.pdf`)

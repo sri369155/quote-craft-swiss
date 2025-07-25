@@ -140,10 +140,13 @@ export type Database = {
           consignee_phone: string | null
           created_at: string | null
           customer_id: string
+          delivery_challan_date: string | null
+          delivery_challan_number: string | null
           delivery_date: string | null
           delivery_number: string | null
           description: string | null
           due_date: string | null
+          eway_lr_number: string | null
           eway_number: string | null
           id: string
           invoice_number: string
@@ -175,10 +178,13 @@ export type Database = {
           consignee_phone?: string | null
           created_at?: string | null
           customer_id: string
+          delivery_challan_date?: string | null
+          delivery_challan_number?: string | null
           delivery_date?: string | null
           delivery_number?: string | null
           description?: string | null
           due_date?: string | null
+          eway_lr_number?: string | null
           eway_number?: string | null
           id?: string
           invoice_number: string
@@ -210,10 +216,13 @@ export type Database = {
           consignee_phone?: string | null
           created_at?: string | null
           customer_id?: string
+          delivery_challan_date?: string | null
+          delivery_challan_number?: string | null
           delivery_date?: string | null
           delivery_number?: string | null
           description?: string | null
           due_date?: string | null
+          eway_lr_number?: string | null
           eway_number?: string | null
           id?: string
           invoice_number?: string
