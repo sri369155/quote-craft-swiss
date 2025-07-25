@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/integrations/supabase/client'
@@ -331,7 +330,7 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ invoiceId, invoice, onE
                 <Checkbox 
                   id="include-header" 
                   checked={includeHeader}
-                  onCheckedChange={setIncludeHeader}
+                  onCheckedChange={(checked) => setIncludeHeader(checked === true)}
                 />
                 <label htmlFor="include-header" className="text-sm font-medium">
                   Include Header Image
@@ -341,7 +340,7 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ invoiceId, invoice, onE
                 <Checkbox 
                   id="include-footer" 
                   checked={includeFooter}
-                  onCheckedChange={setIncludeFooter}
+                  onCheckedChange={(checked) => setIncludeFooter(checked === true)}
                 />
                 <label htmlFor="include-footer" className="text-sm font-medium">
                   Include Footer Image
@@ -351,7 +350,7 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ invoiceId, invoice, onE
                 <Checkbox 
                   id="include-signature" 
                   checked={includeSignature}
-                  onCheckedChange={setIncludeSignature}
+                  onCheckedChange={(checked) => setIncludeSignature(checked === true)}
                 />
                 <label htmlFor="include-signature" className="text-sm font-medium">
                   Include Signature Image
