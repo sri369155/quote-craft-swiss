@@ -279,9 +279,9 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ invoiceId, invoice, onE
   }
 
   const handleExportPDF = async () => {
-    if (!currentInvoice || !customer || !editableItems.length) return
+    if (!editableInvoice || !customer || !editableItems.length) return
 
-    await exportToPDF(currentInvoice, customer, editableItems, userProfile || undefined)
+    await exportToPDF(editableInvoice, customer, editableItems, userProfile || undefined)
   }
 
   if (invoiceLoading) {
