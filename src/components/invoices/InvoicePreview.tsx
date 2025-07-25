@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/integrations/supabase/client'
@@ -36,7 +37,7 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ invoiceId, invoice, onE
   const { data: invoiceData, isLoading: invoiceLoading } = useQuery({
     queryKey: ['invoice', invoiceId],
     queryFn: async () => {
-      if (!invoiceId) return invoice
+      if (!invoiceId) return null
       const { data, error } = await supabase
         .from('invoices')
         .select('*')
@@ -98,7 +99,8 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ invoiceId, invoice, onE
     },
   })
 
-  const currentInvoice = invoiceData || invoice
+  // Use the passed invoice or fetched invoice data
+  const currentInvoice = invoice || invoiceData
 
   useEffect(() => {
     if (currentInvoice) {
@@ -298,7 +300,7 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ invoiceId, invoice, onE
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto p-4 sm:p-6 space-y-6">
+      <div className="max-w-4xl mx-auto p-2 sm:p-4 space-y-4">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <Button variant="outline" onClick={onBack} className="flex items-center gap-2">
@@ -362,145 +364,170 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ invoiceId, invoice, onE
 
         {/* Invoice Preview */}
         <Card className="bg-white shadow-lg">
-          <CardContent className="p-6 sm:p-8">
-            {/* Header Section */}
-            <div className="text-center mb-8">
-              <div className="text-sm font-medium mb-2 text-gray-600">
-                GSTIN: {userProfile?.gst_number || 'Not Available'}
-              </div>
-              
-              {/* TAX INVOICE with navy blue color and border */}
-              <div className="inline-block border-2 border-blue-800 px-6 py-3 mb-3">
-                <h1 className="text-xl sm:text-2xl font-bold text-blue-800">
-                  <span className="underline">TAX INVOICE</span>
-                </h1>
-              </div>
-              
-              <div className="text-sm text-gray-600">
-                ORIGINAL FOR RECIPIENT
+          <CardContent className="p-3 sm:p-6">
+            {/* Header Section with Company Info */}
+            <div className="bg-orange-600 text-white p-3 mb-4 rounded-t-lg">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h1 className="text-xl font-bold">{userProfile?.company_name || 'BHAIRAVNEX'}</h1>
+                  <p className="text-sm">"Engineering Tomorrow's Technologies, Today"</p>
+                </div>
+                <div className="text-right">
+                  <div className="bg-orange-800 px-2 py-1 rounded text-sm">
+                    GST: {userProfile?.gst_number || '37ABDFB9225A1Z5'}
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Customer and Invoice Details */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-              {/* Customer Details */}
-              <div>
-                <h3 className="text-lg font-semibold mb-4 bg-gray-200 p-3 rounded">Customer Detail</h3>
-                <div className="space-y-3">
-                  <div className="flex flex-col sm:flex-row">
-                    <span className="font-medium w-full sm:w-20 mb-1 sm:mb-0">M/S:</span>
-                    <Input
-                      value={customer?.name || ''}
-                      className="bg-pink-50 border-pink-200 text-sm"
-                      disabled
-                    />
+            {/* TAX INVOICE Section */}
+            <div className="text-center mb-6">
+              <div className="inline-block border-2 border-blue-800 px-4 py-2 mb-2">
+                <h2 className="text-lg font-bold text-blue-800">TAX INVOICE</h2>
+              </div>
+              <div className="text-sm text-gray-600">ORIGINAL FOR RECIPIENT</div>
+            </div>
+
+            {/* Main Content Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+              {/* Left Column - Customer Details */}
+              <div className="border border-gray-300">
+                <div className="bg-gray-200 p-2 border-b">
+                  <h3 className="font-semibold text-sm">Customer Detail</h3>
+                </div>
+                <div className="p-3 space-y-3">
+                  <div className="grid grid-cols-3 gap-2 items-center">
+                    <span className="text-sm font-medium">M/S</span>
+                    <div className="col-span-2">
+                      <Input
+                        value={customer?.name || ''}
+                        className="bg-pink-50 border-pink-200 text-sm h-8"
+                        disabled
+                      />
+                    </div>
                   </div>
-                  <div className="flex flex-col sm:flex-row">
-                    <span className="font-medium w-full sm:w-20 mb-1 sm:mb-0">Address:</span>
-                    <Textarea
-                      value={customer?.address || ''}
-                      className="bg-pink-50 border-pink-200 text-sm min-h-[80px]"
-                      disabled
-                    />
+                  <div className="grid grid-cols-3 gap-2 items-start">
+                    <span className="text-sm font-medium">Address</span>
+                    <div className="col-span-2">
+                      <Textarea
+                        value={customer?.address || ''}
+                        className="bg-pink-50 border-pink-200 text-sm min-h-[60px]"
+                        disabled
+                      />
+                    </div>
                   </div>
-                  <div className="flex flex-col sm:flex-row">
-                    <span className="font-medium w-full sm:w-20 mb-1 sm:mb-0">Phone:</span>
-                    <Input
-                      value={customer?.phone || ''}
-                      className="bg-pink-50 border-pink-200 text-sm"
-                      disabled
-                    />
+                  <div className="grid grid-cols-3 gap-2 items-center">
+                    <span className="text-sm font-medium">PHONE</span>
+                    <div className="col-span-2">
+                      <Input
+                        value={customer?.phone || ''}
+                        className="bg-pink-50 border-pink-200 text-sm h-8"
+                        disabled
+                      />
+                    </div>
                   </div>
-                  <div className="flex flex-col sm:flex-row">
-                    <span className="font-medium w-full sm:w-20 mb-1 sm:mb-0">GSTIN:</span>
-                    <Input
-                      value={editableInvoice?.consignee_gstin || ''}
-                      onChange={(e) => handleInputChange('consignee_gstin', e.target.value)}
-                      className="bg-pink-50 border-pink-200 text-sm"
-                    />
+                  <div className="grid grid-cols-3 gap-2 items-center">
+                    <span className="text-sm font-medium">GSTIN</span>
+                    <div className="col-span-2">
+                      <Input
+                        value={editableInvoice?.consignee_gstin || ''}
+                        onChange={(e) => handleInputChange('consignee_gstin', e.target.value)}
+                        className="bg-pink-50 border-pink-200 text-sm h-8"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 items-center">
+                    <span className="text-sm font-medium">Place of Supply</span>
+                    <div className="col-span-2">
+                      <Input
+                        value={editableInvoice?.consignee_address || ''}
+                        onChange={(e) => handleInputChange('consignee_address', e.target.value)}
+                        className="bg-pink-50 border-pink-200 text-sm h-8"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Invoice Details */}
-              <div>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="flex flex-col">
-                      <span className="font-medium mb-1">Invoice No.:</span>
+              {/* Right Column - Invoice Details */}
+              <div className="border border-gray-300">
+                <div className="grid grid-cols-2 h-full">
+                  <div className="border-r border-gray-300 p-3 space-y-3">
+                    <div>
+                      <span className="text-sm font-medium block mb-1">Invoice No.</span>
                       <Input
                         value={editableInvoice?.invoice_number || ''}
-                        className="bg-pink-50 border-pink-200 text-sm"
+                        className="bg-pink-50 border-pink-200 text-sm h-8"
                         disabled
                       />
                     </div>
-                    <div className="flex flex-col">
-                      <span className="font-medium mb-1">Invoice Date:</span>
+                    <div>
+                      <span className="text-sm font-medium block mb-1">Challan No.</span>
+                      <Input
+                        value={editableInvoice?.delivery_challan_number || ''}
+                        onChange={(e) => handleInputChange('delivery_challan_number', e.target.value)}
+                        className="bg-pink-50 border-pink-200 text-sm h-8"
+                      />
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium block mb-1">P.O. No.</span>
+                      <Input
+                        value={editableInvoice?.order_number || ''}
+                        onChange={(e) => handleInputChange('order_number', e.target.value)}
+                        className="bg-pink-50 border-pink-200 text-sm h-8"
+                      />
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium block mb-1">DELIVERY DATE</span>
+                      <Input
+                        type="date"
+                        value={editableInvoice?.delivery_date || ''}
+                        onChange={(e) => handleInputChange('delivery_date', e.target.value)}
+                        className="bg-pink-50 border-pink-200 text-sm h-8"
+                      />
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium block mb-1">Delivery No & Date</span>
+                      <Input
+                        value={editableInvoice?.delivery_number || ''}
+                        onChange={(e) => handleInputChange('delivery_number', e.target.value)}
+                        className="bg-pink-50 border-pink-200 text-sm h-8"
+                      />
+                    </div>
+                  </div>
+                  <div className="p-3 space-y-3">
+                    <div>
+                      <span className="text-sm font-medium block mb-1">Invoice Date</span>
                       <Input
                         type="date"
                         value={editableInvoice?.issue_date || ''}
                         onChange={(e) => handleInputChange('issue_date', e.target.value)}
-                        className="bg-pink-50 border-pink-200 text-sm"
+                        className="bg-pink-50 border-pink-200 text-sm h-8"
                       />
                     </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="flex flex-col">
-                      <span className="font-medium mb-1">Delivery Challan No.:</span>
-                      <Input
-                        value={editableInvoice?.delivery_challan_number || ''}
-                        onChange={(e) => handleInputChange('delivery_challan_number', e.target.value)}
-                        className="bg-pink-50 border-pink-200 text-sm"
-                      />
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="font-medium mb-1">Delivery Date:</span>
+                    <div>
+                      <span className="text-sm font-medium block mb-1">Challan Date</span>
                       <Input
                         type="date"
                         value={editableInvoice?.delivery_challan_date || ''}
                         onChange={(e) => handleInputChange('delivery_challan_date', e.target.value)}
-                        className="bg-pink-50 border-pink-200 text-sm"
+                        className="bg-pink-50 border-pink-200 text-sm h-8"
                       />
                     </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="flex flex-col">
-                      <span className="font-medium mb-1">Order No.:</span>
-                      <Input
-                        value={editableInvoice?.order_number || ''}
-                        onChange={(e) => handleInputChange('order_number', e.target.value)}
-                        className="bg-pink-50 border-pink-200 text-sm"
-                      />
+                    <div>
+                      <span className="text-sm font-medium block mb-1">Reverse Charge</span>
+                      <select className="w-full bg-pink-50 border border-pink-200 text-sm h-8 px-2 rounded">
+                        <option value="N">N</option>
+                        <option value="Y">Y</option>
+                      </select>
                     </div>
-                    <div className="flex flex-col">
-                      <span className="font-medium mb-1">Order Date:</span>
-                      <Input
-                        type="date"
-                        value={editableInvoice?.order_date || ''}
-                        onChange={(e) => handleInputChange('order_date', e.target.value)}
-                        className="bg-pink-50 border-pink-200 text-sm"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="flex flex-col">
-                      <span className="font-medium mb-1">E-Way/LR No.:</span>
-                      <Input
-                        value={editableInvoice?.eway_lr_number || ''}
-                        onChange={(e) => handleInputChange('eway_lr_number', e.target.value)}
-                        className="bg-pink-50 border-pink-200 text-sm"
-                      />
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="font-medium mb-1">Due Date:</span>
+                    <div>
+                      <span className="text-sm font-medium block mb-1">Due Date</span>
                       <Input
                         type="date"
                         value={editableInvoice?.due_date || ''}
                         onChange={(e) => handleInputChange('due_date', e.target.value)}
-                        className="bg-pink-50 border-pink-200 text-sm"
+                        className="bg-pink-50 border-pink-200 text-sm h-8"
                       />
                     </div>
                   </div>
@@ -509,195 +536,202 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ invoiceId, invoice, onE
             </div>
 
             {/* Items Table */}
-            <div className="mb-8 overflow-x-auto">
-              <div className="min-w-full border border-gray-300">
-                <div className="grid grid-cols-12 bg-gray-200 font-medium text-sm min-w-full">
-                  <div className="col-span-1 p-3 border-r text-center">Sr.No.</div>
-                  <div className="col-span-4 p-3 border-r">Name of Product/Service</div>
-                  <div className="col-span-1 p-3 border-r text-center">HSN/SAC</div>
-                  <div className="col-span-1 p-3 border-r text-center">Qty</div>
-                  <div className="col-span-1 p-3 border-r text-center">Rate</div>
-                  <div className="col-span-2 p-3 border-r text-center">Taxable Value</div>
-                  <div className="col-span-1 p-3 border-r text-center">IGST %</div>
-                  <div className="col-span-1 p-3 text-center">Total</div>
-                </div>
-                
-                {editableItems.map((item, index) => (
-                  <div key={item.id} className="grid grid-cols-12 text-sm border-t min-w-full">
-                    <div className="col-span-1 p-3 border-r text-center">{index + 1}</div>
-                    <div className="col-span-4 p-3 border-r">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <div className="cursor-pointer hover:bg-pink-50 p-2 rounded min-h-[40px] text-sm">
-                            {item.description}
-                          </div>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-md">
-                          <DialogHeader>
-                            <DialogTitle>Edit Item Description</DialogTitle>
-                          </DialogHeader>
-                          <Textarea
-                            value={item.description}
-                            onChange={(e) => handleItemChange(index, 'description', e.target.value)}
-                            className="min-h-[100px]"
-                            placeholder="Enter item description..."
-                          />
-                        </DialogContent>
-                      </Dialog>
-                    </div>
-                    <div className="col-span-1 p-3 border-r text-center">
+            <div className="mb-6 overflow-x-auto">
+              <table className="w-full border border-gray-300 text-sm">
+                <thead>
+                  <tr className="bg-gray-200">
+                    <th className="border border-gray-300 p-2 text-center w-12">Sr. No.</th>
+                    <th className="border border-gray-300 p-2 text-left">Name of Product/Service</th>
+                    <th className="border border-gray-300 p-2 text-center w-16">HSN/SAC</th>
+                    <th className="border border-gray-300 p-2 text-center w-16">Qty</th>
+                    <th className="border border-gray-300 p-2 text-center w-24">Rate</th>
+                    <th className="border border-gray-300 p-2 text-center w-24">Taxable Value</th>
+                    <th className="border border-gray-300 p-2 text-center w-16">IGST %</th>
+                    <th className="border border-gray-300 p-2 text-center w-24">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {editableItems.map((item, index) => (
+                    <tr key={item.id}>
+                      <td className="border border-gray-300 p-2 text-center">{index + 1}</td>
+                      <td className="border border-gray-300 p-2">
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <div className="cursor-pointer hover:bg-pink-50 p-1 rounded min-h-[32px] text-sm">
+                              {item.description}
+                            </div>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-md">
+                            <DialogHeader>
+                              <DialogTitle>Edit Item Description</DialogTitle>
+                            </DialogHeader>
+                            <Textarea
+                              value={item.description}
+                              onChange={(e) => handleItemChange(index, 'description', e.target.value)}
+                              className="min-h-[100px]"
+                              placeholder="Enter item description..."
+                            />
+                          </DialogContent>
+                        </Dialog>
+                      </td>
+                      <td className="border border-gray-300 p-2">
+                        <Input
+                          value={item.hsn_code || ''}
+                          onChange={(e) => handleItemChange(index, 'hsn_code', e.target.value)}
+                          className="bg-pink-50 border-pink-200 text-center text-sm h-8"
+                        />
+                      </td>
+                      <td className="border border-gray-300 p-2">
+                        <Input
+                          type="number"
+                          value={item.quantity}
+                          onChange={(e) => handleItemChange(index, 'quantity', parseFloat(e.target.value) || 0)}
+                          className="bg-pink-50 border-pink-200 text-center text-sm h-8"
+                        />
+                      </td>
+                      <td className="border border-gray-300 p-2">
+                        <Input
+                          type="number"
+                          value={item.unit_price}
+                          onChange={(e) => handleItemChange(index, 'unit_price', parseFloat(e.target.value) || 0)}
+                          className="bg-pink-50 border-pink-200 text-center text-sm h-8"
+                        />
+                      </td>
+                      <td className="border border-gray-300 p-2 text-center">
+                        ₹{item.line_total.toFixed(2)}
+                      </td>
+                      <td className="border border-gray-300 p-2 text-center">
+                        {editableInvoice?.tax_rate}%
+                      </td>
+                      <td className="border border-gray-300 p-2 text-center">
+                        ₹{(item.line_total + (item.line_total * (editableInvoice?.tax_rate || 0)) / 100).toFixed(2)}
+                      </td>
+                    </tr>
+                  ))}
+                  
+                  {/* Add New Item Row */}
+                  <tr className="bg-gray-50">
+                    <td className="border border-gray-300 p-2 text-center">
+                      <Button
+                        onClick={handleAddItem}
+                        size="sm"
+                        className="h-6 w-6 p-0"
+                      >
+                        <Plus className="h-3 w-3" />
+                      </Button>
+                    </td>
+                    <td className="border border-gray-300 p-2">
                       <Input
-                        value={item.hsn_code || ''}
-                        onChange={(e) => handleItemChange(index, 'hsn_code', e.target.value)}
-                        className="bg-pink-50 border-pink-200 text-center text-sm"
+                        value={newItem.description}
+                        onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+                        placeholder="Add new item..."
+                        className="bg-white border-gray-300 text-sm h-8"
                       />
-                    </div>
-                    <div className="col-span-1 p-3 border-r text-center">
+                    </td>
+                    <td className="border border-gray-300 p-2">
+                      <Input
+                        value={newItem.hsn_code}
+                        onChange={(e) => setNewItem({ ...newItem, hsn_code: e.target.value })}
+                        className="bg-white border-gray-300 text-center text-sm h-8"
+                      />
+                    </td>
+                    <td className="border border-gray-300 p-2">
                       <Input
                         type="number"
-                        value={item.quantity}
-                        onChange={(e) => handleItemChange(index, 'quantity', parseFloat(e.target.value) || 0)}
-                        className="bg-pink-50 border-pink-200 text-center text-sm"
+                        value={newItem.quantity}
+                        onChange={(e) => setNewItem({ ...newItem, quantity: parseFloat(e.target.value) || 0 })}
+                        className="bg-white border-gray-300 text-center text-sm h-8"
                       />
-                    </div>
-                    <div className="col-span-1 p-3 border-r text-center">
+                    </td>
+                    <td className="border border-gray-300 p-2">
                       <Input
                         type="number"
-                        value={item.unit_price}
-                        onChange={(e) => handleItemChange(index, 'unit_price', parseFloat(e.target.value) || 0)}
-                        className="bg-pink-50 border-pink-200 text-center text-sm"
+                        value={newItem.unit_price}
+                        onChange={(e) => setNewItem({ ...newItem, unit_price: parseFloat(e.target.value) || 0 })}
+                        className="bg-white border-gray-300 text-center text-sm h-8"
                       />
-                    </div>
-                    <div className="col-span-2 p-3 border-r text-center flex items-center justify-center">
-                      ₹{item.line_total.toFixed(2)}
-                    </div>
-                    <div className="col-span-1 p-3 border-r text-center flex items-center justify-center">
-                      {editableInvoice?.tax_rate}%
-                    </div>
-                    <div className="col-span-1 p-3 text-center flex items-center justify-center">
-                      ₹{(item.line_total + (item.line_total * (editableInvoice?.tax_rate || 0)) / 100).toFixed(2)}
-                    </div>
-                  </div>
-                ))}
-                
-                {/* Add New Item Row */}
-                <div className="grid grid-cols-12 text-sm border-t bg-gray-50 min-w-full">
-                  <div className="col-span-1 p-3 border-r text-center">
-                    <Button
-                      onClick={handleAddItem}
-                      size="sm"
-                      className="h-8 w-8 p-0"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <div className="col-span-4 p-3 border-r">
-                    <Input
-                      value={newItem.description}
-                      onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
-                      placeholder="Add new item..."
-                      className="bg-white border-gray-300 text-sm"
-                    />
-                  </div>
-                  <div className="col-span-1 p-3 border-r">
-                    <Input
-                      value={newItem.hsn_code}
-                      onChange={(e) => setNewItem({ ...newItem, hsn_code: e.target.value })}
-                      className="bg-white border-gray-300 text-center text-sm"
-                    />
-                  </div>
-                  <div className="col-span-1 p-3 border-r">
-                    <Input
-                      type="number"
-                      value={newItem.quantity}
-                      onChange={(e) => setNewItem({ ...newItem, quantity: parseFloat(e.target.value) || 0 })}
-                      className="bg-white border-gray-300 text-center text-sm"
-                    />
-                  </div>
-                  <div className="col-span-1 p-3 border-r">
-                    <Input
-                      type="number"
-                      value={newItem.unit_price}
-                      onChange={(e) => setNewItem({ ...newItem, unit_price: parseFloat(e.target.value) || 0 })}
-                      className="bg-white border-gray-300 text-center text-sm"
-                    />
-                  </div>
-                  <div className="col-span-4 p-3"></div>
-                </div>
-              </div>
+                    </td>
+                    <td className="border border-gray-300 p-2"></td>
+                    <td className="border border-gray-300 p-2"></td>
+                    <td className="border border-gray-300 p-2"></td>
+                  </tr>
+                  
+                  {/* Total Row */}
+                  <tr className="bg-gray-200 font-semibold">
+                    <td className="border border-gray-300 p-2 text-center" colSpan={4}>Total</td>
+                    <td className="border border-gray-300 p-2 text-center">1.00</td>
+                    <td className="border border-gray-300 p-2 text-center">₹{editableInvoice?.subtotal.toFixed(2)}</td>
+                    <td className="border border-gray-300 p-2 text-center"></td>
+                    <td className="border border-gray-300 p-2 text-center">₹{editableInvoice?.total_amount.toFixed(2)}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
 
-            {/* Bank Details and Signature */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-              <div>
-                <h3 className="font-semibold mb-3">Bank Details</h3>
-                <div className="space-y-2 text-sm">
-                  <div>Bank Name: {userProfile?.bank_name || 'Not Available'}</div>
-                  <div>Branch: {userProfile?.bank_branch || 'Not Available'}</div>
-                  <div>Account No: {userProfile?.bank_account_number || 'Not Available'}</div>
-                  <div>IFSC: {userProfile?.bank_ifsc_code || 'Not Available'}</div>
+            {/* Bottom Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Total in Words */}
+              <div className="border border-gray-300 p-3">
+                <div className="font-semibold text-sm mb-2">Total in words</div>
+                <div className="text-sm">
+                  {editableInvoice?.total_amount ? 
+                    `${Math.floor(editableInvoice.total_amount / 10000000)} CRORE ${Math.floor((editableInvoice.total_amount % 10000000) / 100000)} LAKH RUPEES ONLY` 
+                    : 'ZERO RUPEES ONLY'}
                 </div>
               </div>
               
-              <div className="text-right">
-                <div className="mb-4">
-                  <div className="text-sm mb-2">For {userProfile?.company_name || 'Company Name'}</div>
-                  {userProfile?.signature_image_url && includeSignature && (
-                    <img 
-                      src={userProfile.signature_image_url} 
-                      alt="Signature" 
-                      className="h-16 ml-auto mt-2 max-w-full"
-                    />
-                  )}
-                  <div className="text-sm mt-4">Authorised Signatory</div>
+              {/* Tax Summary */}
+              <div className="border border-gray-300">
+                <div className="grid grid-cols-2 border-b border-gray-300">
+                  <div className="p-2 font-semibold text-sm">Taxable Amount</div>
+                  <div className="p-2 text-right text-sm">₹{editableInvoice?.subtotal.toFixed(2)}</div>
+                </div>
+                <div className="grid grid-cols-2">
+                  <div className="p-2 font-semibold text-sm">Add: IGST</div>
+                  <div className="p-2 text-right text-sm">₹{editableInvoice?.tax_amount.toFixed(2)}</div>
                 </div>
               </div>
             </div>
 
             {/* Terms and Conditions */}
-            <div className="mb-8">
-              <h3 className="font-semibold mb-3">Terms & Conditions</h3>
+            <div className="mt-6 mb-4">
+              <h3 className="font-semibold mb-2 text-sm">Terms & Conditions</h3>
               <Textarea
                 value={editableInvoice?.description || ''}
                 onChange={(e) => handleInputChange('description', e.target.value)}
-                className="bg-pink-50 border-pink-200 min-h-[100px] text-sm"
+                className="bg-pink-50 border-pink-200 min-h-[80px] text-sm"
                 placeholder="Enter terms and conditions..."
               />
             </div>
 
-            {/* Totals */}
-            <div className="flex justify-end mb-8">
-              <div className="w-full max-w-md space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Subtotal:</span>
-                  <span>₹{editableInvoice?.subtotal.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>IGST ({editableInvoice?.tax_rate}%):</span>
-                  <span>₹{editableInvoice?.tax_amount.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between font-bold text-lg border-t pt-2">
-                  <span>Total:</span>
-                  <span>₹{editableInvoice?.total_amount.toFixed(2)}</span>
-                </div>
+            {/* Signature Section */}
+            <div className="flex justify-end">
+              <div className="text-right">
+                <div className="text-sm mb-2">For {userProfile?.company_name || 'Company Name'}</div>
+                {userProfile?.signature_image_url && includeSignature && (
+                  <img 
+                    src={userProfile.signature_image_url} 
+                    alt="Signature" 
+                    className="h-12 ml-auto mt-2 max-w-full"
+                  />
+                )}
+                <div className="text-sm mt-4 border-t pt-2">Authorised Signatory</div>
               </div>
             </div>
 
-            {/* Certification line at bottom */}
-            <div className="text-center text-xs text-gray-600 mt-8">
+            {/* Certification */}
+            <div className="text-center text-xs text-gray-600 mt-6">
               Certified that the particulars given above are true and correct.
             </div>
           </CardContent>
         </Card>
 
         {/* Save Button */}
-        {isEditing && (
-          <div className="flex justify-center">
-            <Button onClick={handleSave} className="px-8">
-              Save Changes
-            </Button>
-          </div>
-        )}
+        <div className="flex justify-center">
+          <Button onClick={handleSave} className="px-8">
+            Save Changes
+          </Button>
+        </div>
       </div>
     </div>
   )
