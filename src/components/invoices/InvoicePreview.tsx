@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { useInvoicePDFExport } from '@/hooks/useInvoicePDFExport'
@@ -36,14 +37,15 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
   const [editableBankDetails, setEditableBankDetails] = useState('')
   const [termsConditions, setTermsConditions] = useState('1. Subject to Ahmedabad Jurisdiction.\n2. Our responsibility ceases as soon as the goods leave our premises.\n3. Goods once sold will not be taken back.\n4. Delivery ex-premises.')
   const [editableInvoiceData, setEditableInvoiceData] = useState({
-    challanNumber: '',
-    lrNumber: '',
-    reverseCharge: 'No',
+    deliveryChallanNumber: '',
+    deliveryDate: '',
+    eWayLrNumber: '',
     placeOfSupply: '',
     senderAddress: '',
     senderGstin: '',
     senderPhone: '',
-    poNumber: ''
+    orderNumber: '',
+    orderDate: ''
   })
   
   // Image preference controls
@@ -106,15 +108,15 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
 
       // Set editable invoice data
       setEditableInvoiceData({
-        DC Number: data.delivery_challan_number || '',
-        Delivery Date: data.delivery_challan_date || '',
-        EWayNumber: data.eway_lr_number || '',
+        deliveryChallanNumber: data.delivery_challan_number || '',
+        deliveryDate: data.delivery_challan_date || '',
+        eWayLrNumber: data.eway_lr_number || '',
         placeOfSupply: data.place_of_supply || '',
         senderAddress: data.sender_address || '',
         senderGstin: data.sender_gstin || '',
         senderPhone: data.sender_phone || '',
-        OrderNumber: data.Order_number || '',
-        OrderDate: data.Order_Date || '',
+        orderNumber: data.order_number || '',
+        orderDate: data.order_date || ''
       })
     } catch (error) {
       console.error('Error fetching invoice:', error)
@@ -160,8 +162,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
     
     const modifiedInvoice = {
       ...invoice,
-      ...editableInvoiceData,
-      reverse_charge: editableInvoiceData.reverseCharge === 'Yes'
+      ...editableInvoiceData
     }
     
     await exportToPDF(modifiedInvoice as Invoice, customer, items, modifiedProfile, { 
@@ -282,69 +283,64 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
         {/* Additional Invoice Fields */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="challanNumber">Challan No.</Label>
+            <Label htmlFor="deliveryChallanNumber">Delivery Challan No.</Label>
             <Input
-              id="challanNumber"
-              value={editableInvoiceData.challanNumber}
-              onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, challanNumber: e.target.value }))}
+              id="deliveryChallanNumber"
+              value={editableInvoiceData.deliveryChallanNumber}
+              onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, deliveryChallanNumber: e.target.value }))}
               placeholder="865"
             />
           </div>
           <div>
-            <Label htmlFor="lrNumber">Delivery No & Date</Label>
+            <Label htmlFor="deliveryDate">Delivery Date</Label>
             <Input
-              id="lrNumber"
-              value={editableInvoiceData.lrNumber}
-              onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, lrNumber: e.target.value }))}
+              id="deliveryDate"
+              value={editableInvoiceData.deliveryDate}
+              onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, deliveryDate: e.target.value }))}
               placeholder="958"
             />
           </div>
         </div>
 
-        {/* Additional Data Fields with Checkbox */}
-        <div className="space-y-2">
-          <div className="flex items-center space-x-2">
-            <input type="checkbox" id="showAdditionalFields" />
-            <Label htmlFor="showAdditionalFields">Add Additional Invoice Data Fields</Label>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="orderNumber">Order No.</Label>
+            <Input
+              id="orderNumber"
+              value={editableInvoiceData.orderNumber}
+              onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, orderNumber: e.target.value }))}
+              placeholder="PO-123"
+            />
           </div>
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="order_number">Order Number</Label>
-              <Input
-                id="poNumber"
-                value={editableInvoiceData.order_number}
-                onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, poNumber: e.target.value }))}
-                placeholder="PO-123"
-              />
-            </div>
-            <div className="grid grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="order_date">Order Date</Label>
-              <Input
-                id="order_date"
-                value={editableInvoiceData.order_date}
-                onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, poNumber: e.target.value }))}
-                placeholder="Order_date"
-              />
-            </div>
-            <div>
-              <Label htmlFor="senderGstin">Sender GSTIN</Label>
-              <Input
-                id="senderGstin"
-                value={editableInvoiceData.senderGstin}
-                onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, senderGstin: e.target.value }))}
-                placeholder="24AABCG1234H1Z5"
-              />
-            </div>
-            <div>
-              <Label htmlFor="senderPhone">Sender Phone</Label>
-              <Input
-                id="senderPhone"
-                value={editableInvoiceData.senderPhone}
-                onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, senderPhone: e.target.value }))}
-                placeholder="+91 98765 43210"
-              />
-            </div>
+          <div>
+            <Label htmlFor="orderDate">Order Date</Label>
+            <Input
+              id="orderDate"
+              value={editableInvoiceData.orderDate}
+              onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, orderDate: e.target.value }))}
+              placeholder="Order Date"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="eWayLrNumber">E-Way/LR No.</Label>
+            <Input
+              id="eWayLrNumber"
+              value={editableInvoiceData.eWayLrNumber}
+              onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, eWayLrNumber: e.target.value }))}
+              placeholder="EWay/LR Number"
+            />
+          </div>
+          <div>
+            <Label htmlFor="senderGstin">Sender GSTIN</Label>
+            <Input
+              id="senderGstin"
+              value={editableInvoiceData.senderGstin}
+              onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, senderGstin: e.target.value }))}
+              placeholder="24AABCG1234H1Z5"
+            />
           </div>
         </div>
       </div>
@@ -474,8 +470,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                     <td className="border-b border-black p-1 font-semibold text-xs">Invoice No.</td>
                     <td className="border-b border-black p-1 text-xs">
                       <Input 
-                        value={editableInvoiceData.invoice_number}
-                        onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, delivery_challan_Number: e.target.value }))}
+                        value={invoice.invoice_number}
                         className="border-0 p-0 h-auto text-xs bg-pink-50/30"
                         style={{ fontSize: '12px' }}
                       />
@@ -484,31 +479,31 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                     <td className="border-b border-black p-1 text-xs">{format(new Date(invoice.issue_date), 'dd-MMM-yyyy')}</td>
                   </tr>
                   <tr>
-                    <td className="border-b border-black p-1 font-semibold text-xs">DC No.</td>
+                    <td className="border-b border-black p-1 font-semibold text-xs">Delivery Challan No.</td>
                     <td className="border-b border-black p-1 text-xs">
                       <Input 
-                        value={editableInvoiceData.delivery_challan_number} 
-                        onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, delivery_challan_Number: e.target.value }))}
+                        value={editableInvoiceData.deliveryChallanNumber} 
+                        onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, deliveryChallanNumber: e.target.value }))}
                         className="border-0 p-0 h-auto text-xs bg-pink-50/30"
                         style={{ fontSize: '12px' }}
                       />
                     </td>
-                    <td className="border-b border-black p-1 font-semibold text-xs">DC Date</td>
-                    <td className="border-b border-black p-1 text-xs">{invoice.delivery_challan_date ? format(new Date(invoice.delivery_challan_date), 'dd-MMM-yyyy') : ''}
+                    <td className="border-b border-black p-1 font-semibold text-xs">Delivery Date</td>
+                    <td className="border-b border-black p-1 text-xs">
                       <Input 
-                        value={editableInvoiceData.invoice.delivery_challan_date} 
-                        onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, delivery_challan_date: e.target.value }))}
+                        value={editableInvoiceData.deliveryDate} 
+                        onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, deliveryDate: e.target.value }))}
                         className="border-0 p-0 h-auto text-xs bg-pink-50/30"
                         style={{ fontSize: '12px' }}
                       />
-                      </td>
+                    </td>
                   </tr>
                   <tr>
                     <td className="border-b border-black p-1 font-semibold text-xs">Order No.</td>
                     <td className="border-b border-black p-1 text-xs">
                       <Input 
-                        value={editableInvoiceData.order_Number} 
-                        onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, order_Number: e.target.value }))}
+                        value={editableInvoiceData.orderNumber} 
+                        onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, orderNumber: e.target.value }))}
                         className="border-0 p-0 h-auto text-xs bg-pink-50/30"
                         style={{ fontSize: '12px' }}
                       />
@@ -516,28 +511,25 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                     <td className="border-b border-black p-1 font-semibold text-xs">Order Date</td>
                     <td className="border-b border-black p-1 text-xs">
                       <Input 
-                        value={editableInvoiceData.Order_date} 
-                        onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, order_date: e.target.value }))}
+                        value={editableInvoiceData.orderDate} 
+                        onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, orderDate: e.target.value }))}
                         className="border-0 p-0 h-auto text-xs bg-pink-50/30 w-full"
                         style={{ fontSize: '12px' }}
                       />
-                  </td>
+                    </td>
                   </tr>
                   <tr>
-                   
-                    <td className="border-b border-black p-1 font-semibold text-xs">Due Date</td>
-                    <td className="border-b border-black p-1 text-xs">{format(new Date(invoice.due_date), 'dd-MMM-yyyy')}</td>
-                  </tr>
-                  <tr>
-                    <td className="p-1 font-semibold text-xs" colSpan={2}>Misc Invoice Data</td>
-                    <td className="p-1 text-xs" colSpan={2}>
+                    <td className="border-b border-black p-1 font-semibold text-xs">E-Way/LR No.</td>
+                    <td className="border-b border-black p-1 text-xs">
                       <Input 
-                        value={editableInvoiceData.lrNumber} 
-                        onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, lrNumber: e.target.value }))}
+                        value={editableInvoiceData.eWayLrNumber} 
+                        onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, eWayLrNumber: e.target.value }))}
                         className="border-0 p-0 h-auto text-xs bg-pink-50/30"
                         style={{ fontSize: '12px' }}
                       />
                     </td>
+                    <td className="border-b border-black p-1 font-semibold text-xs">Due Date</td>
+                    <td className="border-b border-black p-1 text-xs">{format(new Date(invoice.due_date), 'dd-MMM-yyyy')}</td>
                   </tr>
                 </tbody>
               </table>
@@ -684,7 +676,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
             </div>
           </div>
 
-          {/* Bank Details and Terms - Compact with page break control */}
+          {/* Bank Details and Signature - Compact with page break control */}
           <div className="grid grid-cols-2 gap-3 mb-3" style={{ pageBreakInside: 'avoid' }}>
             {/* Bank Details - Editable */}
             <div className="border border-black">
@@ -718,7 +710,6 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
               </div>
             </div>
           </div>
-
 
           {/* Certification Statement */}
           <div className="text-center text-xs font-semibold pt-2 border-t border-gray-200 mb-2">
