@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { useInvoicePDFExport } from '@/hooks/useInvoicePDFExport'
@@ -106,10 +105,10 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
       await fetchCustomer(data.customer_id)
       await fetchItems(data.id)
 
-      // Set editable invoice data
+      // Set editable invoice data with correct field names
       setEditableInvoiceData({
         deliveryChallanNumber: data.delivery_challan_number || '',
-        deliveryDate: data.delivery_challan_date || '',
+        deliveryDate: data.delivery_date || '',
         eWayLrNumber: data.eway_lr_number || '',
         placeOfSupply: data.place_of_supply || '',
         senderAddress: data.sender_address || '',
