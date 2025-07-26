@@ -105,15 +105,15 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
       await fetchCustomer(data.customer_id)
       await fetchItems(data.id)
 
-      // Set editable invoice data with correct field names
+      // Set editable invoice data with correct database field names
       setEditableInvoiceData({
-        deliveryChallanNumber: data.delivery_challan_number || '',
+        deliveryChallanNumber: data.delivery_number || '',
         deliveryDate: data.delivery_date || '',
-        eWayLrNumber: data.eway_lr_number || '',
-        placeOfSupply: data.place_of_supply || '',
-        senderAddress: data.sender_address || '',
-        senderGstin: data.sender_gstin || '',
-        senderPhone: data.sender_phone || '',
+        eWayLrNumber: data.consignee_gstin || '',
+        placeOfSupply: data.consignee_address || '',
+        senderAddress: data.consignee_address || '',
+        senderGstin: data.consignee_gstin || '',
+        senderPhone: data.consignee_phone || '',
         orderNumber: data.order_number || '',
         orderDate: data.order_date || ''
       })
