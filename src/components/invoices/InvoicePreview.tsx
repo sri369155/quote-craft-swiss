@@ -47,7 +47,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
     senderPhone: '',
     orderNumber: '',
     orderDate: '',
-    customerGstin: '07AQLCC1206D1ZG'
+    consigneeGstin: '07AQLCC1206D1ZG'
   })
   
   // Image preference controls
@@ -119,7 +119,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
         senderPhone: data.consignee_phone || '',
         orderNumber: data.order_number || '',
         orderDate: data.order_date || '',
-        customerGstin: data.customer_gstin || '07AQLCC1206D1ZG'
+        consigneeGstin: data.consignee_gstin || '07AQLCC1206D1ZG'
       })
     } catch (error) {
       console.error('Error fetching invoice:', error)
@@ -411,7 +411,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
         {/* Header Section - Full width image */}
         {imagePreferences.useCustomHeader && profile?.header_image_url ? (
           <div className="border-b-2 border-black" style={{ margin: '0 -100vw', width: '100vw', position: 'relative', left: '50%', right: '50%', marginLeft: '-50vw', marginRight: '-50vw' }}>
-            <img src={profile.header_image_url} alt="Header" className="w-full max-h-24 object-cover" style={{ width: '100%', maxWidth: 'none' }} />
+            <img src={profile.header_image_url} alt="Header" className="w-full h-auto max-h-32 object-contain" style={{ width: '100%', maxWidth: 'none' }} />
           </div>
         ) : (
           <div className="bg-blue-800 text-white p-3" style={{ margin: '0 -100vw', width: '100vw', position: 'relative', left: '50%', right: '50%', marginLeft: '-50vw', marginRight: '-50vw' }}>
@@ -499,8 +499,8 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                     <td className="border-b border-gray-300 p-1 font-semibold text-xs">GSTIN</td>
                     <td className="border-b border-gray-300 p-1 text-xs">
                       <Input 
-                        value={editableInvoiceData.customerGstin} 
-                        onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, customerGstin: e.target.value }))}
+                        value={editableInvoiceData.consigneeGstin} 
+                        onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, consigneeGstin: e.target.value }))}
                         className="border-0 p-0 h-auto text-xs bg-yellow-100 print:bg-transparent"
                         style={{ fontSize: '12px' }}
                       />
