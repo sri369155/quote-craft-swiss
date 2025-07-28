@@ -467,8 +467,8 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                       <Input 
                         value={customer.name} 
                         onChange={(e) => setCustomer(prev => prev ? { ...prev, name: e.target.value } : null)}
-                        className="border-0 p-0 h-auto text-xs bg-yellow-100 print:bg-transparent"
-                        style={{ fontSize: '12px' }}
+                        className="border-1 border-gray-300 p-1 h-6 text-xs bg-yellow-200 print:bg-transparent print:border-0"
+                        style={{ fontSize: '12px', minHeight: '20px' }}
                       />
                     </td>
                   </tr>
@@ -478,8 +478,8 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                       <Textarea 
                         value={customer.address || ''} 
                         onChange={(e) => setCustomer(prev => prev ? { ...prev, address: e.target.value } : null)}
-                        className="border-0 p-0 h-auto text-xs bg-yellow-100 print:bg-transparent resize-none min-h-0"
-                        style={{ fontSize: '12px' }}
+                        className="border-1 border-gray-300 p-1 h-auto text-xs bg-yellow-200 print:bg-transparent print:border-0 resize-none"
+                        style={{ fontSize: '12px', minHeight: '40px' }}
                         rows={2}
                       />
                     </td>
@@ -490,8 +490,8 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                       <Input 
                         value={customer.phone || ''} 
                         onChange={(e) => setCustomer(prev => prev ? { ...prev, phone: e.target.value } : null)}
-                        className="border-0 p-0 h-auto text-xs bg-yellow-100 print:bg-transparent"
-                        style={{ fontSize: '12px' }}
+                        className="border-1 border-gray-300 p-1 h-6 text-xs bg-yellow-200 print:bg-transparent print:border-0"
+                        style={{ fontSize: '12px', minHeight: '20px' }}
                       />
                     </td>
                   </tr>
@@ -501,8 +501,8 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                       <Input 
                         value={editableInvoiceData.consigneeGstin} 
                         onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, consigneeGstin: e.target.value }))}
-                        className="border-0 p-0 h-auto text-xs bg-yellow-100 print:bg-transparent"
-                        style={{ fontSize: '12px' }}
+                        className="border-1 border-gray-300 p-1 h-6 text-xs bg-yellow-200 print:bg-transparent print:border-0"
+                        style={{ fontSize: '12px', minHeight: '20px' }}
                       />
                     </td>
                   </tr>
@@ -512,8 +512,8 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                       <Input 
                         value={editableInvoiceData.placeOfSupply || 'Delhi ( 07 )'} 
                         onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, placeOfSupply: e.target.value }))}
-                        className="border-0 p-0 h-auto text-xs bg-yellow-100 print:bg-transparent"
-                        style={{ fontSize: '12px' }}
+                        className="border-1 border-gray-300 p-1 h-6 text-xs bg-yellow-200 print:bg-transparent print:border-0"
+                        style={{ fontSize: '12px', minHeight: '20px' }}
                       />
                     </td>
                   </tr>
@@ -531,8 +531,8 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                       <Input 
                         value={invoice.invoice_number}
                         onChange={(e) => setInvoice(prev => prev ? { ...prev, invoice_number: e.target.value } : null)}
-                        className="border-0 p-0 h-auto text-xs bg-yellow-100 print:bg-transparent"
-                        style={{ fontSize: '12px' }}
+                        className="border-1 border-gray-300 p-1 h-6 text-xs bg-yellow-200 print:bg-transparent print:border-0"
+                        style={{ fontSize: '12px', minHeight: '20px' }}
                       />
                     </td>
                     <td className="border-b border-black p-1 font-semibold text-xs">Invoice Date</td>
@@ -542,8 +542,8 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                           <PopoverTrigger asChild>
                             <Button
                               variant="ghost"
-                              className="h-auto p-0 text-xs bg-yellow-100 print:bg-transparent w-full justify-start font-normal"
-                              style={{ fontSize: '12px' }}
+                              className="h-6 p-1 text-xs bg-yellow-200 print:bg-transparent w-full justify-start font-normal"
+                              style={{ fontSize: '12px', minHeight: '20px' }}
                             >
                               <CalendarIcon className="mr-1 h-3 w-3" />
                               {invoice.issue_date ? (
@@ -577,8 +577,8 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                       <Input 
                         value={editableInvoiceData.deliveryChallanNumber} 
                         onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, deliveryChallanNumber: e.target.value }))}
-                        className="border-0 p-0 h-auto text-xs bg-yellow-100 print:bg-transparent"
-                        style={{ fontSize: '12px' }}
+                        className="border-1 border-gray-300 p-1 h-6 text-xs bg-yellow-200 print:bg-transparent print:border-0"
+                        style={{ fontSize: '12px', minHeight: '20px' }}
                       />
                     </td>
                     <td className="border-b border-black p-1 font-semibold text-xs">Delivery Date</td>
@@ -588,8 +588,8 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                           <PopoverTrigger asChild>
                             <Button
                               variant="ghost"
-                              className="h-auto p-0 text-xs bg-yellow-100 print:bg-transparent w-full justify-start font-normal"
-                              style={{ fontSize: '12px' }}
+                              className="h-6 p-1 text-xs bg-yellow-200 print:bg-transparent w-full justify-start font-normal"
+                              style={{ fontSize: '12px', minHeight: '20px' }}
                             >
                               <CalendarIcon className="mr-1 h-3 w-3" />
                               {editableInvoiceData.deliveryDate ? (
@@ -623,8 +623,8 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                       <Input 
                         value={editableInvoiceData.orderNumber} 
                         onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, orderNumber: e.target.value }))}
-                        className="border-0 p-0 h-auto text-xs bg-yellow-100 print:bg-transparent"
-                        style={{ fontSize: '12px' }}
+                        className="border-1 border-gray-300 p-1 h-6 text-xs bg-yellow-200 print:bg-transparent print:border-0"
+                        style={{ fontSize: '12px', minHeight: '20px' }}
                       />
                     </td>
                     <td className="border-b border-black p-1 font-semibold text-xs">Order Date</td>
@@ -634,8 +634,8 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                           <PopoverTrigger asChild>
                             <Button
                               variant="ghost"
-                              className="h-auto p-0 text-xs bg-yellow-100 print:bg-transparent w-full justify-start font-normal"
-                              style={{ fontSize: '12px' }}
+                              className="h-6 p-1 text-xs bg-yellow-200 print:bg-transparent w-full justify-start font-normal"
+                              style={{ fontSize: '12px', minHeight: '20px' }}
                             >
                               <CalendarIcon className="mr-1 h-3 w-3" />
                               {editableInvoiceData.orderDate ? (
@@ -669,8 +669,8 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                       <Input 
                         value={editableInvoiceData.eWayLrNumber} 
                         onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, eWayLrNumber: e.target.value }))}
-                        className="border-0 p-0 h-auto text-xs bg-yellow-100 print:bg-transparent"
-                        style={{ fontSize: '12px' }}
+                        className="border-1 border-gray-300 p-1 h-6 text-xs bg-yellow-200 print:bg-transparent print:border-0"
+                        style={{ fontSize: '12px', minHeight: '20px' }}
                       />
                     </td>
                     <td className="border-b border-black p-1 font-semibold text-xs">Due Date</td>
@@ -680,8 +680,8 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                           <PopoverTrigger asChild>
                             <Button
                               variant="ghost"
-                              className="h-auto p-0 text-xs bg-yellow-100 print:bg-transparent w-full justify-start font-normal"
-                              style={{ fontSize: '12px' }}
+                              className="h-6 p-1 text-xs bg-yellow-200 print:bg-transparent w-full justify-start font-normal"
+                              style={{ fontSize: '12px', minHeight: '20px' }}
                             >
                               <CalendarIcon className="mr-1 h-3 w-3" />
                               {invoice.due_date ? (
@@ -757,8 +757,8 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                             updatedItems[index] = { ...updatedItems[index], description: e.target.value }
                             setItems(updatedItems)
                           }}
-                          className="border-0 p-0 h-auto text-xs bg-yellow-100 print:bg-transparent resize-none min-h-0"
-                          style={{ fontSize: '11px' }}
+                          className="border-1 border-gray-300 p-1 h-auto text-xs bg-yellow-200 print:bg-transparent print:border-0 resize-none"
+                          style={{ fontSize: '11px', minHeight: '40px' }}
                           rows={2}
                         />
                       </td>
@@ -770,8 +770,8 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                             updatedItems[index] = { ...updatedItems[index], hsn_code: e.target.value }
                             setItems(updatedItems)
                           }}
-                          className="border-0 p-0 h-auto text-xs bg-yellow-100 print:bg-transparent text-center"
-                          style={{ fontSize: '11px' }}
+                          className="border-1 border-gray-300 p-1 h-6 text-xs bg-yellow-200 print:bg-transparent print:border-0 text-center"
+                          style={{ fontSize: '11px', minHeight: '20px' }}
                         />
                       </td>
                       <td className="border border-black p-1 text-center text-xs">{item.quantity.toFixed(2)} PCS</td>
@@ -812,8 +812,8 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                   <Textarea 
                     value={termsConditions}
                     onChange={(e) => setTermsConditions(e.target.value)}
-                    className="border-0 p-0 h-auto text-xs bg-yellow-50 print:bg-transparent resize-none min-h-0 w-full"
-                    style={{ fontSize: '9px' }}
+                    className="border-1 border-gray-300 p-1 h-auto text-xs bg-yellow-200 print:bg-transparent print:border-0 resize-none w-full"
+                    style={{ fontSize: '9px', minHeight: '60px' }}
                     rows={4}
                   />
                 </div>
@@ -854,8 +854,8 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                 <Textarea 
                   value={editableBankDetails}
                   onChange={(e) => setEditableBankDetails(e.target.value)}
-                  className="border-0 p-0 h-auto text-xs bg-yellow-50 print:bg-transparent resize-none min-h-0 w-full"
-                  style={{ fontSize: '10px' }}
+                  className="border-1 border-gray-300 p-1 h-auto text-xs bg-yellow-200 print:bg-transparent print:border-0 resize-none w-full"
+                  style={{ fontSize: '10px', minHeight: '60px' }}
                   rows={4}
                 />
               </div>
