@@ -464,6 +464,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                     <td className="border-b border-gray-300 p-1 text-xs">
                       <Input 
                         value={customer.name} 
+                        onChange={(e) => setCustomer(prev => prev ? { ...prev, name: e.target.value } : null)}
                         className="border-0 p-0 h-auto text-xs bg-pink-50/30"
                         style={{ fontSize: '12px' }}
                       />
@@ -474,6 +475,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                     <td className="border-b border-gray-300 p-1 text-xs">
                       <Textarea 
                         value={customer.address || ''} 
+                        onChange={(e) => setCustomer(prev => prev ? { ...prev, address: e.target.value } : null)}
                         className="border-0 p-0 h-auto text-xs bg-pink-50/30 resize-none min-h-0"
                         style={{ fontSize: '12px' }}
                         rows={2}
@@ -485,6 +487,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                     <td className="border-b border-gray-300 p-1 text-xs">
                       <Input 
                         value={customer.phone || ''} 
+                        onChange={(e) => setCustomer(prev => prev ? { ...prev, phone: e.target.value } : null)}
                         className="border-0 p-0 h-auto text-xs bg-pink-50/30"
                         style={{ fontSize: '12px' }}
                       />
@@ -524,6 +527,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                     <td className="border-b border-black p-1 text-xs">
                       <Input 
                         value={invoice.invoice_number}
+                        onChange={(e) => setInvoice(prev => prev ? { ...prev, invoice_number: e.target.value } : null)}
                         className="border-0 p-0 h-auto text-xs bg-pink-50/30"
                         style={{ fontSize: '12px' }}
                       />
@@ -538,6 +542,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                               className="h-auto p-0 text-xs bg-pink-50/30 w-full justify-start font-normal"
                               style={{ fontSize: '12px' }}
                             >
+                              <CalendarIcon className="mr-1 h-3 w-3" />
                               {invoice.issue_date ? (
                                 format(new Date(invoice.issue_date), "dd-MMM-yyyy")
                               ) : (
@@ -583,6 +588,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                               className="h-auto p-0 text-xs bg-pink-50/30 w-full justify-start font-normal"
                               style={{ fontSize: '12px' }}
                             >
+                              <CalendarIcon className="mr-1 h-3 w-3" />
                               {editableInvoiceData.deliveryDate ? (
                                 format(new Date(editableInvoiceData.deliveryDate), "dd-MMM-yyyy")
                               ) : (
@@ -628,6 +634,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                               className="h-auto p-0 text-xs bg-pink-50/30 w-full justify-start font-normal"
                               style={{ fontSize: '12px' }}
                             >
+                              <CalendarIcon className="mr-1 h-3 w-3" />
                               {editableInvoiceData.orderDate ? (
                                 format(new Date(editableInvoiceData.orderDate), "dd-MMM-yyyy")
                               ) : (
@@ -664,7 +671,40 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                       />
                     </td>
                     <td className="border-b border-black p-1 font-semibold text-xs">Due Date</td>
-                    <td className="border-b border-black p-1 text-xs">{format(new Date(invoice.due_date), 'dd-MMM-yyyy')}</td>
+                    <td className="border-b border-black p-1 text-xs">
+                      <div className="w-full">
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              className="h-auto p-0 text-xs bg-pink-50/30 w-full justify-start font-normal"
+                              style={{ fontSize: '12px' }}
+                            >
+                              <CalendarIcon className="mr-1 h-3 w-3" />
+                              {invoice.due_date ? (
+                                format(new Date(invoice.due_date), "dd-MMM-yyyy")
+                              ) : (
+                                <span className="text-gray-400">Select date</span>
+                              )}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={invoice.due_date ? new Date(invoice.due_date) : undefined}
+                              onSelect={(date) => 
+                                setInvoice(prev => prev ? { 
+                                  ...prev, 
+                                  due_date: date ? format(date, 'yyyy-MM-dd') : prev.due_date 
+                                } : null)
+                              }
+                              initialFocus
+                              className={cn("p-3 pointer-events-auto")}
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                    </td>
                   </tr>
                 </tbody>
               </table>
