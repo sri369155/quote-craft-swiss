@@ -111,7 +111,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
       setEditableInvoiceData({
         deliveryChallanNumber: data.delivery_number || '',
         deliveryDate: data.delivery_date || '',
-        eWayLrNumber: data.consignee_gstin || '',
+        eWayLrNumber: data.eway_number || '',
         placeOfSupply: data.consignee_address || '',
         senderAddress: data.consignee_address || '',
         senderGstin: data.consignee_gstin || '',
@@ -294,12 +294,38 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
           </div>
           <div>
             <Label htmlFor="deliveryDate">Delivery Date</Label>
-            <Input
-              id="deliveryDate"
-              value={editableInvoiceData.deliveryDate}
-              onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, deliveryDate: e.target.value }))}
-              placeholder="958"
-            />
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !editableInvoiceData.deliveryDate && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {editableInvoiceData.deliveryDate ? (
+                    format(new Date(editableInvoiceData.deliveryDate), "PPP")
+                  ) : (
+                    <span>Pick a date</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={editableInvoiceData.deliveryDate ? new Date(editableInvoiceData.deliveryDate) : undefined}
+                  onSelect={(date) => 
+                    setEditableInvoiceData(prev => ({ 
+                      ...prev, 
+                      deliveryDate: date ? format(date, 'yyyy-MM-dd') : '' 
+                    }))
+                  }
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                />
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
 
@@ -318,7 +344,7 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
             <Popover>
               <PopoverTrigger asChild>
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   className={cn(
                     "w-full justify-start text-left font-normal",
                     !editableInvoiceData.orderDate && "text-muted-foreground"
@@ -503,7 +529,39 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                       />
                     </td>
                     <td className="border-b border-black p-1 font-semibold text-xs">Invoice Date</td>
-                    <td className="border-b border-black p-1 text-xs">{format(new Date(invoice.issue_date), 'dd-MMM-yyyy')}</td>
+                    <td className="border-b border-black p-1 text-xs">
+                      <div className="w-full">
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              className="h-auto p-0 text-xs bg-pink-50/30 w-full justify-start font-normal"
+                              style={{ fontSize: '12px' }}
+                            >
+                              {invoice.issue_date ? (
+                                format(new Date(invoice.issue_date), "dd-MMM-yyyy")
+                              ) : (
+                                <span className="text-gray-400">Select date</span>
+                              )}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={invoice.issue_date ? new Date(invoice.issue_date) : undefined}
+                              onSelect={(date) => 
+                                setInvoice(prev => prev ? { 
+                                  ...prev, 
+                                  issue_date: date ? format(date, 'yyyy-MM-dd') : prev.issue_date 
+                                } : null)
+                              }
+                              initialFocus
+                              className={cn("p-3 pointer-events-auto")}
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                    </td>
                   </tr>
                   <tr>
                     <td className="border-b border-black p-1 font-semibold text-xs">Delivery Challan No.</td>
@@ -517,12 +575,37 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
                     </td>
                     <td className="border-b border-black p-1 font-semibold text-xs">Delivery Date</td>
                     <td className="border-b border-black p-1 text-xs">
-                      <Input 
-                        value={editableInvoiceData.deliveryDate} 
-                        onChange={(e) => setEditableInvoiceData(prev => ({ ...prev, deliveryDate: e.target.value }))}
-                        className="border-0 p-0 h-auto text-xs bg-pink-50/30"
-                        style={{ fontSize: '12px' }}
-                      />
+                      <div className="w-full">
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              className="h-auto p-0 text-xs bg-pink-50/30 w-full justify-start font-normal"
+                              style={{ fontSize: '12px' }}
+                            >
+                              {editableInvoiceData.deliveryDate ? (
+                                format(new Date(editableInvoiceData.deliveryDate), "dd-MMM-yyyy")
+                              ) : (
+                                <span className="text-gray-400">Select date</span>
+                              )}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={editableInvoiceData.deliveryDate ? new Date(editableInvoiceData.deliveryDate) : undefined}
+                              onSelect={(date) => 
+                                setEditableInvoiceData(prev => ({ 
+                                  ...prev, 
+                                  deliveryDate: date ? format(date, 'yyyy-MM-dd') : '' 
+                                }))
+                              }
+                              initialFocus
+                              className={cn("p-3 pointer-events-auto")}
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </div>
                     </td>
                   </tr>
                   <tr>
