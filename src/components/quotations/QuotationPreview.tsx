@@ -420,7 +420,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
           </div>
         </DialogHeader>
 
-        {/* PDF-like Content */}
+        {/* PDF-like Content - FIRST PAGE */}
         <div className="bg-white p-8 print:p-0" style={{ 
           display: 'flex', 
           flexDirection: 'column', 
@@ -549,20 +549,6 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
             <p className="hidden print:block"><strong>Sub: {quotation.title}</strong></p>
             </div>
           </div>
-
-          {/* Scope of Work Section */}
-          {quotation.scope_of_work && (
-            <div className="border border-gray-300 p-4" style={{ marginTop: `${spacing.tableSpacing * 0.25}rem` }}>
-              <div className="mb-3">
-                <h3 className="font-bold text-base underline">Scope of Work / Specifications</h3>
-              </div>
-              <div className="text-sm space-y-1">
-                {formatScopeOfWork(quotation.scope_of_work).map((point, index) => (
-                  <div key={index} className="whitespace-pre-wrap">{point}</div>
-                ))}
-              </div>
-            </div>
-          )}
 
           {/* Items Table */}
           <div className="border border-gray-300" style={{ marginTop: `${spacing.tableSpacing * 0.25}rem` }}>
@@ -814,6 +800,94 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
             )}
           </div>
         </div>
+
+        {/* PAGE BREAK - Only visible in print */}
+        <div className="print:page-break-before-always print:block hidden"></div>
+
+        {/* SCOPE OF WORK - SEPARATE PAGE */}
+        {quotation.scope_of_work && (
+          <div className="bg-white p-8 print:p-0 print:pt-8">
+            {/* Header for Second Page */}
+            <div className="relative mb-8">
+              {imagePreferences.useCustomHeader && profile?.header_image_url ? (
+                <div className="w-full rounded-lg overflow-hidden">
+                  <img 
+                    src={profile.header_image_url} 
+                    alt="Header" 
+                    className="w-full h-auto max-h-32 object-contain"
+                  />
+                </div>
+              ) : (
+                <div className="bg-orange-600 text-foreground p-4 rounded-lg relative">
+                  {/* GST Number - Top Right */}
+                  <div className="absolute top-2 right-4">
+                    <p className="font-bold">{editableText.gstNumber}</p>
+                  </div>
+
+                  {/* Company Name and Logo - Center */}
+                  <div className="flex flex-col items-center justify-center pt-6 pb-4">
+                    <div className="flex items-center gap-4">
+                      {/* Company Logo */}
+                      {profile?.company_logo_url && (
+                        <img 
+                          src={profile.company_logo_url} 
+                          alt="Company Logo" 
+                          className="h-16 w-16 object-contain"
+                        />
+                      )}
+                      
+                      {/* Company Name */}
+                      <div className="text-center">
+                        <h1 className="text-4xl font-bold underline">{editableText.companyName || profile?.company_name || 'BHAIRAVNEX'}</h1>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Company Slogan - Bottom Left */}
+                  <div className="absolute bottom-2 left-4">
+                    <p className="text-sm italic">{editableText.tagline}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Scope of Work Section with Underlined Heading */}
+            <div className="border border-gray-300 p-6">
+              <div className="mb-6">
+                <h3 className="font-bold text-xl underline text-center">SCOPE OF WORK</h3>
+              </div>
+              <div className="text-sm space-y-2">
+                {formatScopeOfWork(quotation.scope_of_work).map((point, index) => (
+                  <div key={index} className="whitespace-pre-wrap leading-relaxed">{point}</div>
+                ))}
+              </div>
+            </div>
+
+            {/* Footer for Second Page */}
+            <div className="mt-8">
+              {imagePreferences.useCustomFooter && profile?.footer_image_url ? (
+                <img 
+                  src={profile.footer_image_url} 
+                  alt="Footer" 
+                  className="w-full h-16 object-cover rounded-lg"
+                />
+              ) : (
+                <div className="bg-orange-600 text-foreground p-3 rounded-lg text-xs">
+                  <div className="flex justify-between items-start">
+                    <div className="text-left">
+                      <div>{editableText.footerAddress1}</div>
+                      <div>{editableText.footerAddress2}</div>
+                    </div>
+                    <div className="text-right">
+                      <div>{editableText.footerPhone}</div>
+                      <div>{editableText.footerEmail}</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   )
