@@ -105,60 +105,8 @@ export function usePDFExport() {
         userProfile
       )
       
-      // Add Scope of Work on a new page if it exists
-      if (quotation.scope_of_work) {
-        // Add footer to current page
-        addFooterToPage(pdf, pageWidth, pageHeight, footerImage, userProfile)
-        
-        // Add new page for scope of work
-        pdf.addPage()
-        
-        // Add header to new page
-        let scopeYPosition = addHeaderToPage(pdf, pageWidth, headerImage, userProfile)
-        
-        // Scope of Work title
-        pdf.setFont('helvetica', 'bold')
-        pdf.setFontSize(16)
-        pdf.setTextColor(37, 99, 235) // Modern blue color
-        const scopeTitle = 'Scope of Work / Specifications'
-        pdf.text(scopeTitle, pageWidth / 2, scopeYPosition + 10, { align: 'center' })
-        
-        // Underline the title
-        const titleWidth = pdf.getTextWidth(scopeTitle)
-        const startX = (pageWidth - titleWidth) / 2
-        pdf.line(startX, scopeYPosition + 12, startX + titleWidth, scopeYPosition + 12)
-        
-        scopeYPosition += 25
-        
-        // Scope of Work content
-        pdf.setFont('helvetica', 'normal')
-        pdf.setFontSize(11)
-        pdf.setTextColor(blackColor)
-        
-        const scopeLines = quotation.scope_of_work.split('\n').filter(line => line.trim().length > 0)
-        for (const line of scopeLines) {
-          if (scopeYPosition > pageHeight - 50) {
-            // Add footer and new page if content exceeds page
-            addFooterToPage(pdf, pageWidth, pageHeight, footerImage, userProfile)
-            pdf.addPage()
-            scopeYPosition = addHeaderToPage(pdf, pageWidth, headerImage, userProfile) + 10
-          }
-          
-          const wrappedLines = pdf.splitTextToSize(line, pageWidth - 30)
-          pdf.text(wrappedLines, 15, scopeYPosition)
-          scopeYPosition += wrappedLines.length * 5 + 3
-        }
-        
-        // Add footer to scope of work page
-        addFooterToPage(pdf, pageWidth, pageHeight, footerImage, userProfile)
-        
-        // Add new page for signature
-        pdf.addPage()
-        yPosition = addHeaderToPage(pdf, pageWidth, headerImage, userProfile)
-      }
-      
-      // Terms & Conditions and Signature section
-      const termsStartY = yPosition + 5 // Reduced from 10
+      // Terms & Conditions and Signature section (always on main page)
+      const termsStartY = yPosition + 5
       
       // Check if we need a new page for the signature section
       if (termsStartY + 40 > pageHeight - 30) { // Reduced from 70 to 40
@@ -256,8 +204,53 @@ export function usePDFExport() {
         pdf.text('Authorised Signature', 97, termsStartY + 28) // Reduced from 62
       }
       
-      // Footer
+      // Footer for main page
       addFooterToPage(pdf, pageWidth, pageHeight, footerImage, userProfile)
+      
+      // Add Scope of Work on a fresh new page if it exists
+      if (quotation.scope_of_work) {
+        // Add new page for scope of work
+        pdf.addPage()
+        
+        // Add header to new page
+        let scopeYPosition = addHeaderToPage(pdf, pageWidth, headerImage, userProfile)
+        
+        // Scope of Work title
+        pdf.setFont('helvetica', 'bold')
+        pdf.setFontSize(16)
+        pdf.setTextColor(37, 99, 235) // Modern blue color
+        const scopeTitle = 'Scope of Work / Specifications'
+        pdf.text(scopeTitle, pageWidth / 2, scopeYPosition + 10, { align: 'center' })
+        
+        // Underline the title
+        const titleWidth = pdf.getTextWidth(scopeTitle)
+        const startX = (pageWidth - titleWidth) / 2
+        pdf.line(startX, scopeYPosition + 12, startX + titleWidth, scopeYPosition + 12)
+        
+        scopeYPosition += 25
+        
+        // Scope of Work content
+        pdf.setFont('helvetica', 'normal')
+        pdf.setFontSize(11)
+        pdf.setTextColor(blackColor)
+        
+        const scopeLines = quotation.scope_of_work.split('\n').filter(line => line.trim().length > 0)
+        for (const line of scopeLines) {
+          if (scopeYPosition > pageHeight - 50) {
+            // Add footer and new page if content exceeds page
+            addFooterToPage(pdf, pageWidth, pageHeight, footerImage, userProfile)
+            pdf.addPage()
+            scopeYPosition = addHeaderToPage(pdf, pageWidth, headerImage, userProfile) + 10
+          }
+          
+          const wrappedLines = pdf.splitTextToSize(line, pageWidth - 30)
+          pdf.text(wrappedLines, 15, scopeYPosition)
+          scopeYPosition += wrappedLines.length * 5 + 3
+        }
+        
+        // Add footer to scope of work page
+        addFooterToPage(pdf, pageWidth, pageHeight, footerImage, userProfile)
+      }
       
       // Save the PDF
       pdf.save(`quotation-${quotation.quotation_number}.pdf`)
