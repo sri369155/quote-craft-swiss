@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Search, Eye, Edit, Trash2, Download, FileText } from 'lucide-react'
+import { Plus, Search, Eye, Edit, Trash2, Download, FileText, ArrowLeft } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/use-toast'
@@ -17,6 +18,7 @@ interface InvoiceSearchProps {
 }
 
 const InvoiceSearch: React.FC<InvoiceSearchProps> = ({ onNewInvoice, onEditInvoice, onViewInvoice }) => {
+  const navigate = useNavigate()
   const { user } = useAuth()
   const { toast } = useToast()
   const [invoices, setInvoices] = useState<Invoice[]>([])
@@ -148,6 +150,12 @@ const InvoiceSearch: React.FC<InvoiceSearchProps> = ({ onNewInvoice, onEditInvoi
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center gap-4 mb-4">
+        <Button onClick={() => navigate('/dashboard')} variant="outline" size="lg">
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Dashboard
+        </Button>
+      </div>
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
