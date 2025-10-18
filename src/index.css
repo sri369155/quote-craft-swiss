@@ -11,7 +11,7 @@
     --foreground: 15 23 42;                /* Slate-800 - deep contrast */
 
     --card: 255 255 255;                   /* Pure white cards */
-    --card-foreground: 0 0 255;
+    --card-foreground: 15 23 42;           /* Slate-800 for card text */
 
     --popover: 255 255 255;
     --popover-foreground: 15 23 42;
