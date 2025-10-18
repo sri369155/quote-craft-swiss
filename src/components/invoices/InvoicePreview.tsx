@@ -189,15 +189,17 @@ function InvoicePreview({ invoiceId, invoice: passedInvoice, onEdit, onBack }: I
   return (
     <div className="max-w-6xl mx-auto print:shadow-none" style={{ backgroundColor: '#ffffff' }}>
       {/* Controls Section */}
-      <div className="flex justify-between items-start mb-8 print:hidden bg-gray-50 p-4 rounded-lg">
-        <h1 className="text-3xl font-bold text-primary">Invoice Preview</h1>
-        <div className="flex space-x-2">
+      <div className="flex justify-between items-center mb-8 print:hidden bg-gray-50 p-4 rounded-lg">
+        <div className="flex items-center gap-4">
           {onBack && (
-            <Button onClick={onBack} variant="outline" size="sm">
+            <Button onClick={onBack} variant="outline" size="lg">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
+              Back to Invoices
             </Button>
           )}
+          <h1 className="text-3xl font-bold text-primary">Invoice Preview</h1>
+        </div>
+        <div className="flex space-x-2">
           {onEdit && (
             <Button onClick={onEdit} variant="outline" size="sm">
               <Edit2 className="w-4 h-4 mr-2" />
