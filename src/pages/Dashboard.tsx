@@ -304,7 +304,7 @@ export default function Dashboard() {
                   </thead>
                   <tbody>
                     {quotations.slice(0, 5).map((quotation) => (
-                      <tr key={quotation.id} className="border-b hover:bg-[hsl(var(--thick-blue))]/10 hover:text-[#FFFF00] cursor-pointer transition-colors" onClick={() => navigate('/quotations')}>
+                      <tr key={quotation.id} className="border-b hover:bg-[hsl(var(--thick-blue))]/10 cursor-pointer transition-colors [&:hover_td]:!text-[#FFFF00]" onClick={() => navigate('/quotations')}>
                         <td className="py-3 px-2 font-mono text-sm text-thick-blue">{quotation.quotation_number}</td>
                         <td className="py-3 px-2 font-bold text-thick-blue">{quotation.title}</td>
                         <td className="py-3 px-2 text-thick-blue font-semibold">{formatCurrency(quotation.total_amount)}</td>
