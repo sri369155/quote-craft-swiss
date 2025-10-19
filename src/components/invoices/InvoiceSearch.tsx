@@ -212,7 +212,7 @@ const InvoiceSearch: React.FC<InvoiceSearchProps> = ({ onNewInvoice, onEditInvoi
                 </TableHeader>
                 <TableBody>
                   {filteredInvoices.map((invoice) => (
-                    <TableRow key={invoice.id}>
+                    <TableRow key={invoice.id} className="hover:bg-[hsl(var(--thick-blue))]/10 cursor-pointer transition-colors [&:hover_td]:!text-[#FFFF00]">
                       <TableCell className="font-medium">
                         {invoice.invoice_number}
                       </TableCell>
