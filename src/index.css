@@ -18,6 +18,9 @@
 
     --primary: 21 128 61;                  /* Green-700 - thick green */
     --primary-foreground: 255 255 255;
+    
+    --accent-orange: 24 100% 55%;
+    --accent-orange-foreground: 255 255 255;
 
     --secondary: 248 250 252;              /* Slate-50 - subtle background */
     --secondary-foreground: 30 41 59;      /* Slate-700 */

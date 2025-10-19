@@ -389,14 +389,14 @@ export default function Quotations() {
                     )}
                     <div className="flex items-center justify-between pt-3 border-t border-white/30">
                       <div className="flex space-x-2">
-                        <Button variant="outline" size="sm" onClick={() => handleEditQuotation(quotation.id)}>
+                        <Button variant="orange" size="sm" onClick={() => handleEditQuotation(quotation.id)}>
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => setPreviewQuotation(quotation.id)}>
+                        <Button variant="orange" size="sm" onClick={() => setPreviewQuotation(quotation.id)}>
                           <Eye className="w-4 h-4" />
                         </Button>
                         <Button
-                          variant="outline"
+                          variant="orange"
                           size="sm"
                           onClick={() => handleExportPDF(quotation.id)}
                           disabled={pdfLoading}
@@ -404,10 +404,9 @@ export default function Quotations() {
                           <Download className={`w-4 h-4 ${pdfLoading ? 'animate-spin' : ''}`} />
                         </Button>
                         <Button
-                          variant="outline"
+                          variant="orange"
                           size="sm"
                           onClick={() => handleGenerateInvoice(quotation.id)}
-                          className="bg-green-100 text-green-800 border-green-200 hover:bg-green-200"
                         >
                           <FileText className="w-4 h-4" />
                         </Button>
