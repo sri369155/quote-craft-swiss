@@ -121,7 +121,7 @@ export default function Dashboard() {
       {/* Header */}
       <header className="sticky top-0 z-50 bg-green-100/80 backdrop-blur-md border-b border-border">
         <div className="container-app">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-16 bg-primary px-4 rounded-lg -mx-4">
             <div className="flex items-center space-x-8">
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
