@@ -250,7 +250,6 @@ const InvoiceSearch: React.FC<InvoiceSearchProps> = ({ onNewInvoice, onEditInvoi
                             variant="ghost"
                             size="sm"
                             onClick={() => handleDeleteInvoice(invoice.id)}
-                            className="text-destructive hover:text-destructive"
                             title="Delete Invoice"
                           >
                             <Trash2 className="w-4 h-4" />
