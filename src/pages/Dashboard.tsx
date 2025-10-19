@@ -262,7 +262,7 @@ export default function Dashboard() {
                 </Button>
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button variant="outline">
+                    <Button variant="orange">
                       <Upload className="w-4 h-4 mr-2" />
                       Import
                     </Button>
@@ -320,7 +320,7 @@ export default function Dashboard() {
                 </table>
                 {quotations.length > 5 && (
                   <div className="text-center pt-4">
-                    <Button variant="outline" onClick={() => navigate('/quotations')}>
+                    <Button variant="orange" onClick={() => navigate('/quotations')}>
                       View All Quotations
                     </Button>
                   </div>
