@@ -217,6 +217,7 @@ export default function Customers() {
                           title: 'Edit Customer',
                           description: 'Customer editing feature will be implemented next.',
                         })}
+                        className="bg-[#FF751C] hover:bg-[#FF751C]/90 text-white border-[#FF751C]"
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
@@ -224,7 +225,7 @@ export default function Customers() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleDeleteCustomer(customer.id)}
-                        className="text-destructive hover:text-destructive"
+                        className="bg-[#FF751C] hover:bg-[#FF751C]/90 text-white"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
