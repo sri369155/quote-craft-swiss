@@ -174,7 +174,7 @@ const InvoiceSearch: React.FC<InvoiceSearchProps> = ({ onNewInvoice, onEditInvoi
                 placeholder="Search invoices by number, title, or customer..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-[#ffe6e6]"
+                className="pl-10 !bg-[#ffe6e6]"
               />
             </div>
           </div>
