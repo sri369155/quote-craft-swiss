@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Plus, Users, Edit, Trash2, Mail, Phone, MapPin } from 'lucide-react'
+import { Plus, Users, Edit, Trash2, Mail, Phone, MapPin, ArrowLeft } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { Customer } from '@/types/database'
 import { useToast } from '@/hooks/use-toast'
 import CustomerForm from '@/components/quotations/CustomerForm'
 
 export default function Customers() {
+  const navigate = useNavigate()
   const { user } = useAuth()
   const { toast } = useToast()
   const [customers, setCustomers] = useState<Customer[]>([])
@@ -101,11 +103,17 @@ export default function Customers() {
       <header className="sticky top-0 z-50 bg-green-100/80 backdrop-blur-md border-b border-border">
         <div className="container-app">
           <div className="flex items-center justify-between h-16 bg-primary px-4 rounded-lg -mx-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <Users className="w-4 h-4 text-primary-foreground" />
+            <div className="flex items-center gap-4">
+              <Button onClick={() => navigate('/dashboard')} variant="outline" size="sm">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Dashboard
+              </Button>
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                  <Users className="w-4 h-4 text-primary-foreground" />
+                </div>
+                <span className="font-semibold text-lg tracking-tight">InvoiceGen</span>
               </div>
-              <span className="font-semibold text-lg tracking-tight">InvoiceGen</span>
             </div>
           </div>
         </div>

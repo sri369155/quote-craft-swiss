@@ -18,6 +18,7 @@ import {
   Trash2,
   Download,
   Settings,
+  ArrowLeft,
 } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { Quotation, Customer, QuotationItem } from '@/types/database'
@@ -257,11 +258,17 @@ export default function Quotations() {
         <header className="sticky top-0 z-50 bg-gradient-to-r from-green-400 to-lime-300/80 backdrop-blur-md border-b border-border">
           <div className="container-app">
             <div className="flex items-center justify-between h-16 bg-primary px-4 rounded-lg -mx-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                  <FileText className="w-4 h-4 text-white" />
+              <div className="flex items-center gap-4">
+                <Button onClick={() => navigate('/dashboard')} variant="outline" size="sm">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back to Dashboard
+                </Button>
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                    <FileText className="w-4 h-4 text-white" />
+                  </div>
+                  <span className="font-semibold text-white text-lg tracking-tight">InvoiceGen</span>
                 </div>
-                <span className="font-semibold text-white text-lg tracking-tight">InvoiceGen</span>
               </div>
             </div>
           </div>
@@ -294,11 +301,17 @@ export default function Quotations() {
       <header className="sticky top-0 z-50 bg-gradient-to-r from-green-400 to-lime-300/80 backdrop-blur-md border-b border-border">
         <div className="container-app">
           <div className="flex items-center justify-between h-16 bg-primary px-4 rounded-lg -mx-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <FileText className="w-4 h-4 text-white" />
+            <div className="flex items-center gap-4">
+              <Button onClick={() => navigate('/dashboard')} variant="outline" size="sm">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Dashboard
+              </Button>
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                  <FileText className="w-4 h-4 text-white" />
+                </div>
+                <span className="font-semibold text-white text-lg tracking-tight">InvoiceGen</span>
               </div>
-              <span className="font-semibold text-white text-lg tracking-tight">InvoiceGen</span>
             </div>
             <Button variant="outline" size="sm" onClick={() => navigate('/profile-settings')}>
               <Settings className="w-4 h-4 mr-2" />

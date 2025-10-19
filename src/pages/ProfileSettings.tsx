@@ -1,17 +1,19 @@
 
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { User, Save } from 'lucide-react'
+import { User, Save, ArrowLeft } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { useToast } from '@/hooks/use-toast'
 import ImageUpload from '@/components/profile/ImageUpload'
 import { Profile } from '@/types/database'
 
 export default function ProfileSettings() {
+  const navigate = useNavigate()
   const { user, profile, updateProfile } = useAuth()
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
@@ -95,12 +97,18 @@ export default function ProfileSettings() {
     <div className="min-h-screen bg-green-50">
       <header className="sticky top-0 z-50 bg-green-100/80 backdrop-blur-md border-b border-border">
         <div className="container-app">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <User className="w-4 h-4 text-primary-foreground" />
+          <div className="flex items-center justify-between h-16 bg-primary px-4 rounded-lg -mx-4">
+            <div className="flex items-center gap-4">
+              <Button onClick={() => navigate('/dashboard')} variant="outline" size="sm">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Dashboard
+              </Button>
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                  <User className="w-4 h-4 text-primary-foreground" />
+                </div>
+                <span className="font-semibold text-lg tracking-tight">Profile Settings</span>
               </div>
-              <span className="font-semibold text-lg tracking-tight">Profile Settings</span>
             </div>
           </div>
         </div>
