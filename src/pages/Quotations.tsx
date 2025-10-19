@@ -11,6 +11,12 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
+import {
   Plus,
   FileText,
   Eye,
@@ -388,37 +394,68 @@ export default function Quotations() {
                       </div>
                     )}
                     <div className="flex items-center justify-between pt-3 border-t border-white/30">
-                      <div className="flex space-x-2">
-                        <Button variant="orange" size="sm" onClick={() => handleEditQuotation(quotation.id)}>
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button variant="orange" size="sm" onClick={() => setPreviewQuotation(quotation.id)}>
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="orange"
-                          size="sm"
-                          onClick={() => handleExportPDF(quotation.id)}
-                          disabled={pdfLoading}
-                        >
-                          <Download className={`w-4 h-4 ${pdfLoading ? 'animate-spin' : ''}`} />
-                        </Button>
-                        <Button
-                          variant="orange"
-                          size="sm"
-                          onClick={() => handleGenerateInvoice(quotation.id)}
-                        >
-                          <FileText className="w-4 h-4" />
-                        </Button>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDeleteQuotation(quotation.id)}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      <TooltipProvider>
+                        <div className="flex space-x-2">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button variant="orange" size="sm" onClick={() => handleEditQuotation(quotation.id)}>
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Edit</TooltipContent>
+                          </Tooltip>
+                          
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button variant="orange" size="sm" onClick={() => setPreviewQuotation(quotation.id)}>
+                                <Eye className="w-4 h-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Preview</TooltipContent>
+                          </Tooltip>
+                          
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="orange"
+                                size="sm"
+                                onClick={() => handleExportPDF(quotation.id)}
+                                disabled={pdfLoading}
+                              >
+                                <Download className={`w-4 h-4 ${pdfLoading ? 'animate-spin' : ''}`} />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Export PDF</TooltipContent>
+                          </Tooltip>
+                          
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="orange"
+                                size="sm"
+                                onClick={() => handleGenerateInvoice(quotation.id)}
+                              >
+                                <FileText className="w-4 h-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Generate Invoice</TooltipContent>
+                          </Tooltip>
+                        </div>
+                        
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDeleteQuotation(quotation.id)}
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Delete</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </div>
                   </div>
                 </CardContent>
