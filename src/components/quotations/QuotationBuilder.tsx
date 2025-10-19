@@ -395,7 +395,7 @@ Example: Complete website development for restaurant including design, developme
               value={bulkAIText}
               onChange={(e) => setBulkAIText(e.target.value)}
               rows={8}
-              className="resize-none bg-gradient-to-br from-pink-25/50 to-blue-25/50 border-pink-200/40 text-pink-800 placeholder:text-pink-500/70 focus:border-pink-300/60 focus:ring-pink-200/40 animate-shimmer"
+              className="resize-none !bg-[#ffe6e6] border-2 border-[#3333ff] text-pink-800 placeholder:text-pink-500/70 focus:border-pink-300/60 focus:ring-pink-200/40"
             />
             <Button 
               onClick={useBulkAIAutofill} 
