@@ -150,7 +150,7 @@ const InvoiceSearch: React.FC<InvoiceSearchProps> = ({ onNewInvoice, onEditInvoi
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4 mb-4">
+      <div className="flex items-center gap-4 mb-4 bg-primary p-4 rounded-lg">
         <Button onClick={() => navigate('/dashboard')} variant="outline" size="lg">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Dashboard
