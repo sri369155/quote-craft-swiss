@@ -611,7 +611,7 @@ Example: Complete website development for restaurant including design, developme
               </TableHeader>
               <TableBody>
                 {items.map((item, index) => (
-                  <TableRow key={index} className="hover:bg-[#ffe6ff] transition-colors">
+                  <TableRow key={index} className="group hover:bg-[#ffe6ff] transition-colors">
                     <TableCell>
                       <div className="flex space-x-2">
                         <HoverCard>
@@ -672,7 +672,7 @@ Example: Complete website development for restaurant including design, developme
                       />
                     </TableCell>
                     <TableCell>
-                      <div className="font-medium hover:text-[#0000cc] transition-colors cursor-default">
+                      <div className="font-medium group-hover:text-[#ffe6ff] transition-colors cursor-default">
                         ₹{item.line_total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                       </div>
                     </TableCell>
