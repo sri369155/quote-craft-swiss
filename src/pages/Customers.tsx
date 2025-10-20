@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Plus, Users, Edit, Trash2, Mail, Phone, MapPin, ArrowLeft } from 'lucide-react'
+import { Plus, Users, Edit, Trash2, Mail, Phone, MapPin, ArrowLeft, Coins } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { Customer } from '@/types/database'
 import { useToast } from '@/hooks/use-toast'
@@ -110,9 +110,9 @@ export default function Customers() {
               </Button>
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                  <Users className="w-4 h-4 text-[#0000cc]" />
+                  <Coins className="w-4 h-4 text-[#0000cc]" />
                 </div>
-                <span className="font-semibold text-lg tracking-tight">Laabh AI</span>
+                <span className="font-bookman font-semibold text-lg tracking-tight animate-flash-slow">Laabh AI</span>
               </div>
             </div>
           </div>

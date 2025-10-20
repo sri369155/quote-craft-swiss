@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Plus, FileText, Users, TrendingUp, LogOut, Upload } from 'lucide-react'
+import { Plus, FileText, Users, TrendingUp, LogOut, Upload, Coins } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { Quotation } from '@/types/database'
 import { useToast } from '@/hooks/use-toast'
@@ -125,9 +125,9 @@ export default function Dashboard() {
             <div className="flex items-center space-x-8">
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                  <FileText className="w-4 h-4 text-[#0000cc]" />
+                  <Coins className="w-4 h-4 text-[#0000cc]" />
                 </div>
-                <span className="font-bold text-lg tracking-tight text-thick-blue">Laabh AI</span>
+                <span className="font-bookman font-bold text-lg tracking-tight text-thick-blue animate-flash-slow">Laabh AI</span>
               </div>
               
               <nav className="hidden md:flex items-center space-x-1">

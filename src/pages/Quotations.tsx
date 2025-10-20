@@ -25,6 +25,7 @@ import {
   Download,
   Settings,
   ArrowLeft,
+  Coins,
 } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { Quotation, Customer, QuotationItem } from '@/types/database'
@@ -271,9 +272,9 @@ export default function Quotations() {
                 </Button>
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                    <FileText className="w-4 h-4 text-white" />
+                    <Coins className="w-4 h-4 text-white" />
                   </div>
-                  <span className="font-semibold text-white text-lg tracking-tight">Laabh AI</span>
+                  <span className="font-bookman font-semibold text-white text-lg tracking-tight animate-flash-slow">Laabh AI</span>
                 </div>
               </div>
             </div>
@@ -314,9 +315,9 @@ export default function Quotations() {
               </Button>
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                  <FileText className="w-4 h-4 text-white" />
+                  <Coins className="w-4 h-4 text-white" />
                 </div>
-                <span className="font-semibold text-white text-lg tracking-tight">Laabh AI</span>
+                <span className="font-bookman font-semibold text-white text-lg tracking-tight animate-flash-slow">Laabh AI</span>
               </div>
             </div>
             <Button variant="outline" size="sm" onClick={() => navigate('/profile-settings')}>

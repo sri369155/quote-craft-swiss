@@ -21,6 +21,7 @@ export default {
 		extend: {
 			fontFamily: {
 				inter: ['Inter', 'sans-serif'],
+				bookman: ['"Bookman Old Style"', 'serif'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',
