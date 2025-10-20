@@ -112,7 +112,7 @@ export default function Customers() {
                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                   <Users className="w-4 h-4 text-[#0000cc]" />
                 </div>
-                <span className="font-semibold text-lg tracking-tight">InvoiceGen</span>
+                <span className="font-semibold text-lg tracking-tight">Laabh AI</span>
               </div>
             </div>
           </div>

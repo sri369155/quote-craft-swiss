@@ -273,7 +273,7 @@ export default function Quotations() {
                   <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                     <FileText className="w-4 h-4 text-white" />
                   </div>
-                  <span className="font-semibold text-white text-lg tracking-tight">InvoiceGen</span>
+                  <span className="font-semibold text-white text-lg tracking-tight">Laabh AI</span>
                 </div>
               </div>
             </div>
@@ -316,7 +316,7 @@ export default function Quotations() {
                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                   <FileText className="w-4 h-4 text-white" />
                 </div>
-                <span className="font-semibold text-white text-lg tracking-tight">InvoiceGen</span>
+                <span className="font-semibold text-white text-lg tracking-tight">Laabh AI</span>
               </div>
             </div>
             <Button variant="outline" size="sm" onClick={() => navigate('/profile-settings')}>

@@ -127,7 +127,7 @@ export default function Dashboard() {
                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                   <FileText className="w-4 h-4 text-[#0000cc]" />
                 </div>
-                <span className="font-bold text-lg tracking-tight text-thick-blue">InvoiceGen</span>
+                <span className="font-bold text-lg tracking-tight text-thick-blue">Laabh AI</span>
               </div>
               
               <nav className="hidden md:flex items-center space-x-1">
