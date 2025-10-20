@@ -188,7 +188,7 @@ export default function QuotationSearch({
           onChange={(e) => handleSearchChange(e.target.value)}
           onFocus={handleSearchFocus}
           placeholder="Search quotations by number, title, description, or item..."
-          className="pl-10 pr-10 h-12 text-base !bg-[#ffe6e6] border-2 border-[#3333ff]"
+          className="pl-10 pr-10 h-12 text-base !bg-[#ffffcc] border-2 border-[#3333ff]"
         />
         {searchQuery && (
           <Button
