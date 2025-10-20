@@ -554,7 +554,7 @@ Example: Complete website development for restaurant including design, developme
           </Card>
 
           {/* Line Items */}
-          <Card>
+          <Card className="lg:col-span-3">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
@@ -574,8 +574,8 @@ Example: Complete website development for restaurant including design, developme
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-[35%]">Description</TableHead>
-                      <TableHead className="w-[12%]">HSN Code</TableHead>
+                      <TableHead className="w-[40%]">Description</TableHead>
+                      <TableHead className="w-[15%]">HSN Code</TableHead>
                       <TableHead className="w-[10%]">Qty</TableHead>
                       <TableHead className="w-[15%]">Unit Price</TableHead>
                       <TableHead className="w-[15%]">Total</TableHead>
@@ -593,7 +593,7 @@ Example: Complete website development for restaurant including design, developme
                                   value={item.description}
                                   onChange={(e) => updateItem(index, 'description', e.target.value)}
                                   placeholder="Item description"
-                                  className="flex-1"
+                                  className="flex-1 w-full"
                                 />
                               </HoverCardTrigger>
                               {item.description && (
@@ -621,7 +621,7 @@ Example: Complete website development for restaurant including design, developme
                             value={item.hsn_code}
                             onChange={(e) => updateItem(index, 'hsn_code', e.target.value)}
                             placeholder="HSN Code"
-                            className="text-sm"
+                            className="text-sm w-full"
                           />
                         </TableCell>
                         <TableCell>
@@ -631,6 +631,7 @@ Example: Complete website development for restaurant including design, developme
                             onChange={(e) => updateItem(index, 'quantity', Number(e.target.value))}
                             min="0"
                             step="1"
+                            className="w-full"
                           />
                         </TableCell>
                         <TableCell>
@@ -640,10 +641,11 @@ Example: Complete website development for restaurant including design, developme
                             onChange={(e) => updateItem(index, 'unit_price', Number(e.target.value))}
                             min="0"
                             step="0.01"
+                            className="w-full"
                           />
                         </TableCell>
                         <TableCell>
-                          <div className="font-medium">
+                          <div className="font-medium hover:text-[#0000cc] transition-colors cursor-default">
                             ₹{item.line_total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                           </div>
                         </TableCell>
