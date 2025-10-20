@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Search, Eye, Edit, Trash2, Download, FileText, ArrowLeft } from 'lucide-react'
+import { Plus, Search, Eye, Edit, Trash2, Download, FileText, ArrowLeft, IndianRupee } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/use-toast'
@@ -150,11 +150,19 @@ const InvoiceSearch: React.FC<InvoiceSearchProps> = ({ onNewInvoice, onEditInvoi
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4 mb-4 bg-primary p-4 rounded-lg">
-        <Button onClick={() => navigate('/dashboard')} variant="outline" size="lg">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Dashboard
-        </Button>
+      <div className="flex items-center justify-between mb-4 bg-primary p-4 rounded-lg">
+        <div className="flex items-center gap-4">
+          <Button onClick={() => navigate('/dashboard')} variant="outline" size="sm">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Dashboard
+          </Button>
+          <div className="flex items-center space-x-3">
+            <div className="w-14 h-14 bg-primary rounded-lg flex items-center justify-center">
+              <IndianRupee className="w-9 h-9 text-[#0000cc] animate-rupee-rotate" />
+            </div>
+            <span className="font-bookman font-semibold text-2xl tracking-tight text-green-700 animate-flash-slow">Laabh AI</span>
+          </div>
+        </div>
       </div>
       <Card>
         <CardHeader>
