@@ -682,9 +682,9 @@ Example: Complete website development for restaurant including design, developme
                           variant="ghost"
                           size="sm"
                           onClick={() => removeItem(index)}
-                          className="text-destructive hover:text-destructive"
+                          className="hover:bg-accent"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-4 h-4 text-[#0000cc]" />
                         </Button>
                       )}
                     </TableCell>

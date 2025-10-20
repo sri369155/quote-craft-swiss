@@ -449,9 +449,9 @@ export default function Quotations() {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleDeleteQuotation(quotation.id)}
-                              className="text-destructive hover:text-destructive"
+                              className="hover:bg-accent"
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <Trash2 className="w-4 h-4 text-[#0000cc]" />
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>Delete</TooltipContent>
