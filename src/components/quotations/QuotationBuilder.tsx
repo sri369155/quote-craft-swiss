@@ -552,122 +552,6 @@ Example: Complete website development for restaurant including design, developme
               </div>
             </CardContent>
           </Card>
-
-          {/* Line Items */}
-          <Card className="lg:col-span-3">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Line Items</CardTitle>
-                  <CardDescription>
-                    Add items and services to your quotation
-                  </CardDescription>
-                </div>
-                <Button onClick={addItem} size="sm" className="btn-primary">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Item
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[40%]">Description</TableHead>
-                      <TableHead className="w-[15%]">HSN Code</TableHead>
-                      <TableHead className="w-[10%]">Qty</TableHead>
-                      <TableHead className="w-[15%]">Unit Price</TableHead>
-                      <TableHead className="w-[15%]">Total</TableHead>
-                      <TableHead className="w-[5%]"></TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {items.map((item, index) => (
-                      <TableRow key={index} className="hover:bg-[#ffe6ff] transition-colors">
-                        <TableCell>
-                          <div className="flex space-x-2">
-                            <HoverCard>
-                              <HoverCardTrigger asChild>
-                                <Input
-                                  value={item.description}
-                                  onChange={(e) => updateItem(index, 'description', e.target.value)}
-                                  placeholder="Item description"
-                                  className="flex-1 w-full"
-                                />
-                              </HoverCardTrigger>
-                              {item.description && (
-                                <HoverCardContent className="w-80 max-w-sm">
-                                  <div className="text-sm">
-                                    <p className="font-medium mb-2">Full Description:</p>
-                                    <p className="whitespace-pre-wrap break-words">{item.description}</p>
-                                  </div>
-                                </HoverCardContent>
-                              )}
-                            </HoverCard>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => useAIAutofill(index)}
-                              disabled={aiLoading}
-                              title="AI Autofill"
-                            >
-                              <Sparkles className={`w-4 h-4 ${aiLoading ? 'animate-spin' : ''}`} />
-                            </Button>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Input
-                            value={item.hsn_code}
-                            onChange={(e) => updateItem(index, 'hsn_code', e.target.value)}
-                            placeholder="HSN Code"
-                            className="text-sm w-full"
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Input
-                            type="number"
-                            value={item.quantity}
-                            onChange={(e) => updateItem(index, 'quantity', Number(e.target.value))}
-                            min="0"
-                            step="1"
-                            className="w-full"
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Input
-                            type="number"
-                            value={item.unit_price}
-                            onChange={(e) => updateItem(index, 'unit_price', Number(e.target.value))}
-                            min="0"
-                            step="0.01"
-                            className="w-full"
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <div className="font-medium hover:text-[#0000cc] transition-colors cursor-default">
-                            ₹{item.line_total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          {items.length > 1 && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removeItem(index)}
-                              className="text-destructive hover:text-destructive"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         {/* Summary Card */}
@@ -695,6 +579,122 @@ Example: Complete website development for restaurant including design, developme
           </Card>
         </div>
       </div>
+
+      {/* Line Items - Full Width */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Line Items</CardTitle>
+              <CardDescription>
+                Add items and services to your quotation
+              </CardDescription>
+            </div>
+            <Button onClick={addItem} size="sm" className="btn-primary">
+              <Plus className="w-4 h-4 mr-2" />
+              Add Item
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[40%]">Description</TableHead>
+                  <TableHead className="w-[15%]">HSN Code</TableHead>
+                  <TableHead className="w-[10%]">Qty</TableHead>
+                  <TableHead className="w-[15%]">Unit Price</TableHead>
+                  <TableHead className="w-[15%]">Total</TableHead>
+                  <TableHead className="w-[5%]"></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {items.map((item, index) => (
+                  <TableRow key={index} className="hover:bg-[#ffe6ff] transition-colors">
+                    <TableCell>
+                      <div className="flex space-x-2">
+                        <HoverCard>
+                          <HoverCardTrigger asChild>
+                            <Input
+                              value={item.description}
+                              onChange={(e) => updateItem(index, 'description', e.target.value)}
+                              placeholder="Item description"
+                              className="flex-1 w-full"
+                            />
+                          </HoverCardTrigger>
+                          {item.description && (
+                            <HoverCardContent className="w-80 max-w-sm">
+                              <div className="text-sm">
+                                <p className="font-medium mb-2">Full Description:</p>
+                                <p className="whitespace-pre-wrap break-words">{item.description}</p>
+                              </div>
+                            </HoverCardContent>
+                          )}
+                        </HoverCard>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => useAIAutofill(index)}
+                          disabled={aiLoading}
+                          title="AI Autofill"
+                        >
+                          <Sparkles className={`w-4 h-4 ${aiLoading ? 'animate-spin' : ''}`} />
+                        </Button>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        value={item.hsn_code}
+                        onChange={(e) => updateItem(index, 'hsn_code', e.target.value)}
+                        placeholder="HSN Code"
+                        className="text-sm w-full"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        type="number"
+                        value={item.quantity}
+                        onChange={(e) => updateItem(index, 'quantity', Number(e.target.value))}
+                        min="0"
+                        step="1"
+                        className="w-full"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        type="number"
+                        value={item.unit_price}
+                        onChange={(e) => updateItem(index, 'unit_price', Number(e.target.value))}
+                        min="0"
+                        step="0.01"
+                        className="w-full"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-medium hover:text-[#0000cc] transition-colors cursor-default">
+                        ₹{item.line_total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {items.length > 1 && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeItem(index)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }
