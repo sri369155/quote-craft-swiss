@@ -584,7 +584,7 @@ Example: Complete website development for restaurant including design, developme
                   </TableHeader>
                   <TableBody>
                     {items.map((item, index) => (
-                      <TableRow key={index}>
+                      <TableRow key={index} className="hover:bg-[#ffe6ff] transition-colors">
                         <TableCell>
                           <div className="flex space-x-2">
                             <HoverCard>

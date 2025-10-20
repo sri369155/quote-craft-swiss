@@ -227,7 +227,7 @@ export default function QuotationSearch({
                   {filteredQuotations.map((quotation) => (
                     <div
                       key={quotation.id}
-                      className="p-3 rounded-md hover:bg-[#ffe6ff] cursor-pointer transition-colors border border-transparent hover:border-border"
+                      className="p-3 rounded-md hover:bg-muted/50 cursor-pointer transition-colors border border-transparent hover:border-border"
                       onClick={() => handleQuotationClick(quotation)}
                     >
                       <div className="flex items-start justify-between">
