@@ -125,7 +125,7 @@ export default function Dashboard() {
             <div className="flex items-center space-x-8">
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                  <FileText className="w-4 h-4 text-primary-foreground" />
+                  <FileText className="w-4 h-4 text-[#0000cc]" />
                 </div>
                 <span className="font-bold text-lg tracking-tight text-thick-blue">InvoiceGen</span>
               </div>
@@ -135,15 +135,15 @@ export default function Dashboard() {
                   Dashboard
                 </Button>
                 <Button variant="ghost" className="h-9 px-4 text-sm font-bold text-thick-blue" onClick={() => navigate('/quotations')}>
-                  <FileText className="w-4 h-4 mr-2 text-thick-blue" />
+                  <FileText className="w-4 h-4 mr-2 text-[#0000cc]" />
                   Quotations
                 </Button>
                 <Button variant="ghost" className="h-9 px-4 text-sm font-bold text-thick-blue" onClick={() => navigate('/invoices')}>
-                  <FileText className="w-4 h-4 mr-2 text-thick-blue" />
+                  <FileText className="w-4 h-4 mr-2 text-[#0000cc]" />
                   Invoices
                 </Button>
                 <Button variant="ghost" className="h-9 px-4 text-sm font-bold text-thick-blue" onClick={() => navigate('/customers')}>
-                  <Users className="w-4 h-4 mr-2 text-thick-blue" />
+                  <Users className="w-4 h-4 mr-2 text-[#0000cc]" />
                   Customers
                 </Button>
               </nav>
@@ -154,7 +154,7 @@ export default function Dashboard() {
                 Welcome, {profile?.full_name || user?.email}
               </span>
               <Button variant="outline" size="sm" onClick={handleSignOut}>
-                <LogOut className="w-4 h-4 mr-2" />
+                <LogOut className="w-4 h-4 mr-2 text-[#0000cc]" />
                 Sign Out
               </Button>
             </div>
@@ -168,7 +168,7 @@ export default function Dashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-white">Total Quotations</CardTitle>
-              <FileText className="h-5 w-5 text-white/90" />
+              <FileText className="h-5 w-5 text-[#0000cc]" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-white">{stats.totalQuotations}</div>
@@ -179,7 +179,7 @@ export default function Dashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-white">Draft Quotations</CardTitle>
-              <FileText className="h-5 w-5 text-white/90" />
+              <FileText className="h-5 w-5 text-[#0000cc]" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-white">{stats.draftQuotations}</div>
@@ -190,7 +190,7 @@ export default function Dashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-white">Accepted</CardTitle>
-              <TrendingUp className="h-5 w-5 text-white/90" />
+              <TrendingUp className="h-5 w-5 text-[#0000cc]" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-white">{stats.acceptedQuotations}</div>
@@ -201,7 +201,7 @@ export default function Dashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-white">Total Revenue</CardTitle>
-              <TrendingUp className="h-5 w-5 text-white/90" />
+              <TrendingUp className="h-5 w-5 text-[#0000cc]" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-white">{formatCurrency(stats.totalRevenue)}</div>
@@ -214,7 +214,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/quotations')}>
             <CardContent className="p-6 text-center">
-              <FileText className="w-12 h-12 text-thick-blue mx-auto mb-4" />
+              <FileText className="w-12 h-12 text-[#0000cc] mx-auto mb-4" />
               <h3 className="font-bold mb-2 text-thick-blue">Create Quotation</h3>
               <p className="text-sm text-thick-blue/70">Generate professional quotations for your clients</p>
             </CardContent>
@@ -222,7 +222,7 @@ export default function Dashboard() {
 
           <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/invoices')}>
             <CardContent className="p-6 text-center">
-              <FileText className="w-12 h-12 text-thick-blue mx-auto mb-4" />
+              <FileText className="w-12 h-12 text-[#0000cc] mx-auto mb-4" />
               <h3 className="font-bold mb-2 text-thick-blue">Create Invoice</h3>
               <p className="text-sm text-thick-blue/70">Generate professional invoices for your clients</p>
             </CardContent>
@@ -230,7 +230,7 @@ export default function Dashboard() {
 
           <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/customers')}>
             <CardContent className="p-6 text-center">
-              <Users className="w-12 h-12 text-thick-blue mx-auto mb-4" />
+              <Users className="w-12 h-12 text-[#0000cc] mx-auto mb-4" />
               <h3 className="font-bold mb-2 text-thick-blue">Manage Customers</h3>
               <p className="text-sm text-thick-blue/70">Add and organize your customer information</p>
             </CardContent>
@@ -238,7 +238,7 @@ export default function Dashboard() {
 
           <Card className="hover:shadow-lg transition-shadow cursor-pointer">
             <CardContent className="p-6 text-center">
-              <TrendingUp className="w-12 h-12 text-thick-blue mx-auto mb-4" />
+              <TrendingUp className="w-12 h-12 text-[#0000cc] mx-auto mb-4" />
               <h3 className="font-bold mb-2 text-thick-blue">View Reports</h3>
               <p className="text-sm text-thick-blue/70">Analyze your quotation performance</p>
             </CardContent>
@@ -257,13 +257,13 @@ export default function Dashboard() {
               </div>
               <div className="flex gap-2">
                 <Button className="btn-primary" onClick={() => navigate('/quotations')}>
-                  <Plus className="w-4 h-4 mr-2" />
+                  <Plus className="w-4 h-4 mr-2 text-[#0000cc]" />
                   New Quotation
                 </Button>
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button variant="orange">
-                      <Upload className="w-4 h-4 mr-2" />
+                      <Upload className="w-4 h-4 mr-2 text-[#0000cc]" />
                       Import
                     </Button>
                   </DialogTrigger>
@@ -280,13 +280,13 @@ export default function Dashboard() {
           <CardContent>
             {quotations.length === 0 ? (
               <div className="text-center py-12">
-                <FileText className="w-12 h-12 text-thick-blue mx-auto mb-4" />
+                <FileText className="w-12 h-12 text-[#0000cc] mx-auto mb-4" />
                 <h3 className="text-lg font-bold mb-2 text-thick-blue">No quotations yet</h3>
                 <p className="text-thick-blue/70 mb-4">
                   Create your first quotation to get started
                 </p>
                 <Button className="btn-primary" onClick={() => navigate('/quotations')}>
-                  <Plus className="w-4 h-4 mr-2" />
+                  <Plus className="w-4 h-4 mr-2 text-[#0000cc]" />
                   Create Quotation
                 </Button>
               </div>

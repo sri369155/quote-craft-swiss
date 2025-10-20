@@ -105,12 +105,12 @@ export default function Customers() {
           <div className="flex items-center justify-between h-16 bg-primary px-4 rounded-lg -mx-4">
             <div className="flex items-center gap-4">
               <Button onClick={() => navigate('/dashboard')} variant="outline" size="sm">
-                <ArrowLeft className="w-4 h-4 mr-2" />
+                <ArrowLeft className="w-4 h-4 mr-2 text-[#0000cc]" />
                 Back to Dashboard
               </Button>
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                  <Users className="w-4 h-4 text-primary-foreground" />
+                  <Users className="w-4 h-4 text-[#0000cc]" />
                 </div>
                 <span className="font-semibold text-lg tracking-tight">InvoiceGen</span>
               </div>
@@ -131,7 +131,7 @@ export default function Customers() {
           <Dialog open={showForm} onOpenChange={setShowForm}>
             <DialogTrigger asChild>
               <Button className="btn-primary">
-                <Plus className="w-4 h-4 mr-2" />
+                <Plus className="w-4 h-4 mr-2 text-[#0000cc]" />
                 Add Customer
               </Button>
             </DialogTrigger>
@@ -151,7 +151,7 @@ export default function Customers() {
         {customers.length === 0 ? (
           <Card className="gradient-card">
             <CardContent className="text-center py-12">
-              <Users className="w-12 h-12 text-white/80 mx-auto mb-4" />
+              <Users className="w-12 h-12 text-[#0000cc] mx-auto mb-4" />
               <h3 className="text-lg font-medium mb-2 text-white">No customers yet</h3>
               <p className="text-white/80 mb-4">
                 Add your first customer to start creating quotations
@@ -159,7 +159,7 @@ export default function Customers() {
               <Dialog open={showForm} onOpenChange={setShowForm}>
                 <DialogTrigger asChild>
                   <Button className="btn-primary">
-                    <Plus className="w-4 h-4 mr-2" />
+                    <Plus className="w-4 h-4 mr-2 text-[#0000cc]" />
                     Add Customer
                   </Button>
                 </DialogTrigger>
@@ -193,19 +193,19 @@ export default function Customers() {
                   <div className="space-y-3">
                     {customer.email && (
                       <div className="flex items-center text-sm text-white/80">
-                        <Mail className="w-4 h-4 mr-2" />
+                        <Mail className="w-4 h-4 mr-2 text-[#0000cc]" />
                         <span className="truncate">{customer.email}</span>
                       </div>
                     )}
                     {customer.phone && (
                       <div className="flex items-center text-sm text-white/80">
-                        <Phone className="w-4 h-4 mr-2" />
+                        <Phone className="w-4 h-4 mr-2 text-[#0000cc]" />
                         <span>{customer.phone}</span>
                       </div>
                     )}
                     {customer.address && (
                       <div className="flex items-start text-sm text-white/80">
-                        <MapPin className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />
+                        <MapPin className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0 text-[#0000cc]" />
                         <span className="line-clamp-2">{customer.address}</span>
                       </div>
                     )}
@@ -219,7 +219,7 @@ export default function Customers() {
                         })}
                         className="bg-[#FF751C] hover:bg-[#FF751C]/90 text-white border-[#FF751C]"
                       >
-                        <Edit className="w-4 h-4" />
+                        <Edit className="w-4 h-4 text-[#0000cc]" />
                       </Button>
                       <Button
                         variant="ghost"
@@ -227,7 +227,7 @@ export default function Customers() {
                         onClick={() => handleDeleteCustomer(customer.id)}
                         className="bg-[#FF751C] hover:bg-[#FF751C]/90 text-white"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4 text-[#0000cc]" />
                       </Button>
                     </div>
                   </div>
