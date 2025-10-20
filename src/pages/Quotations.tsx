@@ -25,7 +25,7 @@ import {
   Download,
   Settings,
   ArrowLeft,
-  Coins,
+  Banknote,
 } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { Quotation, Customer, QuotationItem } from '@/types/database'
@@ -271,10 +271,10 @@ export default function Quotations() {
                   Back to Dashboard
                 </Button>
                 <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
-                    <Coins className="w-7 h-7 text-white animate-coins-pour" />
+                  <div className="w-14 h-14 bg-primary rounded-lg flex items-center justify-center">
+                    <Banknote className="w-9 h-9 text-white animate-notes-flip" />
                   </div>
-                  <span className="font-bookman font-semibold text-xl tracking-tight text-white animate-flash-slow">Laabh AI</span>
+                  <span className="font-bookman font-semibold text-2xl tracking-tight text-white animate-flash-slow">Laabh AI</span>
                 </div>
               </div>
             </div>
@@ -314,10 +314,10 @@ export default function Quotations() {
                 Back to Dashboard
               </Button>
               <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
-                  <Coins className="w-7 h-7 text-white animate-coins-pour" />
+                <div className="w-14 h-14 bg-primary rounded-lg flex items-center justify-center">
+                  <Banknote className="w-9 h-9 text-white animate-notes-flip" />
                 </div>
-                <span className="font-bookman font-semibold text-xl tracking-tight text-white animate-flash-slow">Laabh AI</span>
+                <span className="font-bookman font-semibold text-2xl tracking-tight text-white animate-flash-slow">Laabh AI</span>
               </div>
             </div>
             <Button variant="outline" size="sm" onClick={() => navigate('/profile-settings')}>
