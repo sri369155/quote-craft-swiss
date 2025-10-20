@@ -25,7 +25,7 @@ import {
   Download,
   Settings,
   ArrowLeft,
-  Banknote,
+  IndianRupee,
 } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { Quotation, Customer, QuotationItem } from '@/types/database'
@@ -272,9 +272,9 @@ export default function Quotations() {
                 </Button>
                 <div className="flex items-center space-x-3">
                   <div className="w-14 h-14 bg-primary rounded-lg flex items-center justify-center">
-                    <Banknote className="w-9 h-9 text-white animate-notes-flip" />
+                    <IndianRupee className="w-9 h-9 text-white animate-rupee-rotate" />
                   </div>
-                  <span className="font-bookman font-semibold text-2xl tracking-tight text-white animate-flash-slow">Laabh AI</span>
+                  <span className="font-bookman font-semibold text-2xl tracking-tight text-green-700 animate-flash-slow">Laabh AI</span>
                 </div>
               </div>
             </div>
@@ -315,9 +315,9 @@ export default function Quotations() {
               </Button>
               <div className="flex items-center space-x-3">
                 <div className="w-14 h-14 bg-primary rounded-lg flex items-center justify-center">
-                  <Banknote className="w-9 h-9 text-white animate-notes-flip" />
+                  <IndianRupee className="w-9 h-9 text-white animate-rupee-rotate" />
                 </div>
-                <span className="font-bookman font-semibold text-2xl tracking-tight text-white animate-flash-slow">Laabh AI</span>
+                <span className="font-bookman font-semibold text-2xl tracking-tight text-green-700 animate-flash-slow">Laabh AI</span>
               </div>
             </div>
             <Button variant="outline" size="sm" onClick={() => navigate('/profile-settings')}>
