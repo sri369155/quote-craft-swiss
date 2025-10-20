@@ -672,7 +672,7 @@ Example: Complete website development for restaurant including design, developme
                       />
                     </TableCell>
                     <TableCell>
-                      <div className="font-medium group-hover:text-[#ffe6ff] transition-colors cursor-default">
+                      <div className="font-medium group-hover:text-[#0000cc] transition-colors cursor-default">
                         ₹{item.line_total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                       </div>
                     </TableCell>
