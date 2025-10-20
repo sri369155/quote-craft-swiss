@@ -271,10 +271,10 @@ export default function Quotations() {
                   Back to Dashboard
                 </Button>
                 <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                    <Coins className="w-4 h-4 text-white" />
+                  <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
+                    <Coins className="w-7 h-7 text-white animate-coins-pour" />
                   </div>
-                  <span className="font-bookman font-semibold text-white text-lg tracking-tight animate-flash-slow">Laabh AI</span>
+                  <span className="font-bookman font-semibold text-xl tracking-tight text-white animate-flash-slow">Laabh AI</span>
                 </div>
               </div>
             </div>
@@ -314,10 +314,10 @@ export default function Quotations() {
                 Back to Dashboard
               </Button>
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                  <Coins className="w-4 h-4 text-white" />
+                <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
+                  <Coins className="w-7 h-7 text-white animate-coins-pour" />
                 </div>
-                <span className="font-bookman font-semibold text-white text-lg tracking-tight animate-flash-slow">Laabh AI</span>
+                <span className="font-bookman font-semibold text-xl tracking-tight text-white animate-flash-slow">Laabh AI</span>
               </div>
             </div>
             <Button variant="outline" size="sm" onClick={() => navigate('/profile-settings')}>

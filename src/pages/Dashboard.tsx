@@ -124,10 +124,10 @@ export default function Dashboard() {
           <div className="flex items-center justify-between h-16 bg-primary px-4 rounded-lg -mx-4">
             <div className="flex items-center space-x-8">
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                  <Coins className="w-4 h-4 text-[#0000cc]" />
+                <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
+                  <Coins className="w-7 h-7 text-[#0000cc] animate-coins-pour" />
                 </div>
-                <span className="font-bookman font-bold text-lg tracking-tight text-thick-blue animate-flash-slow">Laabh AI</span>
+                <span className="font-bookman font-bold text-xl tracking-tight text-thick-blue animate-flash-slow">Laabh AI</span>
               </div>
               
               <nav className="hidden md:flex items-center space-x-1">
