@@ -342,6 +342,12 @@ export default function ProfileSettings() {
                   </div>
                 </div>
               </div>
+              <div className="mt-6 flex justify-end">
+                <Button onClick={handleSave} disabled={loading} className="btn-primary">
+                  <Save className="w-4 h-4 mr-2" />
+                  {loading ? 'Saving Images...' : 'Save Selected Images'}
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
