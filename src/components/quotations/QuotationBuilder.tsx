@@ -391,50 +391,13 @@ Example: Complete website development for restaurant including design, developme
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <div className="flex items-center justify-end gap-2 pb-1">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={async () => {
-                    try {
-                      const text = await navigator.clipboard.readText()
-                      setBulkAIText(text)
-                      toast({ title: 'Pasted from clipboard' })
-                    } catch (err) {
-                      toast({ 
-                        title: 'Paste failed', 
-                        description: 'Please use Ctrl+V to paste',
-                        variant: 'destructive' 
-                      })
-                    }
-                  }}
-                  className="text-xs h-7"
-                >
-                  Paste
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setBulkAIText('')
-                    toast({ title: 'Text cleared' })
-                  }}
-                  className="text-xs h-7"
-                >
-                  Clear
-                </Button>
-              </div>
-              <Textarea
-                value={bulkAIText}
-                onChange={(e) => setBulkAIText(e.target.value)}
-                rows={8}
-                className="resize-none !bg-[#ffffcc] border-2 border-[#3333ff] text-pink-800 placeholder:text-pink-500/70 focus:border-pink-300/60 focus:ring-pink-200/40"
-                placeholder="Type or paste your project details here..."
-              />
-            </div>
+            <Textarea
+              value={bulkAIText}
+              onChange={(e) => setBulkAIText(e.target.value)}
+              rows={8}
+              className="resize-none !bg-[#ffffcc] border-2 border-[#3333ff] text-pink-800 placeholder:text-pink-500/70 focus:border-pink-300/60 focus:ring-pink-200/40"
+              placeholder="Type or paste your project details here... Use Ctrl+V to paste"
+            />
             <Button
               onClick={useBulkAIAutofill} 
               disabled={aiLoading || !bulkAIText.trim()}
