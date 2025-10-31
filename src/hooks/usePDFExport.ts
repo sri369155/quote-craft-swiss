@@ -342,10 +342,12 @@ export function usePDFExport() {
   }
 
   const addFooterToPage = (pdf: jsPDF, pageWidth: number, pageHeight: number, footerImage: string | null, userProfile?: Profile) => {
-    const footerY = pageHeight - 20 // Reduced footer height
+    const footerY = pageHeight - 20 // Footer height
     if (footerImage) {
       try {
-        pdf.addImage(footerImage, 'JPEG', 0, footerY, pageWidth, 20) // Reduced height from 30 to 20
+        // Add footer image edge-to-edge (no margins)
+        // x: 0 (left edge), y: footerY (bottom), width: full page width, height: 20
+        pdf.addImage(footerImage, 'JPEG', 0, footerY, pageWidth, 20, undefined, 'FAST')
       } catch (error) {
         console.error('Error adding footer image:', error)
         renderDefaultFooter(pdf, pageWidth, footerY, userProfile)
