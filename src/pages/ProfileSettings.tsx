@@ -148,6 +148,10 @@ export default function ProfileSettings() {
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Dashboard
               </Button>
+              <Button onClick={handleSave} disabled={loading} variant="outline" size="sm">
+                <Save className="w-4 h-4 mr-2" />
+                {loading ? 'Saving Images...' : 'Save Selected Images'}
+              </Button>
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                   <User className="w-4 h-4 text-primary-foreground" />
@@ -359,12 +363,6 @@ export default function ProfileSettings() {
                     </Select>
                   </div>
                 </div>
-              </div>
-              <div className="mt-6 flex justify-end">
-                <Button onClick={handleSave} disabled={loading} className="btn-primary">
-                  <Save className="w-4 h-4 mr-2" />
-                  {loading ? 'Saving Images...' : 'Save Selected Images'}
-                </Button>
               </div>
             </CardContent>
           </Card>
