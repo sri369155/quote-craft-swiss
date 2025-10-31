@@ -10,8 +10,11 @@ import { User, Save, ArrowLeft } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { useToast } from '@/hooks/use-toast'
 import ImageUpload from '@/components/profile/ImageUpload'
-import { Profile, CustomImage } from '@/types/database'
+import { Profile } from '@/types/database'
+import { Database } from '@/integrations/supabase/types'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+
+type CustomImage = Database['public']['Tables']['custom_images']['Row']
 
 export default function ProfileSettings() {
   const navigate = useNavigate()
@@ -45,7 +48,7 @@ export default function ProfileSettings() {
         .order('created_at', { ascending: false })
       
       if (!error && data) {
-        setCustomImages(data as CustomImage[])
+        setCustomImages(data)
       }
     }
     
