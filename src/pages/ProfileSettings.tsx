@@ -87,17 +87,42 @@ export default function ProfileSettings() {
           company_phone: formData.company_phone,
           company_email: formData.company_email,
           company_logo_url: formData.company_logo_url,
-          header_image_url: formData.header_image_url,
-          footer_image_url: formData.footer_image_url,
-          signature_image_url: formData.signature_image_url,
+          header_image_url: formData.header_image_url || null,
+          footer_image_url: formData.footer_image_url || null,
+          signature_image_url: formData.signature_image_url || null,
         })
         .eq('id', user?.id)
 
       if (error) throw error
 
+      // Reload profile to ensure it's in sync
+      if (user) {
+        const { data: updatedProfile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single()
+        
+        if (updatedProfile) {
+          setFormData({
+            full_name: updatedProfile.full_name || '',
+            company_name: updatedProfile.company_name || '',
+            company_slogan: updatedProfile.company_slogan || '',
+            gst_number: updatedProfile.gst_number || '',
+            company_address: updatedProfile.company_address || '',
+            company_phone: updatedProfile.company_phone || '',
+            company_email: updatedProfile.company_email || '',
+            company_logo_url: updatedProfile.company_logo_url || '',
+            header_image_url: updatedProfile.header_image_url || '',
+            footer_image_url: updatedProfile.footer_image_url || '',
+            signature_image_url: updatedProfile.signature_image_url || '',
+          })
+        }
+      }
+
       toast({
         title: 'Profile updated',
-        description: 'Your profile has been updated successfully.',
+        description: 'Your selected images have been saved successfully.',
       })
     } catch (error: any) {
       toast({
