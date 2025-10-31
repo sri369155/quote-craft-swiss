@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Upload, X, Image as ImageIcon } from 'lucide-react'
+import { Upload, X, Image as ImageIcon, AlertTriangle } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/use-toast'
@@ -25,6 +25,7 @@ export default function ImageUpload({ type, currentImageUrl, onImageUploaded, on
   const [pendingFile, setPendingFile] = useState<File | null>(null)
   const [showNameDialog, setShowNameDialog] = useState(false)
   const [imageName, setImageName] = useState('')
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
   // Update preview when currentImageUrl changes
   useEffect(() => {
@@ -138,9 +139,39 @@ export default function ImageUpload({ type, currentImageUrl, onImageUploaded, on
   }
 
   const removeImage = async () => {
-    if (!user) return
+    if (!user || !currentImageUrl) return
 
     try {
+      // Delete from custom_images table if it exists there
+      const { data: customImage } = await supabase
+        .from('custom_images')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('image_url', currentImageUrl)
+        .maybeSingle()
+
+      if (customImage) {
+        const { error: deleteError } = await supabase
+          .from('custom_images')
+          .delete()
+          .eq('id', customImage.id)
+
+        if (deleteError) throw deleteError
+      }
+
+      // Extract storage path from URL and delete from storage
+      try {
+        const urlParts = currentImageUrl.split('/user-images/')
+        if (urlParts.length > 1) {
+          const storagePath = urlParts[1].split('?')[0] // Remove query params
+          await supabase.storage
+            .from('user-images')
+            .remove([storagePath])
+        }
+      } catch (storageError) {
+        console.error('Storage deletion error:', storageError)
+      }
+
       // Update profile to remove image URL
       const updateField = `${type}_image_url`
       const { error } = await supabase
@@ -153,9 +184,14 @@ export default function ImageUpload({ type, currentImageUrl, onImageUploaded, on
       setPreview(null)
       onImageUploaded('')
 
+      // Refresh the custom images list
+      if (onImageSaved) {
+        onImageSaved()
+      }
+
       toast({
         title: 'Image removed',
-        description: `${getTitle()} has been removed.`,
+        description: `${getTitle()} has been deleted successfully.`,
       })
     } catch (error: any) {
       toast({
@@ -163,6 +199,8 @@ export default function ImageUpload({ type, currentImageUrl, onImageUploaded, on
         description: error.message,
         variant: 'destructive',
       })
+    } finally {
+      setShowDeleteDialog(false)
     }
   }
 
@@ -257,7 +295,7 @@ export default function ImageUpload({ type, currentImageUrl, onImageUploaded, on
                     </span>
                   </Button>
                 </Label>
-                <Button variant="destructive" size="sm" onClick={removeImage}>
+                <Button variant="destructive" size="sm" onClick={() => setShowDeleteDialog(true)}>
                   <X className="w-4 h-4 mr-2" />
                   Remove
                 </Button>
@@ -318,6 +356,27 @@ export default function ImageUpload({ type, currentImageUrl, onImageUploaded, on
             }}>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleSaveWithName} disabled={!imageName.trim()}>
               Save Image
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-destructive" />
+              Delete {getTitle()}?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the image from your library and storage. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={removeImage} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete Image
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
