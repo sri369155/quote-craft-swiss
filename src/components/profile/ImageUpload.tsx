@@ -1,5 +1,5 @@
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -20,6 +20,11 @@ export default function ImageUpload({ type, currentImageUrl, onImageUploaded }: 
   const { toast } = useToast()
   const [uploading, setUploading] = useState(false)
   const [preview, setPreview] = useState<string | null>(currentImageUrl || null)
+
+  // Update preview when currentImageUrl changes
+  useEffect(() => {
+    setPreview(currentImageUrl || null)
+  }, [currentImageUrl])
 
   const getTitle = () => {
     switch (type) {

@@ -10,13 +10,15 @@ import { User, Save, ArrowLeft } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { useToast } from '@/hooks/use-toast'
 import ImageUpload from '@/components/profile/ImageUpload'
-import { Profile } from '@/types/database'
+import { Profile, CustomImage } from '@/types/database'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 export default function ProfileSettings() {
   const navigate = useNavigate()
   const { user, profile, updateProfile } = useAuth()
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
+  const [customImages, setCustomImages] = useState<CustomImage[]>([])
   const [formData, setFormData] = useState({
     full_name: '',
     company_name: '',
@@ -30,6 +32,25 @@ export default function ProfileSettings() {
     footer_image_url: '',
     signature_image_url: '',
   })
+
+  // Load custom images from database
+  useEffect(() => {
+    const loadCustomImages = async () => {
+      if (!user) return
+      
+      const { data, error } = await supabase
+        .from('custom_images')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+      
+      if (!error && data) {
+        setCustomImages(data as CustomImage[])
+      }
+    }
+    
+    loadCustomImages()
+  }, [user])
 
   useEffect(() => {
     if (profile) {
@@ -90,6 +111,13 @@ export default function ProfileSettings() {
     setFormData(prev => ({
       ...prev,
       [`${type}_image_url`]: url
+    }))
+  }
+
+  const handleImageSelected = (type: 'header' | 'footer' | 'signature', value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [`${type}_image_url`]: value === 'none' ? '' : value
     }))
   }
 
@@ -202,7 +230,7 @@ export default function ProfileSettings() {
             <CardHeader>
               <CardTitle className="text-white">PDF Customization</CardTitle>
               <CardDescription className="text-white/80">
-                Upload custom images for your quotation PDFs
+                Upload custom images for your quotation PDFs or select from saved images
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -212,21 +240,87 @@ export default function ProfileSettings() {
                   currentImageUrl={formData.company_logo_url}
                   onImageUploaded={(url) => handleImageUploaded('company_logo', url)}
                 />
-                <ImageUpload
-                  type="header"
-                  currentImageUrl={formData.header_image_url}
-                  onImageUploaded={(url) => handleImageUploaded('header', url)}
-                />
-                <ImageUpload
-                  type="footer"
-                  currentImageUrl={formData.footer_image_url}
-                  onImageUploaded={(url) => handleImageUploaded('footer', url)}
-                />
-                <ImageUpload
-                  type="signature"
-                  currentImageUrl={formData.signature_image_url}
-                  onImageUploaded={(url) => handleImageUploaded('signature', url)}
-                />
+                
+                <div className="space-y-4">
+                  <ImageUpload
+                    type="header"
+                    currentImageUrl={formData.header_image_url}
+                    onImageUploaded={(url) => handleImageUploaded('header', url)}
+                  />
+                  <div className="space-y-2">
+                    <Label className="text-white">Select Saved Header</Label>
+                    <Select
+                      value={formData.header_image_url || 'none'}
+                      onValueChange={(value) => handleImageSelected('header', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose saved image" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">None</SelectItem>
+                        {customImages.filter(img => img.image_type === 'header').map((img) => (
+                          <SelectItem key={img.id} value={img.image_url}>
+                            {img.image_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <ImageUpload
+                    type="footer"
+                    currentImageUrl={formData.footer_image_url}
+                    onImageUploaded={(url) => handleImageUploaded('footer', url)}
+                  />
+                  <div className="space-y-2">
+                    <Label className="text-white">Select Saved Footer</Label>
+                    <Select
+                      value={formData.footer_image_url || 'none'}
+                      onValueChange={(value) => handleImageSelected('footer', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose saved image" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">None</SelectItem>
+                        {customImages.filter(img => img.image_type === 'footer').map((img) => (
+                          <SelectItem key={img.id} value={img.image_url}>
+                            {img.image_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <ImageUpload
+                    type="signature"
+                    currentImageUrl={formData.signature_image_url}
+                    onImageUploaded={(url) => handleImageUploaded('signature', url)}
+                  />
+                  <div className="space-y-2">
+                    <Label className="text-white">Select Saved Signature</Label>
+                    <Select
+                      value={formData.signature_image_url || 'none'}
+                      onValueChange={(value) => handleImageSelected('signature', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose saved image" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">None</SelectItem>
+                        {customImages.filter(img => img.image_type === 'signature').map((img) => (
+                          <SelectItem key={img.id} value={img.image_url}>
+                            {img.image_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
