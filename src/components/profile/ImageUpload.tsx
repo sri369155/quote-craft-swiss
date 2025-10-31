@@ -88,14 +88,17 @@ export default function ImageUpload({ type, currentImageUrl, onImageUploaded, on
 
       const imageUrl = data.publicUrl
 
-      // Update user profile (set as default)
-      const updateField = `${type}_image_url`
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ [updateField]: imageUrl })
-        .eq('id', user.id)
+      // Only auto-update profile for company_logo
+      // For header/footer/signature, wait for user to click "Save Selected Images"
+      if (type === 'company_logo') {
+        const updateField = `${type}_image_url`
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ [updateField]: imageUrl })
+          .eq('id', user.id)
 
-      if (updateError) throw updateError
+        if (updateError) throw updateError
+      }
 
       // Save to custom_images table if it's not company_logo and has a custom name
       if (type !== 'company_logo' && customName) {
@@ -172,14 +175,17 @@ export default function ImageUpload({ type, currentImageUrl, onImageUploaded, on
         console.error('Storage deletion error:', storageError)
       }
 
-      // Update profile to remove image URL
-      const updateField = `${type}_image_url`
-      const { error } = await supabase
-        .from('profiles')
-        .update({ [updateField]: null })
-        .eq('id', user.id)
+      // Only auto-update profile for company_logo removal
+      // For header/footer/signature, wait for user to click "Save Selected Images"
+      if (type === 'company_logo') {
+        const updateField = `${type}_image_url`
+        const { error } = await supabase
+          .from('profiles')
+          .update({ [updateField]: null })
+          .eq('id', user.id)
 
-      if (error) throw error
+        if (error) throw error
+      }
 
       setPreview(null)
       onImageUploaded('')
