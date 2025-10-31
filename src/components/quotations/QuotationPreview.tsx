@@ -37,9 +37,9 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
   // Custom images from database
   const [customImages, setCustomImages] = useState<CustomImage[]>([])
   const [selectedImages, setSelectedImages] = useState({
-    header: profile?.header_image_url || '',
-    footer: profile?.footer_image_url || '',
-    signature: profile?.signature_image_url || ''
+    header: profile?.header_image_url || 'none',
+    footer: profile?.footer_image_url || 'none',
+    signature: profile?.signature_image_url || 'none'
   })
   
   // Editable text states
@@ -214,9 +214,9 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
       // Create a modified profile object with selected images
       const modifiedProfile = profile ? {
         ...profile,
-        header_image_url: selectedImages.header || null,
-        footer_image_url: selectedImages.footer || null,
-        signature_image_url: selectedImages.signature || null
+        header_image_url: selectedImages.header !== 'none' ? selectedImages.header : null,
+        footer_image_url: selectedImages.footer !== 'none' ? selectedImages.footer : null,
+        signature_image_url: selectedImages.signature !== 'none' ? selectedImages.signature : null
       } : undefined
       
       await exportToPDF(quotation, customer, items, modifiedProfile)
@@ -320,7 +320,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                     <SelectValue placeholder="No header image" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No header image</SelectItem>
+                    <SelectItem value="none">No header image</SelectItem>
                     {profile?.header_image_url && (
                       <SelectItem value={profile.header_image_url}>Default (Profile)</SelectItem>
                     )}
@@ -346,7 +346,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                     <SelectValue placeholder="No footer image" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No footer image</SelectItem>
+                    <SelectItem value="none">No footer image</SelectItem>
                     {profile?.footer_image_url && (
                       <SelectItem value={profile.footer_image_url}>Default (Profile)</SelectItem>
                     )}
@@ -372,7 +372,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                     <SelectValue placeholder="No signature image" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No signature image</SelectItem>
+                    <SelectItem value="none">No signature image</SelectItem>
                     {profile?.signature_image_url && (
                       <SelectItem value={profile.signature_image_url}>Default (Profile)</SelectItem>
                     )}
@@ -502,7 +502,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
         }}>
           {/* Header Section */}
           <div className="relative">
-            {selectedImages.header ? (
+            {selectedImages.header && selectedImages.header !== 'none' ? (
               <div className="w-full rounded-lg overflow-hidden">
                 <img 
                   src={selectedImages.header} 
@@ -794,7 +794,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                   For {editableText.companyName || profile?.company_name || ''}
                 </div>
                 
-                {selectedImages.signature ? (
+                {selectedImages.signature && selectedImages.signature !== 'none' ? (
                   <img 
                     src={selectedImages.signature} 
                     alt="Signature" 
@@ -827,7 +827,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
 
           {/* Footer */}
           <div style={{ marginTop: `${spacing.footerSpacing * 0.25}rem` }} className="-mx-8 print:mx-0">
-            {selectedImages.footer ? (
+            {selectedImages.footer && selectedImages.footer !== 'none' ? (
               <img 
                 src={selectedImages.footer} 
                 alt="Footer" 
@@ -883,7 +883,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
           <div className="bg-white p-8 print:p-0 print:pt-8">
             {/* Header for Second Page */}
             <div className="relative mb-8">
-              {selectedImages.header ? (
+              {selectedImages.header && selectedImages.header !== 'none' ? (
                 <div className="w-full rounded-lg overflow-hidden">
                   <img 
                     src={selectedImages.header} 
@@ -939,7 +939,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
 
             {/* Footer for Second Page */}
             <div className="mt-8 -mx-8 print:mx-0">
-              {selectedImages.footer ? (
+              {selectedImages.footer && selectedImages.footer !== 'none' ? (
                 <img 
                   src={selectedImages.footer} 
                   alt="Footer" 
