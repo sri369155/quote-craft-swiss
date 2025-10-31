@@ -1,6 +1,38 @@
 export interface Database {
   public: {
     Tables: {
+      custom_images: {
+        Row: {
+          id: string
+          user_id: string
+          image_type: 'header' | 'footer' | 'signature'
+          image_url: string
+          image_name: string
+          is_default: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          image_type: 'header' | 'footer' | 'signature'
+          image_url: string
+          image_name: string
+          is_default?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          image_type?: 'header' | 'footer' | 'signature'
+          image_url?: string
+          image_name?: string
+          is_default?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
       profiles: {
         Row: {
           id: string
@@ -308,3 +340,4 @@ export type Quotation = Database['public']['Tables']['quotations']['Row']
 export type QuotationItem = Database['public']['Tables']['quotation_items']['Row']
 export type Invoice = Database['public']['Tables']['invoices']['Row']
 export type InvoiceItem = Database['public']['Tables']['invoice_items']['Row']
+export type CustomImage = Database['public']['Tables']['custom_images']['Row']

@@ -7,13 +7,46 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
   }
   public: {
     Tables: {
+      custom_images: {
+        Row: {
+          created_at: string
+          id: string
+          image_name: string
+          image_type: string
+          image_url: string
+          is_default: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_name: string
+          image_type: string
+          image_url: string
+          is_default?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_name?: string
+          image_type?: string
+          image_url?: string
+          is_default?: boolean | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       customers: {
         Row: {
           address: string | null
@@ -140,10 +173,13 @@ export type Database = {
           consignee_phone: string | null
           created_at: string | null
           customer_id: string
+          delivery_challan_date: string | null
+          delivery_challan_number: string | null
           delivery_date: string | null
           delivery_number: string | null
           description: string | null
           due_date: string | null
+          eway_lr_number: string | null
           eway_number: string | null
           id: string
           invoice_number: string
@@ -175,10 +211,13 @@ export type Database = {
           consignee_phone?: string | null
           created_at?: string | null
           customer_id: string
+          delivery_challan_date?: string | null
+          delivery_challan_number?: string | null
           delivery_date?: string | null
           delivery_number?: string | null
           description?: string | null
           due_date?: string | null
+          eway_lr_number?: string | null
           eway_number?: string | null
           id?: string
           invoice_number: string
@@ -210,10 +249,13 @@ export type Database = {
           consignee_phone?: string | null
           created_at?: string | null
           customer_id?: string
+          delivery_challan_date?: string | null
+          delivery_challan_number?: string | null
           delivery_date?: string | null
           delivery_number?: string | null
           description?: string | null
           due_date?: string | null
+          eway_lr_number?: string | null
           eway_number?: string | null
           id?: string
           invoice_number?: string

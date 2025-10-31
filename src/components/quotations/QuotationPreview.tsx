@@ -12,10 +12,11 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Download, Printer } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
-import { Quotation, Customer, QuotationItem } from '@/types/database'
+import { Quotation, Customer, QuotationItem, CustomImage } from '@/types/database'
 import { useToast } from '@/hooks/use-toast'
 import { numberToWords } from '@/lib/utils'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface QuotationPreviewProps {
   quotationId: string | null
@@ -32,6 +33,14 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
   const [customer, setCustomer] = useState<Customer | null>(null)
   const [items, setItems] = useState<QuotationItem[]>([])
   const [loading, setLoading] = useState(false)
+  
+  // Custom images from database
+  const [customImages, setCustomImages] = useState<CustomImage[]>([])
+  const [selectedImages, setSelectedImages] = useState({
+    header: profile?.header_image_url || '',
+    footer: profile?.footer_image_url || '',
+    signature: profile?.signature_image_url || ''
+  })
   
   // Editable text states
   const [editableText, setEditableText] = useState({
@@ -75,6 +84,30 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
     useCustomFooter: !!profile?.footer_image_url,
     useCustomSignature: !!profile?.signature_image_url
   })
+
+  // Load custom images from database
+  const loadCustomImages = async () => {
+    if (!profile?.id) return
+    
+    const { data, error } = await supabase
+      .from('custom_images')
+      .select('*')
+      .eq('user_id', profile.id)
+      .order('created_at', { ascending: false })
+    
+    if (error) {
+      console.error('Error loading custom images:', error)
+      return
+    }
+    
+    setCustomImages((data || []) as CustomImage[])
+  }
+
+  useEffect(() => {
+    if (profile && open) {
+      loadCustomImages()
+    }
+  }, [profile, open])
 
   useEffect(() => {
     if (quotationId && open) {
@@ -178,12 +211,12 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
     if (!quotation || !customer) return
     
     try {
-      // Create a modified profile object based on image preferences
+      // Create a modified profile object with selected images
       const modifiedProfile = profile ? {
         ...profile,
-        header_image_url: imagePreferences.useCustomHeader ? profile.header_image_url : null,
-        footer_image_url: imagePreferences.useCustomFooter ? profile.footer_image_url : null,
-        signature_image_url: imagePreferences.useCustomSignature ? profile.signature_image_url : null
+        header_image_url: selectedImages.header || null,
+        footer_image_url: selectedImages.footer || null,
+        signature_image_url: selectedImages.signature || null
       } : undefined
       
       await exportToPDF(quotation, customer, items, modifiedProfile)
@@ -275,43 +308,84 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
           
           {/* Image Selection Controls */}
           <div className="print:hidden border-t pt-4 mt-4">
-            <div className="text-sm font-medium mb-2">Image Options:</div>
-            <div className="grid grid-cols-3 gap-4 text-xs">
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="useCustomHeader"
-                  checked={imagePreferences.useCustomHeader}
-                  onChange={(e) => updateImagePreference('useCustomHeader', e.target.checked)}
-                  disabled={!profile?.header_image_url}
-                />
-                <label htmlFor="useCustomHeader" className={!profile?.header_image_url ? 'text-gray-400' : ''}>
-                  Use Custom Header {!profile?.header_image_url && '(Not uploaded)'}
-                </label>
+            <div className="text-sm font-medium mb-3">Select Images for PDF:</div>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <label className="text-xs font-medium">Header Image</label>
+                <Select 
+                  value={selectedImages.header} 
+                  onValueChange={(value) => setSelectedImages(prev => ({ ...prev, header: value }))}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="No header image" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">No header image</SelectItem>
+                    {profile?.header_image_url && (
+                      <SelectItem value={profile.header_image_url}>Default (Profile)</SelectItem>
+                    )}
+                    {customImages
+                      .filter(img => img.image_type === 'header')
+                      .map(img => (
+                        <SelectItem key={img.id} value={img.image_url}>
+                          {img.image_name}
+                        </SelectItem>
+                      ))
+                    }
+                  </SelectContent>
+                </Select>
               </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="useCustomFooter"
-                  checked={imagePreferences.useCustomFooter}
-                  onChange={(e) => updateImagePreference('useCustomFooter', e.target.checked)}
-                  disabled={!profile?.footer_image_url}
-                />
-                <label htmlFor="useCustomFooter" className={!profile?.footer_image_url ? 'text-gray-400' : ''}>
-                  Use Custom Footer {!profile?.footer_image_url && '(Not uploaded)'}
-                </label>
+              
+              <div className="space-y-2">
+                <label className="text-xs font-medium">Footer Image</label>
+                <Select 
+                  value={selectedImages.footer} 
+                  onValueChange={(value) => setSelectedImages(prev => ({ ...prev, footer: value }))}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="No footer image" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">No footer image</SelectItem>
+                    {profile?.footer_image_url && (
+                      <SelectItem value={profile.footer_image_url}>Default (Profile)</SelectItem>
+                    )}
+                    {customImages
+                      .filter(img => img.image_type === 'footer')
+                      .map(img => (
+                        <SelectItem key={img.id} value={img.image_url}>
+                          {img.image_name}
+                        </SelectItem>
+                      ))
+                    }
+                  </SelectContent>
+                </Select>
               </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="useCustomSignature"
-                  checked={imagePreferences.useCustomSignature}
-                  onChange={(e) => updateImagePreference('useCustomSignature', e.target.checked)}
-                  disabled={!profile?.signature_image_url}
-                />
-                <label htmlFor="useCustomSignature" className={!profile?.signature_image_url ? 'text-gray-400' : ''}>
-                  Use Custom Signature {!profile?.signature_image_url && '(Not uploaded)'}
-                </label>
+              
+              <div className="space-y-2">
+                <label className="text-xs font-medium">Signature Image</label>
+                <Select 
+                  value={selectedImages.signature} 
+                  onValueChange={(value) => setSelectedImages(prev => ({ ...prev, signature: value }))}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="No signature image" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">No signature image</SelectItem>
+                    {profile?.signature_image_url && (
+                      <SelectItem value={profile.signature_image_url}>Default (Profile)</SelectItem>
+                    )}
+                    {customImages
+                      .filter(img => img.image_type === 'signature')
+                      .map(img => (
+                        <SelectItem key={img.id} value={img.image_url}>
+                          {img.image_name}
+                        </SelectItem>
+                      ))
+                    }
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>
@@ -428,10 +502,10 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
         }}>
           {/* Header Section */}
           <div className="relative">
-            {imagePreferences.useCustomHeader && profile?.header_image_url ? (
+            {selectedImages.header ? (
               <div className="w-full rounded-lg overflow-hidden">
                 <img 
-                  src={profile.header_image_url} 
+                  src={selectedImages.header} 
                   alt="Header" 
                   className="w-full h-auto max-h-32 object-contain"
                 />
@@ -720,9 +794,9 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                   For {editableText.companyName || profile?.company_name || ''}
                 </div>
                 
-                {imagePreferences.useCustomSignature && profile?.signature_image_url ? (
+                {selectedImages.signature ? (
                   <img 
-                    src={profile.signature_image_url} 
+                    src={selectedImages.signature} 
                     alt="Signature" 
                     className="h-16 w-auto"
                   />
@@ -753,9 +827,9 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
 
           {/* Footer */}
           <div style={{ marginTop: `${spacing.footerSpacing * 0.25}rem` }} className="-mx-8 print:mx-0">
-            {imagePreferences.useCustomFooter && profile?.footer_image_url ? (
+            {selectedImages.footer ? (
               <img 
-                src={profile.footer_image_url} 
+                src={selectedImages.footer} 
                 alt="Footer" 
                 className="w-full h-16 object-cover"
               />
@@ -809,10 +883,10 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
           <div className="bg-white p-8 print:p-0 print:pt-8">
             {/* Header for Second Page */}
             <div className="relative mb-8">
-              {imagePreferences.useCustomHeader && profile?.header_image_url ? (
+              {selectedImages.header ? (
                 <div className="w-full rounded-lg overflow-hidden">
                   <img 
-                    src={profile.header_image_url} 
+                    src={selectedImages.header} 
                     alt="Header" 
                     className="w-full h-auto max-h-32 object-contain"
                   />
@@ -865,9 +939,9 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
 
             {/* Footer for Second Page */}
             <div className="mt-8 -mx-8 print:mx-0">
-              {imagePreferences.useCustomFooter && profile?.footer_image_url ? (
+              {selectedImages.footer ? (
                 <img 
-                  src={profile.footer_image_url} 
+                  src={selectedImages.footer} 
                   alt="Footer" 
                   className="w-full h-16 object-cover"
                 />
