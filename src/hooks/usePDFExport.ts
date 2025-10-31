@@ -204,10 +204,6 @@ export function usePDFExport() {
         pdf.setFontSize(9) // Reduced font size
         pdf.setTextColor(blackColor)
         pdf.text('Authorised Signature', 97, termsStartY + 42) // Adjusted position for larger signature
-        pdf.setFont('helvetica', 'normal')
-        pdf.setFontSize(9) // Reduced font size
-        pdf.setTextColor(blackColor)
-        pdf.text('Authorised Signature', 97, termsStartY + 28) // Reduced from 62
       }
       
       // Footer for main page
