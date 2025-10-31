@@ -752,15 +752,15 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
           </div>
 
           {/* Footer */}
-          <div style={{ marginTop: `${spacing.footerSpacing * 0.25}rem` }}>
+          <div style={{ marginTop: `${spacing.footerSpacing * 0.25}rem` }} className="-mx-8 print:mx-0">
             {imagePreferences.useCustomFooter && profile?.footer_image_url ? (
               <img 
                 src={profile.footer_image_url} 
                 alt="Footer" 
-                className="w-full h-16 object-cover rounded-lg"
+                className="w-full h-16 object-cover"
               />
             ) : (
-              <div className="bg-orange-600 text-foreground p-3 rounded-lg text-xs">
+              <div className="bg-orange-600 text-foreground p-3 text-xs">
                 <div className="flex justify-between items-start">
                   <div className="text-left">
                     {/* Company Address - Left Aligned */}
@@ -864,15 +864,15 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
             </div>
 
             {/* Footer for Second Page */}
-            <div className="mt-8">
+            <div className="mt-8 -mx-8 print:mx-0">
               {imagePreferences.useCustomFooter && profile?.footer_image_url ? (
                 <img 
                   src={profile.footer_image_url} 
                   alt="Footer" 
-                  className="w-full h-16 object-cover rounded-lg"
+                  className="w-full h-16 object-cover"
                 />
               ) : (
-                <div className="bg-orange-600 text-foreground p-3 rounded-lg text-xs">
+                <div className="bg-orange-600 text-foreground p-3 text-xs">
                   <div className="flex justify-between items-start">
                     <div className="text-left">
                       <div>{editableText.footerAddress1}</div>
