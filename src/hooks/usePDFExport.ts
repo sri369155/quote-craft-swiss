@@ -150,7 +150,7 @@ export function usePDFExport() {
         // Add signature image if available
         if (signatureImage) {
           try {
-            pdf.addImage(signatureImage, 'JPEG', 97, newTermsStartY + 18, 60, 10) // Reduced size and position
+            pdf.addImage(signatureImage, 'JPEG', 97, newTermsStartY + 20, 60, 20) // Increased height from 10 to 20
           } catch (error) {
             console.error('Error adding signature image:', error)
           }
@@ -160,12 +160,12 @@ export function usePDFExport() {
         pdf.setFont('helvetica', 'normal')
         pdf.setFontSize(9) // Reduced font size
         pdf.setTextColor(blackColor)
-        pdf.text('Authorised Signature', 97, newTermsStartY + 28) // Reduced from 62
+        pdf.text('Authorised Signature', 97, newTermsStartY + 42) // Adjusted position for larger signature
       } else {
         // Keep original layout if it fits on current page
         pdf.setFillColor(255, 255, 255)
-        pdf.rect(15, termsStartY, 80, 30, 'FD') // Reduced height from 60 to 30
-        pdf.rect(95, termsStartY, 100, 30, 'FD') // Reduced height from 60 to 30
+        pdf.rect(15, termsStartY, 80, 50, 'FD') // Increased height from 30 to 50
+        pdf.rect(95, termsStartY, 100, 50, 'FD') // Increased height from 30 to 50
         
         // Terms & Conditions
         pdf.setFont('helvetica', 'bold')
@@ -193,13 +193,17 @@ export function usePDFExport() {
         // Add signature image if available
         if (signatureImage) {
           try {
-            pdf.addImage(signatureImage, 'JPEG', 97, termsStartY + 18, 60, 10) // Reduced size and position
+            pdf.addImage(signatureImage, 'JPEG', 97, termsStartY + 20, 60, 20) // Increased height from 10 to 20
           } catch (error) {
             console.error('Error adding signature image:', error)
           }
         }
         
         // Only keep "Authorised Signature" - removed "Managing Partner"
+        pdf.setFont('helvetica', 'normal')
+        pdf.setFontSize(9) // Reduced font size
+        pdf.setTextColor(blackColor)
+        pdf.text('Authorised Signature', 97, termsStartY + 42) // Adjusted position for larger signature
         pdf.setFont('helvetica', 'normal')
         pdf.setFontSize(9) // Reduced font size
         pdf.setTextColor(blackColor)
