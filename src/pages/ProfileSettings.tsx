@@ -117,6 +117,20 @@ export default function ProfileSettings() {
     }))
   }
 
+  const reloadCustomImages = async () => {
+    if (!user) return
+    
+    const { data, error } = await supabase
+      .from('custom_images')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+    
+    if (!error && data) {
+      setCustomImages(data)
+    }
+  }
+
   const handleImageSelected = (type: 'header' | 'footer' | 'signature', value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -249,6 +263,7 @@ export default function ProfileSettings() {
                     type="header"
                     currentImageUrl={formData.header_image_url}
                     onImageUploaded={(url) => handleImageUploaded('header', url)}
+                    onImageSaved={reloadCustomImages}
                   />
                   <div className="space-y-2">
                     <Label className="text-white">Select Saved Header</Label>
@@ -276,6 +291,7 @@ export default function ProfileSettings() {
                     type="footer"
                     currentImageUrl={formData.footer_image_url}
                     onImageUploaded={(url) => handleImageUploaded('footer', url)}
+                    onImageSaved={reloadCustomImages}
                   />
                   <div className="space-y-2">
                     <Label className="text-white">Select Saved Footer</Label>
@@ -303,6 +319,7 @@ export default function ProfileSettings() {
                     type="signature"
                     currentImageUrl={formData.signature_image_url}
                     onImageUploaded={(url) => handleImageUploaded('signature', url)}
+                    onImageSaved={reloadCustomImages}
                   />
                   <div className="space-y-2">
                     <Label className="text-white">Select Saved Signature</Label>
