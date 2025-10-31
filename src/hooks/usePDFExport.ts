@@ -139,12 +139,13 @@ export function usePDFExport() {
         // Signature section
         pdf.text('With regards', 97, newTermsStartY + 8) // Reduced from 12
         
-        // Company name in signature
-        pdf.setFont('helvetica', 'bold')
-        pdf.setFontSize(12)
-        pdf.setTextColor(37, 99, 235) // Modern blue to match header
-        const companyName = userProfile?.company_name || 'BHAIRAVNEX'
-        pdf.text(`For ${companyName}`, 97, newTermsStartY + 15) // Reduced from 25
+        // Company name in signature (only if set in profile)
+        if (userProfile?.company_name) {
+          pdf.setFont('helvetica', 'bold')
+          pdf.setFontSize(12)
+          pdf.setTextColor(37, 99, 235) // Modern blue to match header
+          pdf.text(`For ${userProfile.company_name}`, 97, newTermsStartY + 15) // Reduced from 25
+        }
         
         // Add signature image if available
         if (signatureImage) {
@@ -181,12 +182,13 @@ export function usePDFExport() {
         // Signature section
         pdf.text('With regards', 97, termsStartY + 8) // Reduced from 12
         
-        // Company name in signature
-        pdf.setFont('helvetica', 'bold')
-        pdf.setFontSize(12)
-        pdf.setTextColor(37, 99, 235) // Modern blue to match header
-        const companyName = userProfile?.company_name || 'BHAIRAVNEX'
-        pdf.text(`For ${companyName}`, 97, termsStartY + 15) // Reduced from 25
+        // Company name in signature (only if set in profile)
+        if (userProfile?.company_name) {
+          pdf.setFont('helvetica', 'bold')
+          pdf.setFontSize(12)
+          pdf.setTextColor(37, 99, 235) // Modern blue to match header
+          pdf.text(`For ${userProfile.company_name}`, 97, termsStartY + 15) // Reduced from 25
+        }
         
         // Add signature image if available
         if (signatureImage) {
