@@ -268,11 +268,17 @@ export default function ProfileSettings() {
                   <div className="space-y-2">
                     <Label className="text-white">Select Saved Header</Label>
                     <Select
+                      key={`header-${formData.header_image_url}`}
                       value={formData.header_image_url || 'none'}
                       onValueChange={(value) => handleImageSelected('header', value)}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Choose saved image" />
+                        <SelectValue>
+                          {formData.header_image_url 
+                            ? customImages.find(img => img.image_url === formData.header_image_url)?.image_name || 'Selected'
+                            : 'Choose saved image'
+                          }
+                        </SelectValue>
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="none">None</SelectItem>
@@ -296,11 +302,17 @@ export default function ProfileSettings() {
                   <div className="space-y-2">
                     <Label className="text-white">Select Saved Footer</Label>
                     <Select
+                      key={`footer-${formData.footer_image_url}`}
                       value={formData.footer_image_url || 'none'}
                       onValueChange={(value) => handleImageSelected('footer', value)}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Choose saved image" />
+                        <SelectValue>
+                          {formData.footer_image_url 
+                            ? customImages.find(img => img.image_url === formData.footer_image_url)?.image_name || 'Selected'
+                            : 'Choose saved image'
+                          }
+                        </SelectValue>
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="none">None</SelectItem>
@@ -324,11 +336,17 @@ export default function ProfileSettings() {
                   <div className="space-y-2">
                     <Label className="text-white">Select Saved Signature</Label>
                     <Select
+                      key={`signature-${formData.signature_image_url}`}
                       value={formData.signature_image_url || 'none'}
                       onValueChange={(value) => handleImageSelected('signature', value)}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Choose saved image" />
+                        <SelectValue>
+                          {formData.signature_image_url 
+                            ? customImages.find(img => img.image_url === formData.signature_image_url)?.image_name || 'Selected'
+                            : 'Choose saved image'
+                          }
+                        </SelectValue>
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="none">None</SelectItem>
