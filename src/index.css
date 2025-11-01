@@ -272,23 +272,42 @@
   }
   
   body {
-    margin: 0;
-    padding: 0;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
-  /* Make dialog print-friendly */
+  /* Hide dialog overlay completely */
+  [data-radix-dialog-overlay],
+  .fixed.inset-0 {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* Make dialog content visible and properly positioned */
   [role="dialog"] {
     position: static !important;
+    transform: none !important;
     max-width: 100% !important;
+    width: 100% !important;
     max-height: none !important;
     height: auto !important;
     overflow: visible !important;
     box-shadow: none !important;
     border: none !important;
+    padding: 0 !important;
+    left: auto !important;
+    top: auto !important;
+    margin: 0 !important;
   }
 
-  /* Hide dialog overlay */
-  [data-radix-dialog-overlay] {
+  /* Ensure portal content is visible */
+  [data-radix-portal] {
+    position: static !important;
+  }
+
+  /* Hide close button in print */
+  [role="dialog"] button[aria-label="Close"],
+  [role="dialog"] .absolute.right-4 {
     display: none !important;
   }
 }
