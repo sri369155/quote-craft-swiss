@@ -276,17 +276,19 @@
     padding: 0;
   }
 
-  /* Prevent dialog overlay from printing multiple times */
+  /* Make dialog print-friendly */
   [role="dialog"] {
     position: static !important;
     max-width: 100% !important;
     max-height: none !important;
+    height: auto !important;
     overflow: visible !important;
-    page-break-inside: auto !important;
+    box-shadow: none !important;
+    border: none !important;
   }
 
-  /* Prevent content duplication */
-  * {
-    overflow: visible !important;
+  /* Hide dialog overlay */
+  [data-radix-dialog-overlay] {
+    display: none !important;
   }
 }
