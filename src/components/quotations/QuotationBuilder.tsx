@@ -40,6 +40,8 @@ export default function QuotationBuilder({ quotationId, onSave, onCancel }: Quot
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [showCustomerForm, setShowCustomerForm] = useState(false)
+  const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null)
+  const [editingDescription, setEditingDescription] = useState('')
   
   // Form state
   const [selectedCustomerId, setSelectedCustomerId] = useState('')
@@ -369,6 +371,24 @@ Example: Complete website development for restaurant including design, developme
     setShowCustomerForm(false)
   }
 
+  const openDescriptionEditor = (index: number) => {
+    setEditingItemIndex(index)
+    setEditingDescription(items[index].description)
+  }
+
+  const saveDescription = () => {
+    if (editingItemIndex !== null) {
+      updateItem(editingItemIndex, 'description', editingDescription)
+      setEditingItemIndex(null)
+      setEditingDescription('')
+    }
+  }
+
+  const closeDescriptionEditor = () => {
+    setEditingItemIndex(null)
+    setEditingDescription('')
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -615,24 +635,14 @@ Example: Complete website development for restaurant including design, developme
                   <TableRow key={index} className="group hover:bg-[#ffe6ff] transition-colors">
                     <TableCell>
                       <div className="flex space-x-2">
-                        <HoverCard>
-                          <HoverCardTrigger asChild>
-                            <Input
-                              value={item.description}
-                              onChange={(e) => updateItem(index, 'description', e.target.value)}
-                              placeholder="Item description"
-                              className="flex-1 w-full"
-                            />
-                          </HoverCardTrigger>
-                          {item.description && (
-                            <HoverCardContent className="w-80 max-w-sm">
-                              <div className="text-sm">
-                                <p className="font-medium mb-2">Full Description:</p>
-                                <p className="whitespace-pre-wrap break-words">{item.description}</p>
-                              </div>
-                            </HoverCardContent>
-                          )}
-                        </HoverCard>
+                        <Input
+                          value={item.description}
+                          onChange={(e) => updateItem(index, 'description', e.target.value)}
+                          onClick={() => openDescriptionEditor(index)}
+                          placeholder="Item description"
+                          className="flex-1 w-full cursor-pointer"
+                          readOnly
+                        />
                         <Button
                           variant="outline"
                           size="sm"
@@ -696,6 +706,36 @@ Example: Complete website development for restaurant including design, developme
           </div>
         </CardContent>
       </Card>
+
+      {/* Description Editor Dialog */}
+      <Dialog open={editingItemIndex !== null} onOpenChange={(open) => !open && closeDescriptionEditor()}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Item Description</DialogTitle>
+            <DialogDescription>
+              Edit the full description for this line item
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Textarea
+              value={editingDescription}
+              onChange={(e) => setEditingDescription(e.target.value)}
+              placeholder="Enter detailed item description..."
+              rows={10}
+              className="resize-none"
+              autoFocus
+            />
+            <div className="flex justify-end space-x-2">
+              <Button variant="outline" onClick={closeDescriptionEditor}>
+                Cancel
+              </Button>
+              <Button onClick={saveDescription} className="btn-primary">
+                Save Description
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
