@@ -283,7 +283,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-auto print:max-w-none print:h-auto print:overflow-visible">
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-auto print:max-w-full print:h-auto print:overflow-visible print:block print:shadow-none print:border-0">
         <DialogHeader className="print:hidden">
           <div className="flex items-center justify-between">
             <DialogTitle>Quotation Preview</DialogTitle>
@@ -495,7 +495,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
         </DialogHeader>
 
         {/* PDF-like Content - FIRST PAGE */}
-        <div className="bg-white p-8 print:p-0" style={{ 
+        <div className="bg-white p-8 print:p-0 print:page-break-after-auto" style={{
           display: 'flex', 
           flexDirection: 'column', 
           gap: `${spacing.headerSpacing * 0.25}rem` 
@@ -875,12 +875,14 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
           </div>
         </div>
 
-        {/* PAGE BREAK - Only visible in print */}
-        <div className="print:page-break-before-always print:block hidden"></div>
+        {/* PAGE BREAK - Only visible in print when there's a second page */}
+        {quotation.scope_of_work && (
+          <div className="print:page-break-before-always print:block hidden"></div>
+        )}
 
         {/* SCOPE OF WORK - SEPARATE PAGE */}
         {quotation.scope_of_work && (
-          <div className="bg-white p-8 print:p-0 print:pt-8">
+          <div className="bg-white p-8 print:p-0 print:pt-8 print:page-break-after-auto">
             {/* Header for Second Page */}
             <div className="relative mb-8">
               {selectedImages.header && selectedImages.header !== 'none' ? (
