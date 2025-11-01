@@ -41,7 +41,7 @@ export default function QuotationBuilder({ quotationId, onSave, onCancel }: Quot
   const [saving, setSaving] = useState(false)
   const [showCustomerForm, setShowCustomerForm] = useState(false)
   const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null)
-  const [editingDescription, setEditingDescription] = useState('')
+  const [editingItem, setEditingItem] = useState<QuotationItemForm | null>(null)
   
   // Form state
   const [selectedCustomerId, setSelectedCustomerId] = useState('')
@@ -371,22 +371,40 @@ Example: Complete website development for restaurant including design, developme
     setShowCustomerForm(false)
   }
 
-  const openDescriptionEditor = (index: number) => {
+  const openItemEditor = (index: number) => {
     setEditingItemIndex(index)
-    setEditingDescription(items[index].description)
+    setEditingItem({ ...items[index] })
   }
 
-  const saveDescription = () => {
-    if (editingItemIndex !== null) {
-      updateItem(editingItemIndex, 'description', editingDescription)
-      setEditingItemIndex(null)
-      setEditingDescription('')
+  const saveItemEdits = () => {
+    if (editingItemIndex !== null && editingItem) {
+      // Calculate line total
+      const lineTotal = editingItem.quantity * editingItem.unit_price
+      const updatedItem = { ...editingItem, line_total: lineTotal }
+      
+      setItems(currentItems => {
+        const newItems = [...currentItems]
+        newItems[editingItemIndex] = updatedItem
+        return newItems
+      })
+      
+      closeItemEditor()
+      toast({
+        title: 'Item updated',
+        description: 'Line item has been updated successfully.',
+      })
     }
   }
 
-  const closeDescriptionEditor = () => {
+  const closeItemEditor = () => {
     setEditingItemIndex(null)
-    setEditingDescription('')
+    setEditingItem(null)
+  }
+
+  const updateEditingItem = (field: keyof QuotationItemForm, value: string | number) => {
+    if (editingItem) {
+      setEditingItem({ ...editingItem, [field]: value })
+    }
   }
 
   if (loading) {
@@ -632,21 +650,19 @@ Example: Complete website development for restaurant including design, developme
               </TableHeader>
               <TableBody>
                 {items.map((item, index) => (
-                  <TableRow key={index} className="group hover:bg-[#ffe6ff] transition-colors">
-                    <TableCell>
+                  <TableRow key={index} className="group hover:bg-[#ffe6ff] transition-colors cursor-pointer">
+                    <TableCell onClick={() => openItemEditor(index)}>
                       <div className="flex space-x-2">
-                        <Input
-                          value={item.description}
-                          onChange={(e) => updateItem(index, 'description', e.target.value)}
-                          onClick={() => openDescriptionEditor(index)}
-                          placeholder="Item description"
-                          className="flex-1 w-full cursor-pointer"
-                          readOnly
-                        />
+                        <div className="flex-1 px-3 py-2 text-sm border border-transparent rounded-md hover:border-input transition-colors">
+                          {item.description || 'Click to add description'}
+                        </div>
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => useAIAutofill(index)}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            useAIAutofill(index)
+                          }}
                           disabled={aiLoading}
                           title="AI Autofill"
                         >
@@ -654,36 +670,23 @@ Example: Complete website development for restaurant including design, developme
                         </Button>
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <Input
-                        value={item.hsn_code}
-                        onChange={(e) => updateItem(index, 'hsn_code', e.target.value)}
-                        placeholder="HSN Code"
-                        className="text-sm w-full"
-                      />
+                    <TableCell onClick={() => openItemEditor(index)}>
+                      <div className="px-3 py-2 text-sm border border-transparent rounded-md hover:border-input transition-colors">
+                        {item.hsn_code || 'Click to add HSN'}
+                      </div>
                     </TableCell>
-                    <TableCell>
-                      <Input
-                        type="number"
-                        value={item.quantity}
-                        onChange={(e) => updateItem(index, 'quantity', Number(e.target.value))}
-                        min="0"
-                        step="1"
-                        className="w-full"
-                      />
+                    <TableCell onClick={() => openItemEditor(index)}>
+                      <div className="px-3 py-2 text-sm border border-transparent rounded-md hover:border-input transition-colors">
+                        {item.quantity}
+                      </div>
                     </TableCell>
-                    <TableCell>
-                      <Input
-                        type="number"
-                        value={item.unit_price}
-                        onChange={(e) => updateItem(index, 'unit_price', Number(e.target.value))}
-                        min="0"
-                        step="0.01"
-                        className="w-full"
-                      />
+                    <TableCell onClick={() => openItemEditor(index)}>
+                      <div className="px-3 py-2 text-sm border border-transparent rounded-md hover:border-input transition-colors">
+                        ₹{item.unit_price.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                      </div>
                     </TableCell>
-                    <TableCell>
-                      <div className="font-medium group-hover:text-[#0000cc] transition-colors cursor-default">
+                    <TableCell onClick={() => openItemEditor(index)}>
+                      <div className="font-medium group-hover:text-[#0000cc] transition-colors px-3 py-2">
                         ₹{item.line_total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                       </div>
                     </TableCell>
@@ -692,7 +695,10 @@ Example: Complete website development for restaurant including design, developme
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => removeItem(index)}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            removeItem(index)
+                          }}
                           className="hover:bg-accent"
                         >
                           <Trash2 className="w-4 h-4 text-[#0000cc]" />
@@ -707,33 +713,86 @@ Example: Complete website development for restaurant including design, developme
         </CardContent>
       </Card>
 
-      {/* Description Editor Dialog */}
-      <Dialog open={editingItemIndex !== null} onOpenChange={(open) => !open && closeDescriptionEditor()}>
-        <DialogContent className="max-w-2xl">
+      {/* Item Editor Dialog */}
+      <Dialog open={editingItemIndex !== null} onOpenChange={(open) => !open && closeItemEditor()}>
+        <DialogContent className="max-w-3xl">
           <DialogHeader>
-            <DialogTitle>Edit Item Description</DialogTitle>
+            <DialogTitle>Edit Line Item</DialogTitle>
             <DialogDescription>
-              Edit the full description for this line item
+              Edit all details for this line item
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <Textarea
-              value={editingDescription}
-              onChange={(e) => setEditingDescription(e.target.value)}
-              placeholder="Enter detailed item description..."
-              rows={10}
-              className="resize-none"
-              autoFocus
-            />
-            <div className="flex justify-end space-x-2">
-              <Button variant="outline" onClick={closeDescriptionEditor}>
-                Cancel
-              </Button>
-              <Button onClick={saveDescription} className="btn-primary">
-                Save Description
-              </Button>
+          {editingItem && (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-description">Description *</Label>
+                <Textarea
+                  id="edit-description"
+                  value={editingItem.description}
+                  onChange={(e) => updateEditingItem('description', e.target.value)}
+                  placeholder="Enter detailed item description..."
+                  rows={6}
+                  className="resize-none"
+                  autoFocus
+                />
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit-hsn">HSN Code</Label>
+                  <Input
+                    id="edit-hsn"
+                    value={editingItem.hsn_code}
+                    onChange={(e) => updateEditingItem('hsn_code', e.target.value)}
+                    placeholder="Enter HSN code"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="edit-quantity">Quantity *</Label>
+                  <Input
+                    id="edit-quantity"
+                    type="number"
+                    value={editingItem.quantity}
+                    onChange={(e) => updateEditingItem('quantity', Number(e.target.value))}
+                    min="0"
+                    step="1"
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit-price">Unit Price *</Label>
+                  <Input
+                    id="edit-price"
+                    type="number"
+                    value={editingItem.unit_price}
+                    onChange={(e) => updateEditingItem('unit_price', Number(e.target.value))}
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Line Total</Label>
+                  <div className="h-10 px-3 py-2 bg-muted rounded-md flex items-center font-medium">
+                    ₹{(editingItem.quantity * editingItem.unit_price).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex justify-end space-x-2 pt-4">
+                <Button variant="outline" onClick={closeItemEditor}>
+                  Cancel
+                </Button>
+                <Button onClick={saveItemEdits} className="btn-primary">
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Changes
+                </Button>
+              </div>
             </div>
-          </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
