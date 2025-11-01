@@ -206,6 +206,7 @@ Example: Complete website development for restaurant including design, developme
           const unit_price = item.unit_price || 0
           return {
             description: item.description || '',
+            hsn_code: item.hsn_code || '',
             quantity: quantity,
             unit_price: unit_price,
             line_total: quantity * unit_price
@@ -238,13 +239,14 @@ Example: Complete website development for restaurant including design, developme
       if (result.title && !title.trim()) setTitle(result.title)
       if (result.scope_of_work && !scopeOfWork.trim()) setScopeOfWork(result.scope_of_work)
       
-      // Update item with proper calculation
+      // Update item with proper calculation including HSN code
+      if (result.hsn_code) updateItem(itemIndex, 'hsn_code', result.hsn_code)
       updateItem(itemIndex, 'quantity', result.quantity)
       updateItem(itemIndex, 'unit_price', result.unit_price)
       
       toast({
         title: 'AI Autofill Complete',
-        description: `Suggested ${result.quantity} units at ₹${result.unit_price} each with calculations`,
+        description: `Suggested ${result.quantity} units at ₹${result.unit_price} each with HSN code`,
       })
     }
   }

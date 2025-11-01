@@ -55,14 +55,14 @@ serve(async (req) => {
 
       if (lines.length > 1) {
         // Multiline bulk input — Use AI to generate items with title and description
-        systemPrompt = 'You are an expert quotation assistant. Generate a professional quotation with appropriate title, description, and line items with quantities and unit prices. IMPORTANT: Do NOT include GST, tax, or any tax-related items as separate line items. Only include the actual goods/services being quoted.'
+        systemPrompt = 'You are an expert quotation assistant. Generate a professional quotation with appropriate title, description, and line items with quantities, unit prices, and HSN codes. IMPORTANT: Do NOT include GST, tax, or any tax-related items as separate line items. Only include the actual goods/services being quoted.'
         prompt = `Based on this multi-line project description:
 ${lines.join('\n')}
 
 Generate a complete quotation with:
 1. A professional quotation title
 2. A brief project description
-3. Line items with quantities and unit prices (DO NOT include GST or tax as separate line items)
+3. Line items with quantities, unit prices, and appropriate Indian HSN codes (DO NOT include GST or tax as separate line items)
 
 Respond in this exact JSON format:
 {
@@ -72,7 +72,8 @@ Respond in this exact JSON format:
     {
       "description": "item description",
       "quantity": number,
-      "unit_price": number
+      "unit_price": number,
+      "hsn_code": "HSN code (4-8 digits)"
     }
   ]
 }`
@@ -90,10 +91,10 @@ Respond in this exact JSON format:
           const unit_price = parseFloat(base.toFixed(2))
           const cleanDesc = text.replace(grandMatch[0], '').trim()
 
-          systemPrompt = 'Generate a professional quotation title and description for this item.'
+          systemPrompt = 'Generate a professional quotation title and description for this item with appropriate HSN code.'
           prompt = `For this service/item: "${cleanDesc}"
 
-Generate a professional quotation with title and description.
+Generate a professional quotation with title, description, and appropriate Indian HSN code.
 
 Respond in this exact JSON format:
 {
@@ -103,7 +104,8 @@ Respond in this exact JSON format:
     {
       "description": "${cleanDesc}",
       "quantity": 1,
-      "unit_price": ${unit_price}
+      "unit_price": ${unit_price},
+      "hsn_code": "HSN code (4-8 digits)"
     }
   ]
 }`
@@ -112,10 +114,10 @@ Respond in this exact JSON format:
           const unit_price = parseFloat(unitPriceMatch[1].replace(/,/g, ''))
           const cleanDesc = text.replace(unitPriceMatch[0], '').trim()
 
-          systemPrompt = 'Generate a professional quotation title and description for this item.'
+          systemPrompt = 'Generate a professional quotation title and description for this item with appropriate HSN code.'
           prompt = `For this service/item: "${cleanDesc}"
 
-Generate a professional quotation with title and description.
+Generate a professional quotation with title, description, and appropriate Indian HSN code.
 
 Respond in this exact JSON format:
 {
@@ -125,16 +127,17 @@ Respond in this exact JSON format:
     {
       "description": "${cleanDesc}",
       "quantity": 1,
-      "unit_price": ${unit_price}
+      "unit_price": ${unit_price},
+      "hsn_code": "HSN code (4-8 digits)"
     }
   ]
 }`
         } else {
           // No specific pricing info - let AI decide
-          systemPrompt = 'Generate a complete quotation with professional title, description, and appropriate pricing for the service/item. IMPORTANT: Do NOT include GST, tax, or any tax-related items as separate line items.'
+          systemPrompt = 'Generate a complete quotation with professional title, description, appropriate pricing, and HSN codes for the service/item. IMPORTANT: Do NOT include GST, tax, or any tax-related items as separate line items.'
           prompt = `For this service/item: "${text}"
 
-Generate a complete quotation with title, description, and appropriate pricing. Do NOT include GST or tax as separate line items.
+Generate a complete quotation with title, description, appropriate pricing, and Indian HSN codes. Do NOT include GST or tax as separate line items.
 
 Respond in this exact JSON format:
 {
@@ -144,7 +147,8 @@ Respond in this exact JSON format:
     {
       "description": "detailed item description",
       "quantity": number,
-      "unit_price": number
+      "unit_price": number,
+      "hsn_code": "HSN code (4-8 digits)"
     }
   ]
 }`
@@ -164,11 +168,11 @@ Respond in this exact JSON format:
   "scope_of_work": "• Point 1: Description\n• Point 2: Description\n• Point 3: Description\n• Point 4: Description\n• Point 5: Description"
 }`
       } else {
-        // Single item description - generate title, description and pricing
-        systemPrompt = 'Generate a complete quotation with professional title, description, and appropriate pricing for the single item. IMPORTANT: Do NOT include GST, tax, or any tax-related items as separate line items.'
+        // Single item description - generate title, description, pricing, and HSN code
+        systemPrompt = 'Generate a complete quotation with professional title, description, appropriate pricing, and HSN code for the single item. IMPORTANT: Do NOT include GST, tax, or any tax-related items as separate line items.'
         prompt = `For this ONE specific item: "${description}"
 
-Generate a complete quotation with professional title, description, and appropriate pricing for this single item. Do NOT include GST or tax as separate line items.
+Generate a complete quotation with professional title, description, appropriate pricing, and Indian HSN code for this single item. Do NOT include GST or tax as separate line items.
 
 Respond in this exact JSON format:
 {
@@ -176,6 +180,7 @@ Respond in this exact JSON format:
   "description": "Brief project description",
   "quantity": number,
   "unit_price": number,
+  "hsn_code": "HSN code (4-8 digits)",
   "reasoning": "brief explanation for pricing"
 }`
       }
@@ -263,6 +268,7 @@ Respond in this exact JSON format:
         scope_of_work: suggestion.scope_of_work,
         quantity: suggestion.quantity || 1,
         unit_price: suggestion.unit_price || 0,
+        hsn_code: suggestion.hsn_code || '',
         reasoning: suggestion.reasoning || 'AI suggestion'
       }
     }

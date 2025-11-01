@@ -10,6 +10,7 @@ interface AIAutofillResult {
   reasoning?: string
   title?: string
   scope_of_work?: string
+  hsn_code?: string
 }
 
 export function useOpenAI() {
