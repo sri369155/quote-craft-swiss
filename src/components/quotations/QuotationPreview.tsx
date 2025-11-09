@@ -33,6 +33,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
   const [customer, setCustomer] = useState<Customer | null>(null)
   const [items, setItems] = useState<QuotationItem[]>([])
   const [loading, setLoading] = useState(false)
+  const [scopeLines, setScopeLines] = useState<string[]>([])
   
   // Custom images from database
   const [customImages, setCustomImages] = useState<CustomImage[]>([])
@@ -196,6 +197,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
       setQuotation(quotationData as Quotation)
       setCustomer(customerData as Customer)
       setItems(itemsData || [])
+      setScopeLines(formatScopeOfWork(quotationData.scope_of_work || ''))
     } catch (error: any) {
       toast({
         title: 'Error loading quotation',
@@ -265,6 +267,29 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
       tax_amount: taxAmount,
       total_amount: totalAmount
     } : null)
+  }
+
+  const updateScopeLine = (index: number, value: string) => {
+    const updatedLines = [...scopeLines]
+    updatedLines[index] = value
+    setScopeLines(updatedLines)
+    
+    // Update quotation scope_of_work
+    const updatedScopeOfWork = updatedLines.join('\n')
+    setQuotation(prev => prev ? { ...prev, scope_of_work: updatedScopeOfWork } : null)
+  }
+
+  const addScopeLine = () => {
+    setScopeLines([...scopeLines, ''])
+  }
+
+  const removeScopeLine = (index: number) => {
+    const updatedLines = scopeLines.filter((_, i) => i !== index)
+    setScopeLines(updatedLines)
+    
+    // Update quotation scope_of_work
+    const updatedScopeOfWork = updatedLines.join('\n')
+    setQuotation(prev => prev ? { ...prev, scope_of_work: updatedScopeOfWork } : null)
   }
 
   if (loading) {
@@ -929,12 +954,36 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
 
             {/* Scope of Work Section with Underlined Heading */}
             <div className="border border-gray-300 p-6">
-              <div className="mb-6">
-                <h3 className="font-bold text-xl underline text-center">SCOPE OF WORK</h3>
+              <div className="mb-6 flex items-center justify-between">
+                <h3 className="font-bold text-xl underline text-center flex-1">SCOPE OF WORK</h3>
+                <Button
+                  onClick={addScopeLine}
+                  variant="outline"
+                  size="sm"
+                  className="print:hidden"
+                >
+                  + Add Line
+                </Button>
               </div>
               <div className="text-sm space-y-2">
-                {formatScopeOfWork(quotation.scope_of_work).map((point, index) => (
-                  <div key={index} className="whitespace-pre-wrap leading-relaxed">{point}</div>
+                {scopeLines.map((line, index) => (
+                  <div key={index} className="flex gap-2 group">
+                    <Textarea
+                      value={line}
+                      onChange={(e) => updateScopeLine(index, e.target.value)}
+                      className="print:hidden min-h-[60px] text-sm leading-relaxed"
+                      placeholder="Enter scope of work item..."
+                    />
+                    <div className="hidden print:block whitespace-pre-wrap leading-relaxed flex-1">{line}</div>
+                    <Button
+                      onClick={() => removeScopeLine(index)}
+                      variant="ghost"
+                      size="sm"
+                      className="print:hidden opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      ✕
+                    </Button>
+                  </div>
                 ))}
               </div>
             </div>
