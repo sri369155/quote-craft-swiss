@@ -47,6 +47,7 @@ export default function QuotationBuilder({ quotationId, onSave, onCancel }: Quot
   const [selectedCustomerId, setSelectedCustomerId] = useState('')
   const [title, setTitle] = useState('')
   const [scopeOfWork, setScopeOfWork] = useState('')
+  const [scopeLines, setScopeLines] = useState<string[]>([''])
   const [items, setItems] = useState<QuotationItemForm[]>([
     { description: '', hsn_code: '', quantity: 1, unit_price: 0, line_total: 0 }
   ])
@@ -127,6 +128,11 @@ Example: Complete website development for restaurant including design, developme
       setSelectedCustomerId(quotation.customer_id)
       setTitle(quotation.title)
       setScopeOfWork(quotation.scope_of_work || '')
+      // Parse scope of work into lines
+      const parsedLines = quotation.scope_of_work 
+        ? quotation.scope_of_work.split('\n').filter(line => line.trim().length > 0)
+        : ['']
+      setScopeLines(parsedLines.length > 0 ? parsedLines : [''])
       setTaxRate(quotation.tax_rate)
       setValidUntil(quotation.valid_until || '')
       setStatus(quotation.status as 'draft' | 'sent' | 'accepted' | 'rejected')
@@ -183,6 +189,22 @@ Example: Complete website development for restaurant including design, developme
     })
   }, [])
 
+  const addScopeLine = () => {
+    setScopeLines([...scopeLines, ''])
+  }
+
+  const removeScopeLine = (index: number) => {
+    if (scopeLines.length > 1) {
+      setScopeLines(scopeLines.filter((_, i) => i !== index))
+    }
+  }
+
+  const updateScopeLine = (index: number, value: string) => {
+    const updatedLines = [...scopeLines]
+    updatedLines[index] = value
+    setScopeLines(updatedLines)
+  }
+
   const useBulkAIAutofill = async () => {
     if (!bulkAIText.trim()) {
       toast({
@@ -197,7 +219,12 @@ Example: Complete website development for restaurant including design, developme
     if (result) {
       // Fill basic information
       if (result.title) setTitle(result.title)
-      if (result.scope_of_work) setScopeOfWork(result.scope_of_work)
+      if (result.scope_of_work) {
+        setScopeOfWork(result.scope_of_work)
+        // Parse into lines
+        const parsedLines = result.scope_of_work.split('\n').filter((line: string) => line.trim().length > 0)
+        setScopeLines(parsedLines.length > 0 ? parsedLines : [''])
+      }
       
       // Fill line items with proper calculation
       if (result.items && result.items.length > 0) {
@@ -237,7 +264,11 @@ Example: Complete website development for restaurant including design, developme
     if (result) {
       // If result has title and scope_of_work, fill those too (for single items)
       if (result.title && !title.trim()) setTitle(result.title)
-      if (result.scope_of_work && !scopeOfWork.trim()) setScopeOfWork(result.scope_of_work)
+      if (result.scope_of_work && !scopeOfWork.trim()) {
+        setScopeOfWork(result.scope_of_work)
+        const parsedLines = result.scope_of_work.split('\n').filter((line: string) => line.trim().length > 0)
+        setScopeLines(parsedLines.length > 0 ? parsedLines : [''])
+      }
       
       // Update item with proper calculation including HSN code
       if (result.hsn_code) updateItem(itemIndex, 'hsn_code', result.hsn_code)
@@ -263,12 +294,15 @@ Example: Complete website development for restaurant including design, developme
 
     setSaving(true)
     try {
+      // Join scope lines into a single string
+      const scopeOfWorkText = scopeLines.filter(line => line.trim().length > 0).join('\n')
+      
       const quotationData = {
         user_id: user!.id,
         customer_id: selectedCustomerId,
         quotation_number: quotationId ? undefined : generateQuotationNumber(),
         title,
-        scope_of_work: scopeOfWork,
+        scope_of_work: scopeOfWorkText,
         status,
         subtotal,
         tax_rate: taxRate,
@@ -360,6 +394,9 @@ Example: Complete website development for restaurant including design, developme
     const result = await autofillItem(`Generate detailed scope of work for: ${title}`)
     if (result && result.scope_of_work) {
       setScopeOfWork(result.scope_of_work)
+      // Parse into lines
+      const parsedLines = result.scope_of_work.split('\n').filter((line: string) => line.trim().length > 0)
+      setScopeLines(parsedLines.length > 0 ? parsedLines : [''])
       toast({
         title: 'Scope of Work Generated',
         description: 'AI has generated a detailed scope of work for your project.',
@@ -545,26 +582,51 @@ Example: Complete website development for restaurant including design, developme
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="scopeOfWork">Scope of Work / Specifications</Label>
-                <div className="flex gap-2">
-                  <Textarea
-                    id="scopeOfWork"
-                    value={scopeOfWork}
-                    onChange={(e) => setScopeOfWork(e.target.value)}
-                    placeholder="Enter scope of work in point-wise format:&#10;• Point 1&#10;• Point 2&#10;• Point 3..."
-                    rows={6}
-                    className="flex-1"
-                  />
-                  <Button 
-                    onClick={() => generateScopeOfWork()} 
-                    disabled={aiLoading || !title.trim()}
-                    variant="outline"
-                    size="sm"
-                    className="bg-gradient-to-r from-pink-400 to-blue-400 hover:from-pink-500 hover:to-blue-500 text-white border-0"
-                  >
-                    <Sparkles className={`w-4 h-4 ${aiLoading ? 'animate-spin' : 'animate-bounce-gentle'}`} />
-                    {aiLoading ? 'Generating...' : 'AI Generate'}
-                  </Button>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="scopeOfWork">Scope of Work / Specifications</Label>
+                  <div className="flex gap-2">
+                    <Button 
+                      onClick={() => generateScopeOfWork()} 
+                      disabled={aiLoading || !title.trim()}
+                      variant="outline"
+                      size="sm"
+                      className="bg-gradient-to-r from-pink-400 to-blue-400 hover:from-pink-500 hover:to-blue-500 text-white border-0"
+                    >
+                      <Sparkles className={`w-4 h-4 ${aiLoading ? 'animate-spin' : 'animate-bounce-gentle'}`} />
+                      {aiLoading ? 'Generating...' : 'AI Generate'}
+                    </Button>
+                    <Button 
+                      onClick={addScopeLine}
+                      variant="outline"
+                      size="sm"
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      Add Line
+                    </Button>
+                  </div>
+                </div>
+                <div className="space-y-2 border rounded-md p-3 bg-muted/30">
+                  {scopeLines.map((line, index) => (
+                    <div key={index} className="flex gap-2 group">
+                      <Textarea
+                        value={line}
+                        onChange={(e) => updateScopeLine(index, e.target.value)}
+                        placeholder={`Scope item ${index + 1}...`}
+                        rows={2}
+                        className="flex-1 resize-none"
+                      />
+                      {scopeLines.length > 1 && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeScopeLine(index)}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity hover:bg-accent"
+                        >
+                          <Trash2 className="w-4 h-4 text-destructive" />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
 
