@@ -31,7 +31,7 @@ serve(async (req) => {
     // Format scope of work if present
     const scopeSection = quotation.scope_of_work ? `\n\nScope of Work:\n${quotation.scope_of_work}` : '';
 
-    // Create detailed prompt for the quotation image
+    // Create detailed prompt for the quotation image with consistent design template
     const prompt = `Create a professional business quotation document image with the following exact details:
 
 COMPANY INFORMATION (Top of document):
@@ -73,18 +73,25 @@ ${profile.company_address || "Company Address"}
 Phone: ${profile.company_phone || "Phone Number"}
 Email: ${profile.company_email || "Email Address"}
 
+SIGNATURE BLOCK (Bottom right corner):
+For ${profile.company_name || "Company Name"}
+[Authorized Signatory space]
+
 Design Requirements:
-- Professional and modern business document layout
+- CRITICAL: This design template must be CONSISTENT and IDENTICAL for all quotations
+- Professional and modern business document layout with fixed structure
 - Clean, well-organized sections with clear hierarchy
-- Company branding prominent at top with logo space
-- Clear itemized list with proper alignment
-- Financial summary highlighted and easy to read
+- Company branding prominent at top with elegant logo space
+- Clear itemized list table with proper alignment and borders
+- Financial summary highlighted in a box and easy to read
 - Terms and conditions in smaller text at bottom
-- Company footer with contact information
+- Company footer with contact information centered
+- Signature block at bottom right corner with "For ${profile.company_name || "Company Name"}" and space for authorized signatory
 - Indian Rupee (₹) currency formatting throughout
 - A4 size document format (portrait orientation)
-- Professional color scheme (blues, grays, whites)
-- High quality, print-ready resolution
+- Professional color scheme: Navy blue headers (#1e3a8a), light gray backgrounds (#f3f4f6), white content areas
+- High quality, print-ready resolution (300 DPI minimum)
+- Consistent fonts: Headers in bold, body text in regular weight
 - Ultra high resolution`;
 
     console.log("Generating quotation image with Lovable AI...");

@@ -25,48 +25,67 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    // Create a detailed prompt for the quotation image
-    const prompt = `Create a professional business quotation document image with the following details:
+    // Create detailed prompt for sample quotation with consistent design template
+    const prompt = `Create a professional business quotation document image with the following exact details:
 
-Company Information:
-- Company Name: ${companyName || "ABC Company"}
-- Slogan: ${companySlogan || "Your Trusted Partner"}
-- GST Number: ${gstNumber || "22AAAAA0000A1Z5"}
-- Address: ${companyAddress || "123 Business Street, City 400001"}
-- Phone: ${companyPhone || "+91 1234567890"}
-- Email: ${companyEmail || "info@company.com"}
+COMPANY INFORMATION (Top of document):
+Company Name: ${companyName || "ABC Company"}
+Tagline: ${companySlogan || "Your Trusted Partner"}
+GST Number: ${gstNumber || "22AAAAA0000A1Z5"}
 
-Quotation Details (Sample):
-- Quotation Number: QT-2024-001
-- Date: ${new Date().toLocaleDateString('en-IN')}
-- Valid Until: ${new Date(Date.now() + 30*24*60*60*1000).toLocaleDateString('en-IN')}
+QUOTATION DETAILS:
+Quotation Number: SAMPLE-001
+Date: ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+Valid Until: ${new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+Title: Sample Quotation
 
-Customer: Sample Customer Name
-Address: 456 Client Avenue, City 400002
+CUSTOMER DETAILS:
+Name: Sample Customer
+Address: Sample Address, City, State - 000000
+Phone: +91 0000000000
+Email: customer@example.com
 
-Items:
-1. Web Development Services - Qty: 1 - Rate: ₹50,000 - Amount: ₹50,000
-2. Digital Marketing Package - Qty: 1 - Rate: ₹30,000 - Amount: ₹30,000
-3. SEO Optimization - Qty: 1 - Rate: ₹20,000 - Amount: ₹20,000
+ITEMS/SERVICES:
+1. Product/Service Item 1 (HSN: 998314) - Qty: 1 - Rate: ₹10,000 - Amount: ₹10,000
+2. Product/Service Item 2 (HSN: 998315) - Qty: 2 - Rate: ₹5,000 - Amount: ₹10,000
+3. Product/Service Item 3 - Qty: 1 - Rate: ₹8,000 - Amount: ₹8,000
 
-Subtotal: ₹1,00,000
-GST (18%): ₹18,000
-Total: ₹1,18,000
+FINANCIAL SUMMARY:
+Subtotal: ₹28,000
+GST (18%): ₹5,040
+Grand Total: ₹33,040
+In Words: Thirty Three Thousand Forty Rupees Only
 
-Terms & Conditions:
-- Payment within 30 days
-- 50% advance required
+TERMS & CONDITIONS:
+- Payment within 30 days of invoice date
+- 50% advance payment required to start the project
 - Prices are inclusive of GST
+- Delivery as per agreed timeline
 
-The document should be:
-- Professional and modern design
-- Clean layout with proper spacing
-- Company branding prominent at top
-- Clear itemized list
-- Indian Rupee currency format
-- Professional business aesthetic
-- High quality and print-ready
-- A4 size document format
+COMPANY FOOTER:
+${companyAddress || "123 Business Street, City 400001"}
+Phone: ${companyPhone || "+91 1234567890"}
+Email: ${companyEmail || "info@company.com"}
+
+SIGNATURE BLOCK (Bottom right corner):
+For ${companyName || "ABC Company"}
+[Authorized Signatory space]
+
+Design Requirements:
+- CRITICAL: This design template must be CONSISTENT and IDENTICAL for all quotations
+- Professional and modern business document layout with fixed structure
+- Clean, well-organized sections with clear hierarchy
+- Company branding prominent at top with elegant logo space
+- Clear itemized list table with proper alignment and borders
+- Financial summary highlighted in a box and easy to read
+- Terms and conditions in smaller text at bottom
+- Company footer with contact information centered
+- Signature block at bottom right corner with "For ${companyName || "ABC Company"}" and space for authorized signatory
+- Indian Rupee (₹) currency formatting throughout
+- A4 size document format (portrait orientation)
+- Professional color scheme: Navy blue headers (#1e3a8a), light gray backgrounds (#f3f4f6), white content areas
+- High quality, print-ready resolution (300 DPI minimum)
+- Consistent fonts: Headers in bold, body text in regular weight
 - Ultra high resolution`;
 
     console.log("Generating sample quotation image with Lovable AI...");
