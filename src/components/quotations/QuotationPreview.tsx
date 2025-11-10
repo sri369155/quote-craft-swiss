@@ -244,7 +244,20 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
     if (!quotation || !customer) return
     
     try {
-      const imageUrl = await exportToImage(quotation, customer, items, profile || undefined)
+      // Get the selected custom image URLs
+      const headerUrl = selectedImages.header !== 'none' ? selectedImages.header : undefined
+      const footerUrl = selectedImages.footer !== 'none' ? selectedImages.footer : undefined
+      const signatureUrl = selectedImages.signature !== 'none' ? selectedImages.signature : undefined
+
+      const imageUrl = await exportToImage(
+        quotation, 
+        customer, 
+        items, 
+        profile || undefined,
+        headerUrl,
+        footerUrl,
+        signatureUrl
+      )
       if (imageUrl) {
         setGeneratedImageUrl(imageUrl)
       }

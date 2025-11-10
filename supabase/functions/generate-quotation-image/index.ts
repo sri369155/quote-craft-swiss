@@ -15,7 +15,10 @@ serve(async (req) => {
       quotation,
       customer,
       items,
-      profile
+      profile,
+      headerImageUrl,
+      footerImageUrl,
+      signatureImageUrl
     } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -81,20 +84,59 @@ Design Requirements:
 - CRITICAL: This design template must be CONSISTENT and IDENTICAL for all quotations
 - Professional and modern business document layout with fixed structure
 - Clean, well-organized sections with clear hierarchy
-- Company branding prominent at top with elegant logo space
+${headerImageUrl ? '- IMPORTANT: Use the provided header image at the top of the document exactly as shown' : '- Company branding prominent at top with elegant logo space'}
 - Clear itemized list table with proper alignment and borders
 - Financial summary highlighted in a box and easy to read
 - Terms and conditions in smaller text at bottom
-- Company footer with contact information centered
-- Signature block at bottom right corner with "For ${profile.company_name || "Company Name"}" and space for authorized signatory
+${footerImageUrl ? '- IMPORTANT: Use the provided footer image at the bottom of the document exactly as shown' : '- Company footer with contact information centered'}
+${signatureImageUrl ? '- IMPORTANT: Place the provided signature image at the bottom right corner exactly as shown' : '- Signature block at bottom right corner with "For ' + (profile.company_name || "Company Name") + '" and space for authorized signatory'}
 - Indian Rupee (₹) currency formatting throughout
 - A4 size document format (portrait orientation)
 - Professional color scheme: Navy blue headers (#1e3a8a), light gray backgrounds (#f3f4f6), white content areas
 - High quality, print-ready resolution (300 DPI minimum)
 - Consistent fonts: Headers in bold, body text in regular weight
-- Ultra high resolution`;
+- Ultra high resolution
+${headerImageUrl || footerImageUrl || signatureImageUrl ? '\n- CRITICAL: Incorporate the provided images seamlessly into the document maintaining their original quality and aspect ratio' : ''}`;
 
     console.log("Generating quotation image with Lovable AI...");
+
+    // Build content array with prompt and images
+    const contentArray: any[] = [
+      {
+        type: "text",
+        text: prompt
+      }
+    ];
+
+    // Add header image if provided
+    if (headerImageUrl) {
+      contentArray.push({
+        type: "image_url",
+        image_url: {
+          url: headerImageUrl
+        }
+      });
+    }
+
+    // Add footer image if provided
+    if (footerImageUrl) {
+      contentArray.push({
+        type: "image_url",
+        image_url: {
+          url: footerImageUrl
+        }
+      });
+    }
+
+    // Add signature image if provided
+    if (signatureImageUrl) {
+      contentArray.push({
+        type: "image_url",
+        image_url: {
+          url: signatureImageUrl
+        }
+      });
+    }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -107,7 +149,7 @@ Design Requirements:
         messages: [
           {
             role: "user",
-            content: prompt,
+            content: contentArray,
           },
         ],
         modalities: ["image", "text"],

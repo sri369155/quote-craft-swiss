@@ -11,7 +11,10 @@ export function useImageQuoteExport() {
     quotation: Quotation,
     customer: Customer,
     items: QuotationItem[],
-    userProfile?: Profile
+    userProfile?: Profile,
+    headerImageUrl?: string,
+    footerImageUrl?: string,
+    signatureImageUrl?: string
   ): Promise<string | null> => {
     setLoading(true)
     try {
@@ -20,7 +23,10 @@ export function useImageQuoteExport() {
           quotation,
           customer,
           items,
-          profile: userProfile
+          profile: userProfile,
+          headerImageUrl,
+          footerImageUrl,
+          signatureImageUrl
         }
       })
 
