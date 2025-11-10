@@ -3,5 +3,8 @@ project_id = "mxkxkydeluflivpfnyhf"
 [functions.generate-sample-quote]
 verify_jwt = true
 
+[functions.generate-quotation-image]
+verify_jwt = true
+
 [functions.openai-autofill]
 verify_jwt = true

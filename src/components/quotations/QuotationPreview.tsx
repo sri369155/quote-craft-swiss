@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { usePDFExport } from '@/hooks/usePDFExport'
+import { useImageQuoteExport } from '@/hooks/useImageQuoteExport'
 import {
   Dialog,
   DialogContent,
@@ -10,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Download, Printer } from 'lucide-react'
+import { Download, Printer, Image as ImageIcon } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { Quotation, Customer, QuotationItem, CustomImage } from '@/types/database'
 import { useToast } from '@/hooks/use-toast'
@@ -28,12 +29,14 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
   const { profile } = useAuth()
   const { toast } = useToast()
   const { exportToPDF, loading: pdfLoading } = usePDFExport()
+  const { exportToImage, downloadImage, loading: imageLoading } = useImageQuoteExport()
   
   const [quotation, setQuotation] = useState<Quotation | null>(null)
   const [customer, setCustomer] = useState<Customer | null>(null)
   const [items, setItems] = useState<QuotationItem[]>([])
   const [loading, setLoading] = useState(false)
   const [scopeLines, setScopeLines] = useState<string[]>([])
+  const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null)
   
   // Custom images from database
   const [customImages, setCustomImages] = useState<CustomImage[]>([])
@@ -212,23 +215,53 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
   const handleDownloadPreview = async () => {
     if (!quotation || !customer) return
     
+    // Check if user wants to use image design
+    if (profile?.use_image_design) {
+      await handleGenerateImage()
+    } else {
+      // Use PDF export
+      try {
+        // Create a modified profile object with selected images
+        const modifiedProfile = profile ? {
+          ...profile,
+          header_image_url: selectedImages.header !== 'none' ? selectedImages.header : null,
+          footer_image_url: selectedImages.footer !== 'none' ? selectedImages.footer : null,
+          signature_image_url: selectedImages.signature !== 'none' ? selectedImages.signature : null
+        } : undefined
+        
+        await exportToPDF(quotation, customer, items, modifiedProfile)
+      } catch (error: any) {
+        toast({
+          title: 'Export Error',
+          description: error.message || 'Failed to export PDF. Please try again.',
+          variant: 'destructive',
+        })
+      }
+    }
+  }
+
+  const handleGenerateImage = async () => {
+    if (!quotation || !customer) return
+    
     try {
-      // Create a modified profile object with selected images
-      const modifiedProfile = profile ? {
-        ...profile,
-        header_image_url: selectedImages.header !== 'none' ? selectedImages.header : null,
-        footer_image_url: selectedImages.footer !== 'none' ? selectedImages.footer : null,
-        signature_image_url: selectedImages.signature !== 'none' ? selectedImages.signature : null
-      } : undefined
-      
-      await exportToPDF(quotation, customer, items, modifiedProfile)
+      const imageUrl = await exportToImage(quotation, customer, items, profile || undefined)
+      if (imageUrl) {
+        setGeneratedImageUrl(imageUrl)
+      }
     } catch (error: any) {
       toast({
-        title: 'Export Error',
-        description: error.message || 'Failed to export PDF. Please try again.',
+        title: 'Image Generation Error',
+        description: error.message || 'Failed to generate image. Please try again.',
         variant: 'destructive',
       })
     }
+  }
+
+  const handleDownloadImage = async () => {
+    if (!generatedImageUrl || !quotation) return
+    
+    const filename = `quotation-${quotation.quotation_number}.png`
+    await downloadImage(generatedImageUrl, filename)
   }
 
   const handlePrint = () => {
@@ -313,27 +346,52 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
           <div className="flex items-center justify-between">
             <DialogTitle>Quotation Preview</DialogTitle>
             <div className="flex gap-2">
-              <Button
-                onClick={handlePrint}
-                variant="outline"
-              >
-                <Printer className="w-4 h-4 mr-2" />
-                Print
-              </Button>
-              <Button
-                onClick={handleDownloadPreview}
-                disabled={pdfLoading}
-                className="btn-primary"
-              >
-                <Download className={`w-4 h-4 mr-2 ${pdfLoading ? 'animate-spin' : ''}`} />
-                Download PDF
-              </Button>
+              {profile?.use_image_design ? (
+                <>
+                  {generatedImageUrl && (
+                    <Button
+                      onClick={handleDownloadImage}
+                      variant="outline"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Download Image
+                    </Button>
+                  )}
+                  <Button
+                    onClick={handleGenerateImage}
+                    disabled={imageLoading}
+                    className="btn-primary"
+                  >
+                    <ImageIcon className={`w-4 h-4 mr-2 ${imageLoading ? 'animate-spin' : ''}`} />
+                    {generatedImageUrl ? 'Regenerate Image' : 'Generate Image'}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    onClick={handlePrint}
+                    variant="outline"
+                  >
+                    <Printer className="w-4 h-4 mr-2" />
+                    Print
+                  </Button>
+                  <Button
+                    onClick={handleDownloadPreview}
+                    disabled={pdfLoading}
+                    className="btn-primary"
+                  >
+                    <Download className={`w-4 h-4 mr-2 ${pdfLoading ? 'animate-spin' : ''}`} />
+                    Download PDF
+                  </Button>
+                </>
+              )}
             </div>
           </div>
           
-          {/* Image Selection Controls */}
-          <div className="print:hidden border-t pt-4 mt-4">
-            <div className="text-sm font-medium mb-3">Select Images for PDF:</div>
+          {/* Image Selection Controls - only show for PDF mode */}
+          {!profile?.use_image_design && (
+            <div className="print:hidden border-t pt-4 mt-4">
+              <div className="text-sm font-medium mb-3">Select Images for PDF:</div>
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
                 <label className="text-xs font-medium">Header Image</label>
@@ -414,10 +472,12 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
               </div>
             </div>
           </div>
+          )}
           
-          {/* Spacing Controls */}
-          <div className="print:hidden border-t pt-4 mt-4">
-            <div className="text-sm font-medium mb-2">Adjust Spacing:</div>
+          {/* Spacing Controls - only show for PDF mode */}
+          {!profile?.use_image_design && (
+            <div className="print:hidden border-t pt-4 mt-4">
+              <div className="text-sm font-medium mb-2">Adjust Spacing:</div>
             <div className="grid grid-cols-4 gap-2 text-xs">
               <div className="flex items-center gap-1">
                 <label>Header:</label>
@@ -517,14 +577,40 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
               </div>
             </div>
           </div>
+          )}
         </DialogHeader>
 
-        {/* PDF-like Content - FIRST PAGE */}
-        <div className="bg-white p-8 print:p-0 print:page-break-after-auto" style={{
-          display: 'flex', 
-          flexDirection: 'column', 
-          gap: `${spacing.headerSpacing * 0.25}rem` 
-        }}>
+        {/* Show generated image if in image design mode */}
+        {profile?.use_image_design && generatedImageUrl ? (
+          <div className="bg-white p-4">
+            <div className="border border-border rounded-lg overflow-hidden">
+              <img 
+                src={generatedImageUrl} 
+                alt="Generated Quotation" 
+                className="w-full h-auto"
+              />
+            </div>
+            <div className="mt-4 text-center text-sm text-muted-foreground">
+              This is your AI-generated quotation image. You can download it using the button above.
+            </div>
+          </div>
+        ) : profile?.use_image_design ? (
+          <div className="bg-white p-8 text-center">
+            <div className="text-muted-foreground">
+              <ImageIcon className="w-12 h-12 mx-auto mb-4 opacity-50" />
+              <p className="text-lg font-medium mb-2">Generate AI Quotation Image</p>
+              <p className="text-sm">Click "Generate Image" button above to create a professional quotation image using AI.</p>
+            </div>
+          </div>
+        ) : null}
+
+        {/* PDF-like Content - FIRST PAGE (only show if NOT using image design or no image generated yet) */}
+        {!profile?.use_image_design && (
+          <div className="bg-white p-8 print:p-0 print:page-break-after-auto" style={{
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: `${spacing.headerSpacing * 0.25}rem` 
+          }}>
           {/* Header Section */}
           <div className="relative">
             {selectedImages.header && selectedImages.header !== 'none' ? (
@@ -899,14 +985,15 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
             )}
           </div>
         </div>
+        )}
 
         {/* PAGE BREAK - Only visible in print when there's a second page */}
-        {quotation.scope_of_work && (
+        {!profile?.use_image_design && quotation.scope_of_work && (
           <div className="print:page-break-before-always print:block hidden"></div>
         )}
 
         {/* SCOPE OF WORK - SEPARATE PAGE */}
-        {quotation.scope_of_work && (
+        {!profile?.use_image_design && quotation.scope_of_work && (
           <div className="bg-white p-8 print:p-0 print:pt-8 print:page-break-after-auto">
             {/* Header for Second Page */}
             <div className="relative mb-8">
