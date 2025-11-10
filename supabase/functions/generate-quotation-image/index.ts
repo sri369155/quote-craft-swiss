@@ -32,10 +32,10 @@ serve(async (req) => {
     ).join('\n');
 
     // Format scope of work if present
-    const scopeSection = quotation.scope_of_work ? `\n\nScope of Work:\n${quotation.scope_of_work}` : '';
+    const scopeSection = quotation.scope_of_work ? `\n\n--- PAGE 2: SCOPE OF WORK ---\n${quotation.scope_of_work}` : '';
 
     // Create detailed prompt for the quotation image with consistent design template
-    const prompt = `Create a professional business quotation document image with the following exact details:
+    const prompt = `Create a professional business quotation document image${quotation.scope_of_work ? ' (2 pages)' : ''} with the following exact details:
 
 COMPANY INFORMATION (Top of document):
 Company Name: ${profile.company_name || "Company Name"}
@@ -63,7 +63,6 @@ Subtotal: ₹${quotation.subtotal.toLocaleString('en-IN')}
 GST (${quotation.tax_rate}%): ₹${quotation.tax_amount.toLocaleString('en-IN')}
 Grand Total: ₹${quotation.total_amount.toLocaleString('en-IN')}
 In Words: ${numberToWords(quotation.total_amount)} Only
-${scopeSection}
 
 TERMS & CONDITIONS:
 - Payment within 30 days of invoice date
@@ -79,6 +78,7 @@ Email: ${profile.company_email || "Email Address"}
 SIGNATURE BLOCK (Bottom right corner):
 For ${profile.company_name || "Company Name"}
 [Authorized Signatory space]
+${scopeSection}
 
 Design Requirements:
 - CRITICAL: This design template must be CONSISTENT and IDENTICAL for all quotations
@@ -96,7 +96,8 @@ ${signatureImageUrl ? '- IMPORTANT: Place the provided signature image at the bo
 - High quality, print-ready resolution (300 DPI minimum)
 - Consistent fonts: Headers in bold, body text in regular weight
 - Ultra high resolution
-${headerImageUrl || footerImageUrl || signatureImageUrl ? '\n- CRITICAL: Incorporate the provided images seamlessly into the document maintaining their original quality and aspect ratio' : ''}`;
+${headerImageUrl || footerImageUrl || signatureImageUrl ? '\n- CRITICAL: Incorporate the provided images seamlessly into the document maintaining their original quality and aspect ratio' : ''}
+${quotation.scope_of_work ? '\n- CRITICAL: The Scope of Work section MUST appear on a separate PAGE 2 with the same header and footer from page 1. Page 1 ends after the signature block.' : ''}`;
 
     console.log("Generating quotation image with Lovable AI...");
 
