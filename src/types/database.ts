@@ -53,6 +53,8 @@ export interface Database {
           bank_ifsc_code: string | null
           bank_branch: string | null
           bank_account_type: string | null
+          use_image_design: boolean | null
+          sample_quote_image_url: string | null
           created_at: string
           updated_at: string
         }
@@ -75,6 +77,8 @@ export interface Database {
           bank_ifsc_code?: string | null
           bank_branch?: string | null
           bank_account_type?: string | null
+          use_image_design?: boolean | null
+          sample_quote_image_url?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -97,6 +101,8 @@ export interface Database {
           bank_ifsc_code?: string | null
           bank_branch?: string | null
           bank_account_type?: string | null
+          use_image_design?: boolean | null
+          sample_quote_image_url?: string | null
           created_at?: string
           updated_at?: string
         }

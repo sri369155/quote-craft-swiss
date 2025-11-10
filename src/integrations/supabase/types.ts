@@ -300,8 +300,10 @@ export type Database = {
           gst_number: string | null
           header_image_url: string | null
           id: string
+          sample_quote_image_url: string | null
           signature_image_url: string | null
           updated_at: string | null
+          use_image_design: boolean | null
         }
         Insert: {
           bank_account_number?: string | null
@@ -322,8 +324,10 @@ export type Database = {
           gst_number?: string | null
           header_image_url?: string | null
           id: string
+          sample_quote_image_url?: string | null
           signature_image_url?: string | null
           updated_at?: string | null
+          use_image_design?: boolean | null
         }
         Update: {
           bank_account_number?: string | null
@@ -344,8 +348,10 @@ export type Database = {
           gst_number?: string | null
           header_image_url?: string | null
           id?: string
+          sample_quote_image_url?: string | null
           signature_image_url?: string | null
           updated_at?: string | null
+          use_image_design?: boolean | null
         }
         Relationships: []
       }

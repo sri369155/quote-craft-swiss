@@ -6,13 +6,14 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { User, Save, ArrowLeft } from 'lucide-react'
+import { User, Save, ArrowLeft, Sparkles } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { useToast } from '@/hooks/use-toast'
 import ImageUpload from '@/components/profile/ImageUpload'
 import { Profile } from '@/types/database'
 import { Database } from '@/integrations/supabase/types'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
 
 type CustomImage = Database['public']['Tables']['custom_images']['Row']
 
@@ -21,6 +22,7 @@ export default function ProfileSettings() {
   const { user, profile, updateProfile } = useAuth()
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
+  const [generatingImage, setGeneratingImage] = useState(false)
   const [customImages, setCustomImages] = useState<CustomImage[]>([])
   const [formData, setFormData] = useState({
     full_name: '',
@@ -34,6 +36,8 @@ export default function ProfileSettings() {
     header_image_url: '',
     footer_image_url: '',
     signature_image_url: '',
+    use_image_design: false,
+    sample_quote_image_url: '',
   })
 
   // Load custom images from database
@@ -69,6 +73,8 @@ export default function ProfileSettings() {
         header_image_url: profile.header_image_url || '',
         footer_image_url: profile.footer_image_url || '',
         signature_image_url: profile.signature_image_url || '',
+        use_image_design: profile.use_image_design || false,
+        sample_quote_image_url: profile.sample_quote_image_url || '',
       })
     }
   }, [profile])
@@ -89,11 +95,13 @@ export default function ProfileSettings() {
         header_image_url: formData.header_image_url || null,
         footer_image_url: formData.footer_image_url || null,
         signature_image_url: formData.signature_image_url || null,
+        use_image_design: formData.use_image_design,
+        sample_quote_image_url: formData.sample_quote_image_url || null,
       })
 
       toast({
         title: 'Profile updated',
-        description: 'Your selected images have been saved successfully.',
+        description: 'Your settings have been saved successfully.',
       })
     } catch (error: any) {
       toast({
@@ -103,6 +111,44 @@ export default function ProfileSettings() {
       })
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleGenerateSampleQuote = async () => {
+    setGeneratingImage(true)
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-sample-quote', {
+        body: {
+          companyName: formData.company_name,
+          companySlogan: formData.company_slogan,
+          gstNumber: formData.gst_number,
+          companyAddress: formData.company_address,
+          companyPhone: formData.company_phone,
+          companyEmail: formData.company_email,
+        }
+      })
+
+      if (error) throw error
+
+      if (data.imageUrl) {
+        setFormData(prev => ({
+          ...prev,
+          sample_quote_image_url: data.imageUrl
+        }))
+        
+        toast({
+          title: 'Sample quote generated',
+          description: 'Your sample quotation image has been created successfully.',
+        })
+      }
+    } catch (error: any) {
+      toast({
+        title: 'Generation failed',
+        description: error.message,
+        variant: 'destructive',
+      })
+    } finally {
+      setGeneratingImage(false)
     }
   }
 
@@ -235,10 +281,57 @@ export default function ProfileSettings() {
                   placeholder="Complete company address"
                 />
               </div>
-              <Button onClick={handleSave} disabled={loading} className="btn-primary">
-                <Save className="w-4 h-4 mr-2" />
-                {loading ? 'Saving...' : 'Save Changes'}
-              </Button>
+              <div className="flex gap-4">
+                <Button onClick={handleSave} disabled={loading} className="btn-primary">
+                  <Save className="w-4 h-4 mr-2" />
+                  {loading ? 'Saving...' : 'Save Changes'}
+                </Button>
+                <Button 
+                  onClick={handleGenerateSampleQuote} 
+                  disabled={generatingImage || !formData.company_name}
+                  variant="outline"
+                >
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  {generatingImage ? 'Generating...' : 'Generate Sample Quote'}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Quote Design Method Selection */}
+          <Card className="gradient-card">
+            <CardHeader>
+              <CardTitle className="text-white">Quote Design Method</CardTitle>
+              <CardDescription className="text-white/80">
+                Choose between AI-generated image quotes or traditional PDF customization
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex items-center justify-between p-4 bg-background/20 rounded-lg">
+                <div className="space-y-1">
+                  <Label className="text-white font-medium">Use AI-Generated Image Design</Label>
+                  <p className="text-sm text-white/70">
+                    Generate professional quote images using AI instead of PDF templates
+                  </p>
+                </div>
+                <Switch
+                  checked={formData.use_image_design}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, use_image_design: checked }))}
+                />
+              </div>
+
+              {formData.sample_quote_image_url && (
+                <div className="space-y-2">
+                  <Label className="text-white">Sample Quote Preview</Label>
+                  <div className="border border-border rounded-lg overflow-hidden bg-background/20">
+                    <img 
+                      src={formData.sample_quote_image_url} 
+                      alt="Sample Quote" 
+                      className="w-full h-auto"
+                    />
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 
