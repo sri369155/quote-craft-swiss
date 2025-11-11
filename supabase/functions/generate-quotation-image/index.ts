@@ -31,85 +31,83 @@ serve(async (req) => {
       `${index + 1}. ${item.description}${item.hsn_code ? ` (HSN: ${item.hsn_code})` : ''} - Qty: ${item.quantity} - Rate: ₹${item.unit_price.toLocaleString('en-IN')} - Amount: ₹${item.line_total.toLocaleString('en-IN')}`
     ).join('\n');
 
-    // Create detailed prompt for the quotation image with consistent design template
-    const prompt = `Create a professional single-page business quotation document image with the following EXACT DESIGN AND STRUCTURE:
+    // Build company header section only if fields have values
+    let companyHeader = '';
+    if (!headerImageUrl) {
+      const headerParts = [];
+      if (profile.company_name) headerParts.push(`Company Name: ${profile.company_name}`);
+      if (profile.company_slogan) headerParts.push(`Tagline: ${profile.company_slogan}`);
+      if (profile.company_address) headerParts.push(`Address: ${profile.company_address}`);
+      if (profile.company_phone) headerParts.push(`Tel: ${profile.company_phone}`);
+      if (profile.company_email) headerParts.push(`Email: ${profile.company_email}`);
+      if (profile.gst_number) headerParts.push(`GSTIN: ${profile.gst_number}`);
+      
+      companyHeader = `TOP SECTION (Header):
+LEFT SIDE:
+${headerParts.join('\n')}
+RIGHT SIDE: Company logo`;
+    } else {
+      companyHeader = '--- USE PROVIDED HEADER IMAGE AT TOP ---';
+    }
+
+    // Build customer details only if fields have values
+    const customerDetails = [];
+    customerDetails.push(`M/S: ${customer.name}`);
+    if (customer.address) customerDetails.push(`Address: ${customer.address}`);
+    if (customer.phone) customerDetails.push(`PHONE: ${customer.phone}`);
+    if (customer.gst_number) customerDetails.push(`GSTIN: ${customer.gst_number}`);
+    if (customer.state) customerDetails.push(`Place of Supply: ${customer.state}`);
+
+    // Build quotation details only if fields have values
+    const quotationDetails = [];
+    quotationDetails.push(`Quotation No: ${quotation.quotation_number}`);
+    quotationDetails.push(`Quotation Date: ${new Date(quotation.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}`);
+    if (quotation.valid_until) quotationDetails.push(`Valid Until: ${new Date(quotation.valid_until).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}`);
+    if (customer.transport) quotationDetails.push(`Transport: ${customer.transport}`);
+    if (customer.transport_id) quotationDetails.push(`Transport ID: ${customer.transport_id}`);
+    if (customer.vehicle_number) quotationDetails.push(`Vehicle Number: ${customer.vehicle_number}`);
+
+    // Create detailed prompt for the quotation image
+    const prompt = `Create a professional single-page business quotation document image in A4 PORTRAIT orientation with the following EXACT DESIGN AND STRUCTURE:
 
 === LAYOUT STRUCTURE (MUST FOLLOW EXACTLY) ===
 
-${headerImageUrl ? '--- USE PROVIDED HEADER IMAGE AT TOP ---' : `TOP SECTION (Header with company logo on RIGHT):
-LEFT SIDE: Company name, tagline, address, Tel/Web/Email, GSTIN
-RIGHT SIDE: Company logo
-Company Name: ${profile.company_name || "Company Name"}
-Tagline: ${profile.company_slogan || "Manufacturing & Supply"}
-Address: ${profile.company_address || "Company Address"}
-Tel: ${profile.company_phone || "Phone"}
-Web: ${profile.company_email ? profile.company_email.split('@')[1] : "website.com"}
-Email: ${profile.company_email || "email@company.com"}
-GSTIN: ${profile.gst_number || "GST Number"}`}
+${companyHeader}
 
-CENTERED TITLE: "Quotation" (large, bold, centered with borders)
+CENTERED TITLE: "QUOTATION" (large, bold, centered with borders)
 
 TWO-COLUMN DETAILS SECTION (below title):
-LEFT COLUMN:
-  M/S: ${customer.name}
-  Address: ${customer.address || "Customer Address"}
-  PHONE: ${customer.phone || "Phone"}
-  GSTIN: ${customer.gst_number || "GSTIN"}
-  Place of Supply: ${customer.state || "State"}
+LEFT COLUMN (Customer Details):
+${customerDetails.join('\n')}
 
-RIGHT COLUMN (within bordered boxes):
-  Quotation Detail
-  Document Date: [Date]
-  Quotation Date: ${new Date(quotation.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
-  Reverse Charge: No
-  L.R. No: ${quotation.quotation_number}
-  Transport: ${customer.transport || "N/A"}
-  Transport ID: ${customer.transport_id || "N/A"}
-  Due Date: ${quotation.valid_until ? new Date(quotation.valid_until).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A'}
-  Vehicle Number: ${customer.vehicle_number || "N/A"}
+RIGHT COLUMN (Quotation Details in bordered box):
+${quotationDetails.join('\n')}
 
 ITEMS TABLE (full width, bordered):
 Columns: Sr. No. | Name of Product/Service | HSN/SAC | Qty | Rate | Taxable Value | IGST (% | Amount) | Total
 ${itemsList}
-Total Row: Total | [Total Qty] | | | [Subtotal] | [Tax Amount] | [Total]
+Total Row with bold text showing totals
 
-BOTTOM LEFT: "Total in words" (in bordered box)
+BOTTOM SECTION:
+"Total in words" (in bordered box):
 ${numberToWords(quotation.total_amount)} ONLY
 
-BOTTOM RIGHT: Financial Summary (bordered box):
-  Taxable Amount: ${quotation.subtotal.toLocaleString('en-IN')}
-  Add: IGST: 
-  Total Tax: ${quotation.tax_amount.toLocaleString('en-IN')}
-  Total Amount After Tax: ₹ ${quotation.total_amount.toLocaleString('en-IN')}
-
-BANK DETAILS (left side, bordered):
-Bank Name: ${profile.bank_name || "State Bank of India"}
-Branch Name: ${profile.bank_branch || "Branch Name"}
-Bank Account Number: ${profile.bank_account || "Account Number"}
-Bank Branch IFSC: ${profile.bank_ifsc || "IFSC Code"}
-
-TERMS AND CONDITIONS (left side below bank):
+TERMS AND CONDITIONS (below total in words):
 1. Our Responsibility Ceases as soon as goods leaves our Premises.
-2. Our Responsibility Ceases as soon as goods leaves our Premises.
-3. Goods once sold will not taken back
-4. Delivery Ex-Premises.
+2. Goods once sold will not taken back
+3. Delivery Ex-Premises.
 
-RIGHT SIDE (bottom):
-GST Payable on Reverse Charge: N.A.
-Certified that the particulars given above are true and correct.
-
+SIGNATURE SECTION (right side):
 For ${profile.company_name || "Company Name"}
 
 ${signatureImageUrl ? '--- USE PROVIDED SIGNATURE IMAGE HERE ---' : 'Authorized Signatory'}
 
-"This is computer generated invoice no signature required" (small text)
+"This is computer generated quotation no signature required" (small text at bottom)
 
 === CRITICAL DESIGN REQUIREMENTS ===
-- EXACT MATCH to reference design structure shown above
+- A4 PORTRAIT orientation (210mm x 297mm)
 - Table-based layout with clear borders and gridlines
 - Two-column format for customer and quotation details
-- Financial summary in bordered box on bottom right
-- Bank details and terms on bottom left
 - Professional invoice/quotation styling
 - Light blue/teal header background for company section
 - All text properly aligned within bordered cells
@@ -118,7 +116,9 @@ ${signatureImageUrl ? '--- USE PROVIDED SIGNATURE IMAGE HERE ---' : 'Authorized 
 - Indian Rupee (₹) symbol throughout
 - Professional fonts: Bold for headers, regular for content
 - High quality, print-ready resolution (300 DPI)
-- A4 portrait orientation
+- NO bank details section
+- NO separate financial summary box
+- Only include fields that have actual values
 ${headerImageUrl ? '- CRITICAL: Use provided header image at top - no overlapping text' : ''}
 ${footerImageUrl ? '- CRITICAL: Use provided footer image at bottom - no overlapping text' : ''}
 ${signatureImageUrl ? '- CRITICAL: Use provided signature image in signature area - no overlapping text' : ''}
