@@ -82,6 +82,16 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
     footerSpacing: 8
   })
 
+  // Style customization controls
+  const [styleCustomization, setStyleCustomization] = useState({
+    titleColor: '#000000',
+    tableBorderColor: '#d1d5db',
+    tableHeaderBgColor: '#f3f4f6',
+    tableFooterBgColor: '#f3f4f6',
+    companyNameColor: '#000000',
+    tableBorderSize: '1'
+  })
+
   // Image preference controls
   const [imagePreferences, setImagePreferences] = useState({
     useCustomHeader: !!profile?.header_image_url,
@@ -396,6 +406,116 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
             </div>
           </div>
           
+          {/* Style Customization Controls */}
+          {!profile?.use_image_design && (
+            <div className="print:hidden border-t pt-4 mt-4 mb-4">
+              <div className="text-sm font-medium mb-3">Customize Colors & Styles:</div>
+              <div className="grid grid-cols-3 gap-4 mb-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-medium">Title Color</label>
+                  <div className="flex items-center gap-2">
+                    <input 
+                      type="color" 
+                      value={styleCustomization.titleColor}
+                      onChange={(e) => setStyleCustomization(prev => ({ ...prev, titleColor: e.target.value }))}
+                      className="h-10 w-20 rounded border cursor-pointer"
+                    />
+                    <Input 
+                      value={styleCustomization.titleColor}
+                      onChange={(e) => setStyleCustomization(prev => ({ ...prev, titleColor: e.target.value }))}
+                      className="flex-1 h-10 text-xs font-mono"
+                      placeholder="#000000"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-xs font-medium">Company Name Color</label>
+                  <div className="flex items-center gap-2">
+                    <input 
+                      type="color" 
+                      value={styleCustomization.companyNameColor}
+                      onChange={(e) => setStyleCustomization(prev => ({ ...prev, companyNameColor: e.target.value }))}
+                      className="h-10 w-20 rounded border cursor-pointer"
+                    />
+                    <Input 
+                      value={styleCustomization.companyNameColor}
+                      onChange={(e) => setStyleCustomization(prev => ({ ...prev, companyNameColor: e.target.value }))}
+                      className="flex-1 h-10 text-xs font-mono"
+                      placeholder="#000000"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-xs font-medium">Table Border Color</label>
+                  <div className="flex items-center gap-2">
+                    <input 
+                      type="color" 
+                      value={styleCustomization.tableBorderColor}
+                      onChange={(e) => setStyleCustomization(prev => ({ ...prev, tableBorderColor: e.target.value }))}
+                      className="h-10 w-20 rounded border cursor-pointer"
+                    />
+                    <Input 
+                      value={styleCustomization.tableBorderColor}
+                      onChange={(e) => setStyleCustomization(prev => ({ ...prev, tableBorderColor: e.target.value }))}
+                      className="flex-1 h-10 text-xs font-mono"
+                      placeholder="#d1d5db"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-xs font-medium">Table Header Background</label>
+                  <div className="flex items-center gap-2">
+                    <input 
+                      type="color" 
+                      value={styleCustomization.tableHeaderBgColor}
+                      onChange={(e) => setStyleCustomization(prev => ({ ...prev, tableHeaderBgColor: e.target.value }))}
+                      className="h-10 w-20 rounded border cursor-pointer"
+                    />
+                    <Input 
+                      value={styleCustomization.tableHeaderBgColor}
+                      onChange={(e) => setStyleCustomization(prev => ({ ...prev, tableHeaderBgColor: e.target.value }))}
+                      className="flex-1 h-10 text-xs font-mono"
+                      placeholder="#f3f4f6"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-xs font-medium">Table Footer Background</label>
+                  <div className="flex items-center gap-2">
+                    <input 
+                      type="color" 
+                      value={styleCustomization.tableFooterBgColor}
+                      onChange={(e) => setStyleCustomization(prev => ({ ...prev, tableFooterBgColor: e.target.value }))}
+                      className="h-10 w-20 rounded border cursor-pointer"
+                    />
+                    <Input 
+                      value={styleCustomization.tableFooterBgColor}
+                      onChange={(e) => setStyleCustomization(prev => ({ ...prev, tableFooterBgColor: e.target.value }))}
+                      className="flex-1 h-10 text-xs font-mono"
+                      placeholder="#f3f4f6"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-xs font-medium">Table Border Size (px)</label>
+                  <Input 
+                    type="number"
+                    min="1"
+                    max="5"
+                    value={styleCustomization.tableBorderSize}
+                    onChange={(e) => setStyleCustomization(prev => ({ ...prev, tableBorderSize: e.target.value }))}
+                    className="h-10"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Image Selection Controls - only show for PDF mode */}
           {!profile?.use_image_design && (
             <div className="print:hidden border-t pt-4 mt-4">
@@ -659,9 +779,10 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                       <Input
                         value={editableText.companyName || profile?.company_name || 'BHAIRAVNEX'}
                         onChange={(e) => updateEditableText('companyName', e.target.value)}
+                        style={{ color: styleCustomization.companyNameColor }}
                         className="text-4xl font-bold bg-transparent border-0 p-0 text-foreground placeholder-foreground/70 print:hidden text-center underline"
                       />
-                      <h1 className="hidden print:block text-4xl font-bold underline">{editableText.companyName || profile?.company_name || 'BHAIRAVNEX'}</h1>
+                      <h1 className="hidden print:block text-4xl font-bold underline" style={{ color: styleCustomization.companyNameColor }}>{editableText.companyName || profile?.company_name || 'BHAIRAVNEX'}</h1>
                     </div>
                   </div>
                 </div>
@@ -681,7 +802,10 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
 
           {/* QUOTATION Label */}
           <div className="text-center" style={{ marginTop: `${spacing.quotationLabelSpacing * 0.25}rem` }}>
-            <div className="bg-black text-foreground px-6 py-2 inline-block font-bold text-lg">
+            <div 
+              className="text-foreground px-6 py-2 inline-block font-bold text-lg"
+              style={{ backgroundColor: styleCustomization.titleColor }}
+            >
               QUOTATION
             </div>
           </div>
@@ -745,9 +869,23 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
           </div>
 
           {/* Items Table */}
-          <div className="border border-gray-300" style={{ marginTop: `${spacing.tableSpacing * 0.25}rem` }}>
+          <div 
+            className="border" 
+            style={{ 
+              marginTop: `${spacing.tableSpacing * 0.25}rem`,
+              borderColor: styleCustomization.tableBorderColor,
+              borderWidth: `${styleCustomization.tableBorderSize}px`
+            }}
+          >
             {/* Table Header */}
-            <div className="bg-gray-100 grid grid-cols-12 border-b font-bold text-sm p-3">
+            <div 
+              className="grid grid-cols-12 border-b font-bold text-sm p-3"
+              style={{ 
+                backgroundColor: styleCustomization.tableHeaderBgColor,
+                borderColor: styleCustomization.tableBorderColor,
+                borderWidth: `${styleCustomization.tableBorderSize}px`
+              }}
+            >
               <div className="col-span-5">Description</div>
               <div className="col-span-1 text-center">Qty</div>
               <div className="col-span-2 text-center">Rate</div>
@@ -762,7 +900,14 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
               const itemTotal = itemSubtotal + gstAmount
               
               return (
-                <div key={item.id} className={`grid grid-cols-12 border-b text-sm p-3 ${index % 2 === 1 ? 'bg-gray-50' : ''}`}>
+                <div 
+                  key={item.id} 
+                  className={`grid grid-cols-12 border-b text-sm p-3 ${index % 2 === 1 ? 'bg-gray-50' : ''}`}
+                  style={{ 
+                    borderColor: styleCustomization.tableBorderColor,
+                    borderWidth: `${styleCustomization.tableBorderSize}px`
+                  }}
+                >
                   <div className="col-span-5 pr-2">
                     {/* Editable description with hover card */}
                     <HoverCard>
@@ -821,7 +966,14 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
             })}
 
             {/* Subtotal Row */}
-            <div className="bg-gray-100 grid grid-cols-12 border-b font-bold text-sm p-3">
+            <div 
+              className="grid grid-cols-12 border-b font-bold text-sm p-3"
+              style={{ 
+                backgroundColor: styleCustomization.tableFooterBgColor,
+                borderColor: styleCustomization.tableBorderColor,
+                borderWidth: `${styleCustomization.tableBorderSize}px`
+              }}
+            >
               <div className="col-span-5 flex items-center">Sub Total</div>
               <div className="col-span-1"></div>
               <div className="col-span-2"></div>
@@ -831,7 +983,14 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
           </div>
 
           {/* Grand Total Section */}
-          <div className="grid grid-cols-2 border border-gray-300 text-sm" style={{ marginTop: `${spacing.totalSpacing * 0.25}rem` }}>
+          <div 
+            className="grid grid-cols-2 border text-sm" 
+            style={{ 
+              marginTop: `${spacing.totalSpacing * 0.25}rem`,
+              borderColor: styleCustomization.tableBorderColor,
+              borderWidth: `${styleCustomization.tableBorderSize}px`
+            }}
+          >
             <div className="p-3 border-r">
               {/* Editable grand total text */}
               <Input
@@ -1030,7 +1189,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                       
                       {/* Company Name */}
                       <div className="text-center">
-                        <h1 className="text-4xl font-bold underline">{editableText.companyName || profile?.company_name || 'BHAIRAVNEX'}</h1>
+                        <h1 className="text-4xl font-bold underline" style={{ color: styleCustomization.companyNameColor }}>{editableText.companyName || profile?.company_name || 'BHAIRAVNEX'}</h1>
                       </div>
                     </div>
                   </div>
@@ -1044,9 +1203,20 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
             </div>
 
             {/* Scope of Work Section with Underlined Heading */}
-            <div className="border border-gray-300 p-6">
+            <div 
+              className="border p-6"
+              style={{ 
+                borderColor: styleCustomization.tableBorderColor,
+                borderWidth: `${styleCustomization.tableBorderSize}px`
+              }}
+            >
               <div className="mb-6 flex items-center justify-between">
-                <h3 className="font-bold text-xl underline text-center flex-1">SCOPE OF WORK</h3>
+                <h3 
+                  className="font-bold text-xl underline text-center flex-1"
+                  style={{ color: styleCustomization.titleColor }}
+                >
+                  SCOPE OF WORK
+                </h3>
                 <Button
                   onClick={addScopeLine}
                   variant="outline"
