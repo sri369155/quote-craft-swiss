@@ -206,45 +206,50 @@ export default function Quotations() {
       const pdfBlob = await generatePDFBlob(quotation as Quotation, customer, items || [], profile || undefined)
       const pdfFile = new File([pdfBlob], `quotation-${quotation.quotation_number}.pdf`, { type: 'application/pdf' })
 
-      // Try to share the PDF file using Web Share API (works on mobile)
-      if (navigator.share && navigator.canShare?.({ files: [pdfFile] })) {
+      // Prepare WhatsApp message
+      const message = `Hi ${customer.name}! 📄\n\nPlease find the quotation for:\n\n📋 ${quotation.title}\n💰 Amount: ${formatCurrency(quotation.total_amount)}`
+
+      // Try Web Share API first (most reliable for mobile)
+      if (navigator.share) {
         try {
           await navigator.share({
             files: [pdfFile],
             title: `Quotation ${quotation.quotation_number}`,
-            text: `${quotation.title}\nAmount: ${formatCurrency(quotation.total_amount)}`,
+            text: message,
           })
           
           toast({
-            title: 'Success',
-            description: 'PDF shared successfully',
+            title: 'Success! ✅',
+            description: 'PDF shared successfully to WhatsApp',
           })
           return
         } catch (shareError: any) {
-          // User cancelled or share failed, continue to download
-          if (shareError.name !== 'AbortError') {
-            console.error('Share failed:', shareError)
+          // If user didn't cancel, try fallback method
+          if (shareError.name === 'AbortError') {
+            return // User cancelled, do nothing
           }
+          console.error('Web Share failed, trying fallback:', shareError)
         }
       }
 
-      // Download the PDF
-      const url = URL.createObjectURL(pdfBlob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `quotation-${quotation.quotation_number}.pdf`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
+      // Fallback: Create blob URL and download PDF
+      const blobUrl = URL.createObjectURL(pdfBlob)
+      
+      // Download PDF first
+      const downloadLink = document.createElement('a')
+      downloadLink.href = blobUrl
+      downloadLink.download = `quotation-${quotation.quotation_number}.pdf`
+      document.body.appendChild(downloadLink)
+      downloadLink.click()
+      document.body.removeChild(downloadLink)
 
-      // Wait a moment for download to start
-      await new Promise(resolve => setTimeout(resolve, 500))
+      // Wait for download to complete
+      await new Promise(resolve => setTimeout(resolve, 1000))
 
-      // Open WhatsApp with instructions
-      const message = `Hi ${customer.name}! 📄\n\nPlease find the quotation attached:\n\n📋 ${quotation.title}\n💰 Amount: ${formatCurrency(quotation.total_amount)}\n\n*Please attach the downloaded PDF file to this chat*`
-      const encodedMessage = encodeURIComponent(message)
+      // Open WhatsApp with message and PDF attachment instructions
       const customerPhone = customer.phone ? customer.phone.replace(/[^0-9]/g, '') : ''
+      const whatsappMessage = `${message}\n\n📎 *Quotation PDF is downloading - please attach it to this chat*`
+      const encodedMessage = encodeURIComponent(whatsappMessage)
       
       const whatsappUrl = customerPhone 
         ? `https://wa.me/${customerPhone}?text=${encodedMessage}`
@@ -253,10 +258,31 @@ export default function Quotations() {
       window.open(whatsappUrl, '_blank')
 
       toast({
-        title: 'PDF Downloaded',
-        description: 'PDF downloaded. Opening WhatsApp - please attach the file manually.',
-        duration: 5000,
+        title: 'PDF Ready! 📄',
+        description: (
+          <div className="flex flex-col gap-2">
+            <p>PDF downloaded! Opening WhatsApp...</p>
+            <button
+              onClick={() => {
+                const link = document.createElement('a')
+                link.href = blobUrl
+                link.download = `quotation-${quotation.quotation_number}.pdf`
+                document.body.appendChild(link)
+                link.click()
+                document.body.removeChild(link)
+              }}
+              className="text-sm font-medium text-primary hover:underline text-left"
+            >
+              📥 Download PDF Again
+            </button>
+          </div>
+        ),
+        duration: 10000,
       })
+
+      // Clean up blob URL after a delay
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 15000)
+
     } catch (error: any) {
       toast({
         title: 'Share Error',
