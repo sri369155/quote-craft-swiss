@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Download, Printer, Image as ImageIcon } from 'lucide-react'
+import { Download, Printer, Image as ImageIcon, MessageCircle } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { Quotation, Customer, QuotationItem, CustomImage } from '@/types/database'
 import { useToast } from '@/hooks/use-toast'
@@ -286,6 +286,46 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
     window.print()
   }
 
+  const handleWhatsAppShare = async () => {
+    if (!quotation || !customer) return
+    
+    try {
+      const formatCurrency = (amount: number) => {
+        return new Intl.NumberFormat('en-IN', {
+          style: 'currency',
+          currency: 'INR',
+        }).format(amount)
+      }
+
+      const message = `Check out this quotation: ${quotation.quotation_number}\n\nTitle: ${quotation.title}\nAmount: ${formatCurrency(quotation.total_amount)}\n\nPlease download the PDF for full details.`
+      
+      // Try Web Share API first (works on mobile)
+      if (navigator.share) {
+        await navigator.share({
+          title: `Quotation ${quotation.quotation_number}`,
+          text: message,
+        })
+      } else {
+        // Fallback to WhatsApp Web
+        const encodedMessage = encodeURIComponent(message)
+        window.open(`https://wa.me/?text=${encodedMessage}`, '_blank')
+      }
+
+      toast({
+        title: 'Share via WhatsApp',
+        description: 'Opening WhatsApp...',
+      })
+    } catch (error: any) {
+      if (error.name !== 'AbortError') {
+        toast({
+          title: 'Share Error',
+          description: error.message || 'Failed to share. Please try again.',
+          variant: 'destructive',
+        })
+      }
+    }
+  }
+
   const updateQuotationField = (field: keyof Quotation, value: any) => {
     if (!quotation) return
     setQuotation({ ...quotation, [field]: value })
@@ -386,6 +426,13 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                 </>
               ) : (
                 <>
+                  <Button
+                    onClick={handleWhatsAppShare}
+                    variant="outline"
+                  >
+                    <MessageCircle className="w-4 h-4 mr-2" />
+                    WhatsApp
+                  </Button>
                   <Button
                     onClick={handlePrint}
                     variant="outline"

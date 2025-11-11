@@ -26,6 +26,7 @@ import {
   Settings,
   ArrowLeft,
   IndianRupee,
+  MessageCircle,
 } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { Quotation, Customer, QuotationItem } from '@/types/database'
@@ -142,6 +143,51 @@ export default function Quotations() {
         description: error.message || 'Failed to export PDF. Please try again.',
         variant: 'destructive',
       })
+    }
+  }
+
+  const handleWhatsAppShare = async (quotationId: string) => {
+    try {
+      const { data: quotation, error: quotationError } = await supabase
+        .from('quotations')
+        .select('*')
+        .eq('id', quotationId)
+        .single()
+      if (quotationError) throw quotationError
+
+      const { data: customer, error: customerError } = await supabase
+        .from('customers')
+        .select('*')
+        .eq('id', quotation.customer_id)
+        .single()
+      if (customerError) throw customerError
+
+      const message = `Check out this quotation: ${quotation.quotation_number}\n\nTitle: ${quotation.title}\nAmount: ${formatCurrency(quotation.total_amount)}\n\nPlease download the PDF for full details.`
+      
+      // Try Web Share API first (works on mobile)
+      if (navigator.share) {
+        await navigator.share({
+          title: `Quotation ${quotation.quotation_number}`,
+          text: message,
+        })
+      } else {
+        // Fallback to WhatsApp Web
+        const encodedMessage = encodeURIComponent(message)
+        window.open(`https://wa.me/?text=${encodedMessage}`, '_blank')
+      }
+
+      toast({
+        title: 'Share via WhatsApp',
+        description: 'Opening WhatsApp...',
+      })
+    } catch (error: any) {
+      if (error.name !== 'AbortError') {
+        toast({
+          title: 'Share Error',
+          description: error.message || 'Failed to share. Please try again.',
+          variant: 'destructive',
+        })
+      }
     }
   }
 
@@ -440,6 +486,19 @@ export default function Quotations() {
                               </Button>
                             </TooltipTrigger>
                             <TooltipContent>Generate Invoice</TooltipContent>
+                          </Tooltip>
+                          
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="orange"
+                                size="sm"
+                                onClick={() => handleWhatsAppShare(quotation.id)}
+                              >
+                                <MessageCircle className="w-4 h-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Share on WhatsApp</TooltipContent>
                           </Tooltip>
                         </div>
                         
