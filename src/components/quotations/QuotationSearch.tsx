@@ -59,10 +59,12 @@ export default function QuotationSearch({
 
       if (customersError) throw customersError
 
-      // Get all quotation items
+      // Get all quotation items for user's quotations
+      const quotationIds = quotations.map(q => q.id)
       const { data: items, error: itemsError } = await supabase
         .from('quotation_items')
         .select('*')
+        .in('quotation_id', quotationIds)
         .order('created_at')
 
       if (itemsError) throw itemsError
