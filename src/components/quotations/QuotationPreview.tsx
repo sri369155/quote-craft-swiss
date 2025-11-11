@@ -252,7 +252,16 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
             <div className="flex flex-col gap-2">
               <p>Saved to your Downloads folder</p>
               <button
-                onClick={() => window.open(pdfUrl, '_blank')}
+                onClick={() => {
+                  // Create temporary link and click it for better mobile compatibility
+                  const link = document.createElement('a')
+                  link.href = pdfUrl
+                  link.target = '_blank'
+                  link.rel = 'noopener noreferrer'
+                  document.body.appendChild(link)
+                  link.click()
+                  document.body.removeChild(link)
+                }}
                 className="text-sm font-medium text-primary hover:underline text-left"
               >
                 📂 Open PDF
