@@ -215,28 +215,23 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
   const handleDownloadPreview = async () => {
     if (!quotation || !customer) return
     
-    // Check if user wants to use image design
-    if (profile?.use_image_design) {
-      await handleGenerateImage()
-    } else {
-      // Use PDF export
-      try {
-        // Create a modified profile object with selected images
-        const modifiedProfile = profile ? {
-          ...profile,
-          header_image_url: selectedImages.header !== 'none' ? selectedImages.header : null,
-          footer_image_url: selectedImages.footer !== 'none' ? selectedImages.footer : null,
-          signature_image_url: selectedImages.signature !== 'none' ? selectedImages.signature : null
-        } : undefined
-        
-        await exportToPDF(quotation, customer, items, modifiedProfile)
-      } catch (error: any) {
-        toast({
-          title: 'Export Error',
-          description: error.message || 'Failed to export PDF. Please try again.',
-          variant: 'destructive',
-        })
-      }
+    // Always use PDF export with selected images
+    try {
+      // Create a modified profile object with selected images
+      const modifiedProfile = profile ? {
+        ...profile,
+        header_image_url: selectedImages.header !== 'none' ? selectedImages.header : null,
+        footer_image_url: selectedImages.footer !== 'none' ? selectedImages.footer : null,
+        signature_image_url: selectedImages.signature !== 'none' ? selectedImages.signature : null
+      } : undefined
+      
+      await exportToPDF(quotation, customer, items, modifiedProfile)
+    } catch (error: any) {
+      toast({
+        title: 'Export Error',
+        description: error.message || 'Failed to export PDF. Please try again.',
+        variant: 'destructive',
+      })
     }
   }
 
