@@ -126,17 +126,28 @@ export function usePDFExport() {
       pdf.setTextColor(titleRgb.r, titleRgb.g, titleRgb.b)
       pdf.setFontSize(18)
       pdf.setFont('helvetica', 'bold')
-      pdf.text('QUOTATION', pageWidth / 2, yPosition + (spacing.quotationLabelSpacing || 8), { align: 'center' })
-
-      yPosition += (spacing.detailsSpacing || 15)
+      const quotationY = yPosition + (spacing.quotationLabelSpacing || 8)
+      pdf.text('QUOTATION', pageWidth / 2, quotationY, { align: 'center' })
       
-      // Quotation details
+      // Add underline to QUOTATION
+      const quotationTextWidth = pdf.getTextWidth('QUOTATION')
+      pdf.setLineWidth(0.5)
+      pdf.line(
+        (pageWidth - quotationTextWidth) / 2,
+        quotationY + 1,
+        (pageWidth + quotationTextWidth) / 2,
+        quotationY + 1
+      )
+
+      // Two lines spacing below heading
+      yPosition = quotationY + 12
+      
+      // Quotation details - Number and Date on one line
       pdf.setTextColor(0, 0, 0)
       pdf.setFont('helvetica', 'normal')
       pdf.setFontSize(11)
       
-      pdf.text(`Quotation No.: ${quotation.quotation_number}`, 15, yPosition)
-      pdf.text(`Date: ${new Date(quotation.created_at).toLocaleDateString('en-GB')}`, pageWidth - 15, yPosition, { align: 'right' })
+      pdf.text(`Quotation No.: ${quotation.quotation_number}     Date: ${new Date(quotation.created_at).toLocaleDateString('en-GB')}`, 15, yPosition)
       
       yPosition += 12
       pdf.text(text.salutation || 'Dear Sir,', 15, yPosition)
