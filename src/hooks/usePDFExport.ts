@@ -30,7 +30,7 @@ export function usePDFExport() {
     customer: Customer,
     items: QuotationItem[],
     userProfile?: Profile
-  ) => {
+  ): Promise<string | null> => {
     setLoading(true)
     try {
       const pdf = new jsPDF()
@@ -254,19 +254,27 @@ export function usePDFExport() {
         addFooterToPage(pdf, pageWidth, pageHeight, footerImage, userProfile)
       }
       
-      // Save the PDF
-      pdf.save(`quotation-${quotation.quotation_number}.pdf`)
+      // Generate unique filename with timestamp and customer name
+      const timestamp = new Date().toISOString().split('T')[0].replace(/-/g, '')
+      const customerName = customer.name.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 20)
+      const filename = `${quotation.quotation_number}_${customerName}_${timestamp}.pdf`
       
-      toast({
-        title: 'PDF Generated',
-        description: 'Quotation PDF has been downloaded successfully with your custom format.',
-      })
+      // Save the PDF
+      pdf.save(filename)
+      
+      // Create blob URL for opening
+      const pdfBlob = pdf.output('blob')
+      const blobUrl = URL.createObjectURL(pdfBlob)
+      
+      // Return the blob URL so it can be used to open the PDF
+      return blobUrl
     } catch (error: any) {
       toast({
         title: 'PDF Export Error',
         description: error.message || 'Failed to generate PDF. Please try again.',
         variant: 'destructive',
       })
+      return null
     } finally {
       setLoading(false)
     }

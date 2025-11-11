@@ -136,7 +136,26 @@ export default function Quotations() {
         .order('created_at')
       if (itemsError) throw itemsError
 
-      await exportToPDF(quotation as Quotation, customer, items || [], profile || undefined)
+      const pdfUrl = await exportToPDF(quotation as Quotation, customer, items || [], profile || undefined)
+      
+      if (pdfUrl) {
+        // Show success toast with action to open PDF
+        toast({
+          title: 'PDF Downloaded Successfully! 📄',
+          description: (
+            <div className="flex flex-col gap-2">
+              <p>Saved to your Downloads folder</p>
+              <button
+                onClick={() => window.open(pdfUrl, '_blank')}
+                className="text-sm font-medium text-primary hover:underline text-left"
+              >
+                📂 Open PDF
+              </button>
+            </div>
+          ),
+          duration: 8000,
+        })
+      }
     } catch (error: any) {
       toast({
         title: 'Export Error',

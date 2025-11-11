@@ -235,7 +235,26 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
         signature_image_url: selectedImages.signature !== 'none' ? selectedImages.signature : null
       } : undefined
       
-      await exportToPDF(quotation, customer, items, modifiedProfile)
+      const pdfUrl = await exportToPDF(quotation, customer, items, modifiedProfile)
+      
+      if (pdfUrl) {
+        // Show success toast with action to open PDF
+        toast({
+          title: 'PDF Downloaded Successfully! 📄',
+          description: (
+            <div className="flex flex-col gap-2">
+              <p>Saved to your Downloads folder</p>
+              <button
+                onClick={() => window.open(pdfUrl, '_blank')}
+                className="text-sm font-medium text-primary hover:underline text-left"
+              >
+                📂 Open PDF
+              </button>
+            </div>
+          ),
+          duration: 8000,
+        })
+      }
     } catch (error: any) {
       toast({
         title: 'Export Error',
