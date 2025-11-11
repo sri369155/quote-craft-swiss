@@ -164,30 +164,27 @@ export default function Quotations() {
 
       const message = `Check out this quotation: ${quotation.quotation_number}\n\nTitle: ${quotation.title}\nAmount: ${formatCurrency(quotation.total_amount)}\n\nPlease download the PDF for full details.`
       
-      // Try Web Share API first (works on mobile)
-      if (navigator.share) {
-        await navigator.share({
-          title: `Quotation ${quotation.quotation_number}`,
-          text: message,
-        })
-      } else {
-        // Fallback to WhatsApp Web
-        const encodedMessage = encodeURIComponent(message)
-        window.open(`https://wa.me/?text=${encodedMessage}`, '_blank')
-      }
+      // Use WhatsApp Web directly for better compatibility
+      const encodedMessage = encodeURIComponent(message)
+      const customerPhone = customer.phone ? customer.phone.replace(/[^0-9]/g, '') : ''
+      
+      // If customer has a phone number, use it; otherwise just open WhatsApp
+      const whatsappUrl = customerPhone 
+        ? `https://wa.me/${customerPhone}?text=${encodedMessage}`
+        : `https://wa.me/?text=${encodedMessage}`
+      
+      window.open(whatsappUrl, '_blank')
 
       toast({
-        title: 'Share via WhatsApp',
-        description: 'Opening WhatsApp...',
+        title: 'Opening WhatsApp',
+        description: 'WhatsApp will open in a new window',
       })
     } catch (error: any) {
-      if (error.name !== 'AbortError') {
-        toast({
-          title: 'Share Error',
-          description: error.message || 'Failed to share. Please try again.',
-          variant: 'destructive',
-        })
-      }
+      toast({
+        title: 'Share Error',
+        description: error.message || 'Failed to share. Please try again.',
+        variant: 'destructive',
+      })
     }
   }
 
