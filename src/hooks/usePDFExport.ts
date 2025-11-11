@@ -742,8 +742,10 @@ export function usePDFExport() {
       Math.floor(availableWidth * 0.08), // Qty - 8%
       Math.floor(availableWidth * 0.18), // Rate - 18%
       Math.floor(availableWidth * 0.18), // GST Amount - 18%
-      Math.floor(availableWidth * 0.16)  // Total - 16%
     ]
+    // Calculate last column width as remainder to ensure exact fit
+    const usedWidth = colWidths.reduce((sum, w) => sum + w, 0)
+    colWidths.push(availableWidth - usedWidth) // Total column
     
     const colPositions = [pageMargin]
     for (let i = 1; i < colWidths.length; i++) {
