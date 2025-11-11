@@ -32,71 +32,98 @@ serve(async (req) => {
     ).join('\n');
 
     // Create detailed prompt for the quotation image with consistent design template
-    const prompt = `Create a professional single-page business quotation document image with the following exact details:
+    const prompt = `Create a professional single-page business quotation document image with the following EXACT DESIGN AND STRUCTURE:
 
-${headerImageUrl ? '--- USE PROVIDED HEADER IMAGE AT TOP ---' : `COMPANY INFORMATION (Top of document):
+=== LAYOUT STRUCTURE (MUST FOLLOW EXACTLY) ===
+
+${headerImageUrl ? '--- USE PROVIDED HEADER IMAGE AT TOP ---' : `TOP SECTION (Header with company logo on RIGHT):
+LEFT SIDE: Company name, tagline, address, Tel/Web/Email, GSTIN
+RIGHT SIDE: Company logo
 Company Name: ${profile.company_name || "Company Name"}
-Tagline: ${profile.company_slogan || "Your Business Tagline"}
-GST Number: ${profile.gst_number || "GST Number"}`}
+Tagline: ${profile.company_slogan || "Manufacturing & Supply"}
+Address: ${profile.company_address || "Company Address"}
+Tel: ${profile.company_phone || "Phone"}
+Web: ${profile.company_email ? profile.company_email.split('@')[1] : "website.com"}
+Email: ${profile.company_email || "email@company.com"}
+GSTIN: ${profile.gst_number || "GST Number"}`}
 
-QUOTATION DETAILS:
-Quotation Number: ${quotation.quotation_number}
-Date: ${new Date(quotation.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
-Valid Until: ${quotation.valid_until ? new Date(quotation.valid_until).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A'}
-Title: ${quotation.title}
-${quotation.description ? `Description: ${quotation.description}` : ''}
+CENTERED TITLE: "Quotation" (large, bold, centered with borders)
 
-CUSTOMER DETAILS:
-Name: ${customer.name}
-${customer.address ? `Address: ${customer.address}` : ''}
-${customer.phone ? `Phone: ${customer.phone}` : ''}
-${customer.email ? `Email: ${customer.email}` : ''}
+TWO-COLUMN DETAILS SECTION (below title):
+LEFT COLUMN:
+  M/S: ${customer.name}
+  Address: ${customer.address || "Customer Address"}
+  PHONE: ${customer.phone || "Phone"}
+  GSTIN: ${customer.gst_number || "GSTIN"}
+  Place of Supply: ${customer.state || "State"}
 
-ITEMS/SERVICES:
+RIGHT COLUMN (within bordered boxes):
+  Quotation Detail
+  Document Date: [Date]
+  Quotation Date: ${new Date(quotation.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+  Reverse Charge: No
+  L.R. No: ${quotation.quotation_number}
+  Transport: ${customer.transport || "N/A"}
+  Transport ID: ${customer.transport_id || "N/A"}
+  Due Date: ${quotation.valid_until ? new Date(quotation.valid_until).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A'}
+  Vehicle Number: ${customer.vehicle_number || "N/A"}
+
+ITEMS TABLE (full width, bordered):
+Columns: Sr. No. | Name of Product/Service | HSN/SAC | Qty | Rate | Taxable Value | IGST (% | Amount) | Total
 ${itemsList}
+Total Row: Total | [Total Qty] | | | [Subtotal] | [Tax Amount] | [Total]
 
-FINANCIAL SUMMARY:
-Subtotal: ₹${quotation.subtotal.toLocaleString('en-IN')}
-GST (${quotation.tax_rate}%): ₹${quotation.tax_amount.toLocaleString('en-IN')}
-Grand Total: ₹${quotation.total_amount.toLocaleString('en-IN')}
-In Words: ${numberToWords(quotation.total_amount)} Only
+BOTTOM LEFT: "Total in words" (in bordered box)
+${numberToWords(quotation.total_amount)} ONLY
 
-TERMS & CONDITIONS:
-- Payment within 30 days of invoice date
-- 50% advance payment required to start the project
-- Prices are inclusive of GST
-- Delivery as per agreed timeline
+BOTTOM RIGHT: Financial Summary (bordered box):
+  Taxable Amount: ${quotation.subtotal.toLocaleString('en-IN')}
+  Add: IGST: 
+  Total Tax: ${quotation.tax_amount.toLocaleString('en-IN')}
+  Total Amount After Tax: ₹ ${quotation.total_amount.toLocaleString('en-IN')}
 
-${footerImageUrl ? '--- USE PROVIDED FOOTER IMAGE AT BOTTOM ---' : `COMPANY FOOTER:
-${profile.company_address || "Company Address"}
-Phone: ${profile.company_phone || "Phone Number"}
-Email: ${profile.company_email || "Email Address"}`}
+BANK DETAILS (left side, bordered):
+Bank Name: ${profile.bank_name || "State Bank of India"}
+Branch Name: ${profile.bank_branch || "Branch Name"}
+Bank Account Number: ${profile.bank_account || "Account Number"}
+Bank Branch IFSC: ${profile.bank_ifsc || "IFSC Code"}
 
-${signatureImageUrl ? '--- USE PROVIDED SIGNATURE IMAGE AT BOTTOM RIGHT ---' : `SIGNATURE BLOCK (Bottom right corner):
+TERMS AND CONDITIONS (left side below bank):
+1. Our Responsibility Ceases as soon as goods leaves our Premises.
+2. Our Responsibility Ceases as soon as goods leaves our Premises.
+3. Goods once sold will not taken back
+4. Delivery Ex-Premises.
+
+RIGHT SIDE (bottom):
+GST Payable on Reverse Charge: N.A.
+Certified that the particulars given above are true and correct.
+
 For ${profile.company_name || "Company Name"}
-[Authorized Signatory space]`}
 
-Design Requirements:
-- CRITICAL: SINGLE PAGE LAYOUT ONLY - All content must fit on one A4 portrait page
-- CRITICAL: Compact and efficient space utilization - adjust font sizes and spacing to fit everything
-- CRITICAL: This design template must be CONSISTENT and IDENTICAL for all quotations
-- Professional and modern business document layout with fixed structure
-- Clean, well-organized sections with clear hierarchy
-${headerImageUrl ? '- CRITICAL: Use ONLY the provided header image at the TOP of the document - DO NOT generate any additional company information or header text that would overlap with the image' : '- Company branding prominent at top with elegant logo space'}
-- Clear itemized list table with proper alignment and borders
-- Financial summary highlighted in a box and easy to read
-- Terms and conditions in smaller text at bottom
-${footerImageUrl ? '- CRITICAL: Use ONLY the provided footer image at the BOTTOM of the document - DO NOT generate any additional footer text or company information that would overlap with the image' : '- Company footer with contact information centered'}
-${signatureImageUrl ? '- CRITICAL: Place ONLY the provided signature image at the bottom right corner - DO NOT generate any signature block text or "For [Company]" text that would overlap with the image' : '- Signature block at bottom right corner with "For ' + (profile.company_name || "Company Name") + '" and space for authorized signatory'}
-- Indian Rupee (₹) currency formatting throughout
-- A4 size document format (portrait orientation)
-- Professional color scheme: Navy blue headers (#1e3a8a), light gray backgrounds (#f3f4f6), white content areas
-- High quality, print-ready resolution (300 DPI minimum)
-- Consistent fonts: Headers in bold, body text in regular weight
-- Ultra high resolution
-- Layout structure (top to bottom): Header → "QUOTATION" title → Details (Quote#, Date) → Customer info → Items table → Financial summary → Terms & Signature side-by-side → Footer
-- Compact sections with minimal whitespace to fit single page
-${headerImageUrl || footerImageUrl || signatureImageUrl ? '- CRITICAL: The provided images contain all necessary header/footer/signature information - DO NOT add any overlapping text, headings, or labels. Simply place the images at their designated positions and build the quotation content between them.' : ''}`;
+${signatureImageUrl ? '--- USE PROVIDED SIGNATURE IMAGE HERE ---' : 'Authorized Signatory'}
+
+"This is computer generated invoice no signature required" (small text)
+
+=== CRITICAL DESIGN REQUIREMENTS ===
+- EXACT MATCH to reference design structure shown above
+- Table-based layout with clear borders and gridlines
+- Two-column format for customer and quotation details
+- Financial summary in bordered box on bottom right
+- Bank details and terms on bottom left
+- Professional invoice/quotation styling
+- Light blue/teal header background for company section
+- All text properly aligned within bordered cells
+- Clean, structured, business document format
+- SINGLE PAGE ONLY - compact spacing to fit everything
+- Indian Rupee (₹) symbol throughout
+- Professional fonts: Bold for headers, regular for content
+- High quality, print-ready resolution (300 DPI)
+- A4 portrait orientation
+${headerImageUrl ? '- CRITICAL: Use provided header image at top - no overlapping text' : ''}
+${footerImageUrl ? '- CRITICAL: Use provided footer image at bottom - no overlapping text' : ''}
+${signatureImageUrl ? '- CRITICAL: Use provided signature image in signature area - no overlapping text' : ''}
+- Maintain consistent structure across all quotations
+- Professional business quotation document appearance
 
     console.log("Generating quotation image with Lovable AI...");
 
