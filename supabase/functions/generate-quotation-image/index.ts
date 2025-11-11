@@ -123,7 +123,7 @@ ${headerImageUrl ? '- CRITICAL: Use provided header image at top - no overlappin
 ${footerImageUrl ? '- CRITICAL: Use provided footer image at bottom - no overlapping text' : ''}
 ${signatureImageUrl ? '- CRITICAL: Use provided signature image in signature area - no overlapping text' : ''}
 - Maintain consistent structure across all quotations
-- Professional business quotation document appearance
+- Professional business quotation document appearance`;
 
     console.log("Generating quotation image with Lovable AI...");
 
