@@ -178,42 +178,57 @@ export default function Quotations() {
       const pdfBlob = await generatePDFBlob(quotation as Quotation, customer, items || [], profile || undefined)
       const pdfFile = new File([pdfBlob], `quotation-${quotation.quotation_number}.pdf`, { type: 'application/pdf' })
 
-      // Try to share the PDF file using Web Share API
-      if (navigator.share && navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
-        await navigator.share({
-          files: [pdfFile],
-          title: `Quotation ${quotation.quotation_number}`,
-          text: `${quotation.title}\nAmount: ${formatCurrency(quotation.total_amount)}`,
-        })
-        
-        toast({
-          title: 'PDF Shared',
-          description: 'Quotation PDF shared successfully',
-        })
-      } else {
-        // Fallback: Download PDF and open WhatsApp with message
-        const url = URL.createObjectURL(pdfBlob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `quotation-${quotation.quotation_number}.pdf`
-        a.click()
-        URL.revokeObjectURL(url)
-
-        const message = `Quotation: ${quotation.quotation_number}\n\nTitle: ${quotation.title}\nAmount: ${formatCurrency(quotation.total_amount)}\n\nPDF has been downloaded. Please attach it manually to WhatsApp.`
-        const encodedMessage = encodeURIComponent(message)
-        const customerPhone = customer.phone ? customer.phone.replace(/[^0-9]/g, '') : ''
-        
-        const whatsappUrl = customerPhone 
-          ? `https://wa.me/${customerPhone}?text=${encodedMessage}`
-          : `https://wa.me/?text=${encodedMessage}`
-        
-        window.open(whatsappUrl, '_blank')
-
-        toast({
-          title: 'PDF Downloaded',
-          description: 'PDF downloaded. Opening WhatsApp - please attach the file manually.',
-        })
+      // Try to share the PDF file using Web Share API (works on mobile)
+      if (navigator.share && navigator.canShare?.({ files: [pdfFile] })) {
+        try {
+          await navigator.share({
+            files: [pdfFile],
+            title: `Quotation ${quotation.quotation_number}`,
+            text: `${quotation.title}\nAmount: ${formatCurrency(quotation.total_amount)}`,
+          })
+          
+          toast({
+            title: 'Success',
+            description: 'PDF shared successfully',
+          })
+          return
+        } catch (shareError: any) {
+          // User cancelled or share failed, continue to download
+          if (shareError.name !== 'AbortError') {
+            console.error('Share failed:', shareError)
+          }
+        }
       }
+
+      // Download the PDF
+      const url = URL.createObjectURL(pdfBlob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `quotation-${quotation.quotation_number}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+
+      // Wait a moment for download to start
+      await new Promise(resolve => setTimeout(resolve, 500))
+
+      // Open WhatsApp with instructions
+      const message = `Hi ${customer.name}! 📄\n\nPlease find the quotation attached:\n\n📋 ${quotation.title}\n💰 Amount: ${formatCurrency(quotation.total_amount)}\n\n*Please attach the downloaded PDF file to this chat*`
+      const encodedMessage = encodeURIComponent(message)
+      const customerPhone = customer.phone ? customer.phone.replace(/[^0-9]/g, '') : ''
+      
+      const whatsappUrl = customerPhone 
+        ? `https://wa.me/${customerPhone}?text=${encodedMessage}`
+        : `https://wa.me/?text=${encodedMessage}`
+      
+      window.open(whatsappUrl, '_blank')
+
+      toast({
+        title: 'PDF Downloaded',
+        description: 'PDF downloaded. Opening WhatsApp - please attach the file manually.',
+        duration: 5000,
+      })
     } catch (error: any) {
       toast({
         title: 'Share Error',
