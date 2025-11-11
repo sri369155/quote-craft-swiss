@@ -70,16 +70,16 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
     totalText: 'Total'
   })
 
-  // Spacing controls
+  // Spacing controls - exact default values
   const [spacing, setSpacing] = useState({
-    headerSpacing: 6,
-    quotationLabelSpacing: 4,
-    detailsSpacing: 4,
-    introSpacing: 6,
-    tableSpacing: 6,
-    totalSpacing: 6,
-    termsSpacing: 8,
-    footerSpacing: 8
+    headerSpacing: 8,
+    quotationLabelSpacing: 8,
+    detailsSpacing: 15,
+    introSpacing: 8,
+    tableSpacing: 8,
+    totalSpacing: 8,
+    termsSpacing: 10,
+    footerSpacing: 10
   })
 
   // Style customization controls
