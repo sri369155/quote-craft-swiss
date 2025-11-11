@@ -235,7 +235,14 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
         signature_image_url: selectedImages.signature !== 'none' ? selectedImages.signature : null
       } : undefined
       
-      const pdfUrl = await exportToPDF(quotation, customer, items, modifiedProfile)
+      // Pass customization options to PDF export
+      const customization = {
+        editableText,
+        styleCustomization,
+        spacing
+      }
+      
+      const pdfUrl = await exportToPDF(quotation, customer, items, modifiedProfile, customization)
       
       if (pdfUrl) {
         // Show success toast with action to open PDF
@@ -329,8 +336,15 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
         signature_image_url: selectedImages.signature !== 'none' ? selectedImages.signature : null
       } : undefined
 
+      // Pass customization options to PDF export
+      const customization = {
+        editableText,
+        styleCustomization,
+        spacing
+      }
+
       // Generate PDF as Blob
-      const pdfBlob = await generatePDFBlob(quotation, customer, items, modifiedProfile)
+      const pdfBlob = await generatePDFBlob(quotation, customer, items, modifiedProfile, customization)
       const pdfFile = new File([pdfBlob], `quotation-${quotation.quotation_number}.pdf`, { type: 'application/pdf' })
 
       // Try to share the PDF file using Web Share API (works on mobile)
