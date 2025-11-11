@@ -264,16 +264,22 @@
   }
 }
 
-/* Print Styles - Hide browser default headers/footers */
+/* Print Styles - A4 Page Setup */
 @media print {
   @page {
-    margin: 0;
-    size: auto;
+    size: A4;
+    margin: 15mm;
   }
   
   body {
     margin: 0 !important;
     padding: 0 !important;
+    background: white !important;
+  }
+  
+  * {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
   }
 
   /* Hide dialog overlay completely */

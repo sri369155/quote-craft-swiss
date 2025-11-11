@@ -614,10 +614,11 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
 
         {/* PDF-like Content - FIRST PAGE (only show if NOT using image design or no image generated yet) */}
         {!profile?.use_image_design && (
-          <div className="bg-white p-8 print:p-0 print:page-break-after-auto" style={{
+          <div className="bg-white p-8 print:p-0 print:page-break-after-page" style={{
             display: 'flex', 
             flexDirection: 'column', 
-            gap: `${spacing.headerSpacing * 0.25}rem` 
+            gap: `${spacing.headerSpacing * 0.25}rem`,
+            minHeight: 'auto'
           }}>
           {/* Header Section */}
           <div className="relative">
@@ -995,14 +996,9 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
         </div>
         )}
 
-        {/* PAGE BREAK - Only visible in print when there's a second page */}
-        {!profile?.use_image_design && quotation.scope_of_work && (
-          <div className="print:page-break-before-always print:block hidden"></div>
-        )}
-
         {/* SCOPE OF WORK - SEPARATE PAGE */}
         {!profile?.use_image_design && quotation.scope_of_work && (
-          <div className="bg-white p-8 print:p-0 print:pt-8 print:page-break-after-auto">
+          <div className="bg-white p-8 print:p-0 print:page-break-before-page print:page-break-after-avoid" style={{ minHeight: 'auto' }}>
             {/* Header for Second Page */}
             <div className="relative mb-8">
               {selectedImages.header && selectedImages.header !== 'none' ? (
