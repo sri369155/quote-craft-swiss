@@ -272,6 +272,237 @@ export function usePDFExport() {
     }
   }
 
+  const generatePDFBlob = async (
+    quotation: Quotation,
+    customer: Customer,
+    items: QuotationItem[],
+    userProfile?: Profile
+  ): Promise<Blob> => {
+    const pdf = new jsPDF()
+    const pageWidth = pdf.internal.pageSize.getWidth()
+    const pageHeight = pdf.internal.pageSize.getHeight()
+    const footerHeight = 30
+    
+    // Load custom images if available
+    let headerImage: string | null = null
+    let footerImage: string | null = null
+    let signatureImage: string | null = null
+    
+    if (userProfile?.header_image_url) {
+      headerImage = await loadImageAsBase64(userProfile.header_image_url)
+    }
+    if (userProfile?.footer_image_url) {
+      footerImage = await loadImageAsBase64(userProfile.footer_image_url)
+    }
+    if (userProfile?.signature_image_url) {
+      signatureImage = await loadImageAsBase64(userProfile.signature_image_url)
+    }
+    
+    // Colors
+    const orangeColor = '#D2691E'
+    const blackColor = '#000000'
+    const grayColor = '#808080'
+    const lightGray = '#f5f5f5'
+    
+    let yPosition = 0
+    
+    // Header section - First page
+    yPosition = addHeaderToPage(pdf, pageWidth, headerImage, userProfile)
+    
+    // QUOTATION label
+    pdf.setTextColor(37, 99, 235) // Modern blue color
+    pdf.setFontSize(18)
+    pdf.setFont('helvetica', 'bold')
+    pdf.text('QUOTATION', pageWidth / 2, yPosition + 8, { align: 'center' })
+
+    yPosition += 15 // Reduced spacing
+    
+    // Quotation details
+    pdf.setTextColor(blackColor)
+    pdf.setFont('helvetica', 'normal')
+    pdf.setFontSize(11)
+    
+    pdf.text(`Quotation No.: ${quotation.quotation_number}`, 15, yPosition)
+    pdf.text(`Date: ${new Date(quotation.created_at).toLocaleDateString('en-GB')}`, pageWidth - 15, yPosition, { align: 'right' })
+    
+    yPosition += 12 // Reduced spacing
+    pdf.text('Dear Sir,', 15, yPosition)
+    
+    yPosition += 8 // Reduced spacing
+    const introText = 'We would like to submit our lowest budgetary quote for the supply and installation of the following items:'
+    const splitIntro = pdf.splitTextToSize(introText, pageWidth - 30)
+    pdf.text(splitIntro, 15, yPosition)
+    yPosition += splitIntro.length * 4 + 3 // Reduced line spacing
+    
+    pdf.text(`Sub: ${quotation.title || 'Project quotation'}`, 15, yPosition)
+    yPosition += 12 // Reduced spacing
+    
+    // Table rendering with multi-page support
+    yPosition = renderMultiPageTable(
+      pdf, 
+      pageWidth, 
+      pageHeight,
+      yPosition, 
+      items, 
+      quotation,
+      headerImage,
+      footerImage,
+      userProfile
+    )
+    
+    // Terms & Conditions and Signature section (always on main page)
+    const termsStartY = yPosition + 5
+    
+    // Check if we need a new page for the signature section
+    if (termsStartY + 40 > pageHeight - 30) { // Reduced from 70 to 40
+      // Add footer to current page
+      addFooterToPage(pdf, pageWidth, pageHeight, footerImage, userProfile)
+      
+      // Add new page
+      pdf.addPage()
+      
+      // Add header to new page
+      yPosition = addHeaderToPage(pdf, pageWidth, headerImage, userProfile)
+      const newTermsStartY = yPosition + 5 // Reduced from 10
+      
+      pdf.setFillColor(255, 255, 255)
+      pdf.rect(15, newTermsStartY, 80, 30, 'FD') // Reduced height from 60 to 30
+      pdf.rect(95, newTermsStartY, 100, 30, 'FD') // Reduced height from 60 to 30
+      
+      // Terms & Conditions
+      pdf.setFont('helvetica', 'bold')
+      pdf.setFontSize(10)
+      pdf.setTextColor(blackColor)
+      pdf.text('Terms & Conditions', 17, newTermsStartY + 8) // Reduced from 12
+      
+      pdf.setFont('helvetica', 'normal')
+      pdf.setFontSize(9)
+      pdf.text('Completion: 90 Days', 17, newTermsStartY + 15) // Reduced spacing
+      pdf.text('GST: As indicated', 17, newTermsStartY + 20) // Reduced spacing
+      pdf.text('Transport: NA', 17, newTermsStartY + 25) // Reduced spacing
+      
+      // Signature section
+      pdf.text('With regards', 97, newTermsStartY + 8) // Reduced from 12
+      
+      // Company name in signature (only if set in profile)
+      if (userProfile?.company_name) {
+        pdf.setFont('helvetica', 'bold')
+        pdf.setFontSize(12)
+        pdf.setTextColor(37, 99, 235) // Modern blue to match header
+        pdf.text(`For ${userProfile.company_name}`, 97, newTermsStartY + 15) // Reduced from 25
+      }
+      
+      // Add signature image if available
+      if (signatureImage) {
+        try {
+          pdf.addImage(signatureImage, 'JPEG', 97, newTermsStartY + 20, 60, 20) // Increased height from 10 to 20
+        } catch (error) {
+          console.error('Error adding signature image:', error)
+        }
+      }
+      
+      // Only keep "Authorised Signature" - removed "Managing Partner"
+      pdf.setFont('helvetica', 'normal')
+      pdf.setFontSize(9) // Reduced font size
+      pdf.setTextColor(blackColor)
+      pdf.text('Authorised Signature', 97, newTermsStartY + 42) // Adjusted position for larger signature
+    } else {
+      // Keep original layout if it fits on current page
+      pdf.setFillColor(255, 255, 255)
+      pdf.rect(15, termsStartY, 80, 50, 'FD') // Increased height from 30 to 50
+      pdf.rect(95, termsStartY, 100, 50, 'FD') // Increased height from 30 to 50
+      
+      // Terms & Conditions
+      pdf.setFont('helvetica', 'bold')
+      pdf.setFontSize(10)
+      pdf.setTextColor(blackColor)
+      pdf.text('Terms & Conditions', 17, termsStartY + 8) // Reduced from 12
+      
+      pdf.setFont('helvetica', 'normal')
+      pdf.setFontSize(9)
+      pdf.text('Completion: 90 Days', 17, termsStartY + 15) // Reduced spacing
+      pdf.text('GST: As indicated', 17, termsStartY + 20) // Reduced spacing
+      pdf.text('Transport: NA', 17, termsStartY + 25) // Reduced spacing
+      
+      // Signature section
+      pdf.text('With regards', 97, termsStartY + 8) // Reduced from 12
+      
+      // Company name in signature (only if set in profile)
+      if (userProfile?.company_name) {
+        pdf.setFont('helvetica', 'bold')
+        pdf.setFontSize(12)
+        pdf.setTextColor(37, 99, 235) // Modern blue to match header
+        pdf.text(`For ${userProfile.company_name}`, 97, termsStartY + 15) // Reduced from 25
+      }
+      
+      // Add signature image if available
+      if (signatureImage) {
+        try {
+          pdf.addImage(signatureImage, 'JPEG', 97, termsStartY + 20, 60, 20) // Increased height from 10 to 20
+        } catch (error) {
+          console.error('Error adding signature image:', error)
+        }
+      }
+      
+      // Only keep "Authorised Signature" - removed "Managing Partner"
+      pdf.setFont('helvetica', 'normal')
+      pdf.setFontSize(9) // Reduced font size
+      pdf.setTextColor(blackColor)
+      pdf.text('Authorised Signature', 97, termsStartY + 42) // Adjusted position for larger signature
+    }
+    
+    // Footer for main page
+    addFooterToPage(pdf, pageWidth, pageHeight, footerImage, userProfile)
+    
+    // Add Scope of Work on a fresh new page if it exists
+    if (quotation.scope_of_work) {
+      // Add new page for scope of work
+      pdf.addPage()
+      
+      // Add header to new page
+      let scopeYPosition = addHeaderToPage(pdf, pageWidth, headerImage, userProfile)
+      
+      // Scope of Work title
+      pdf.setFont('helvetica', 'bold')
+      pdf.setFontSize(16)
+      pdf.setTextColor(37, 99, 235) // Modern blue color
+      const scopeTitle = 'Scope of Work / Specifications'
+      pdf.text(scopeTitle, pageWidth / 2, scopeYPosition + 10, { align: 'center' })
+      
+      // Underline the title
+      const titleWidth = pdf.getTextWidth(scopeTitle)
+      const startX = (pageWidth - titleWidth) / 2
+      pdf.line(startX, scopeYPosition + 12, startX + titleWidth, scopeYPosition + 12)
+      
+      scopeYPosition += 25
+      
+      // Scope of Work content
+      pdf.setFont('helvetica', 'normal')
+      pdf.setFontSize(11)
+      pdf.setTextColor(blackColor)
+      
+      const scopeLines = quotation.scope_of_work.split('\n').filter(line => line.trim().length > 0)
+      for (const line of scopeLines) {
+        if (scopeYPosition > pageHeight - 50) {
+          // Add footer and new page if content exceeds page
+          addFooterToPage(pdf, pageWidth, pageHeight, footerImage, userProfile)
+          pdf.addPage()
+          scopeYPosition = addHeaderToPage(pdf, pageWidth, headerImage, userProfile) + 10
+        }
+        
+        const wrappedLines = pdf.splitTextToSize(line, pageWidth - 30)
+        pdf.text(wrappedLines, 15, scopeYPosition)
+        scopeYPosition += wrappedLines.length * 5 + 3
+      }
+      
+      // Add footer to scope of work page
+      addFooterToPage(pdf, pageWidth, pageHeight, footerImage, userProfile)
+    }
+    
+    // Return PDF as Blob
+    return pdf.output('blob')
+  }
+
   const renderDefaultHeader = (pdf: jsPDF, pageWidth: number, userProfile?: Profile) => {
     // Header background with modern blue gradient
     pdf.setFillColor(37, 99, 235) // Modern blue color
@@ -549,6 +780,7 @@ export function usePDFExport() {
 
   return {
     exportToPDF,
+    generatePDFBlob,
     loading,
   }
 }

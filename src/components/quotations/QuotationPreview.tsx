@@ -28,7 +28,7 @@ interface QuotationPreviewProps {
 export default function QuotationPreview({ quotationId, open, onClose }: QuotationPreviewProps) {
   const { profile } = useAuth()
   const { toast } = useToast()
-  const { exportToPDF, loading: pdfLoading } = usePDFExport()
+  const { exportToPDF, generatePDFBlob, loading: pdfLoading } = usePDFExport()
   const { exportToImage, downloadImage, loading: imageLoading } = useImageQuoteExport()
   
   const [quotation, setQuotation] = useState<Quotation | null>(null)
@@ -297,27 +297,63 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
         }).format(amount)
       }
 
-      const message = `Check out this quotation: ${quotation.quotation_number}\n\nTitle: ${quotation.title}\nAmount: ${formatCurrency(quotation.total_amount)}\n\nPlease download the PDF for full details.`
-      
-      // Use WhatsApp Web directly for better compatibility
-      const encodedMessage = encodeURIComponent(message)
-      const customerPhone = customer.phone ? customer.phone.replace(/[^0-9]/g, '') : ''
-      
-      // If customer has a phone number, use it; otherwise just open WhatsApp
-      const whatsappUrl = customerPhone 
-        ? `https://wa.me/${customerPhone}?text=${encodedMessage}`
-        : `https://wa.me/?text=${encodedMessage}`
-      
-      window.open(whatsappUrl, '_blank')
-
       toast({
-        title: 'Opening WhatsApp',
-        description: 'WhatsApp will open in a new window',
+        title: 'Generating PDF',
+        description: 'Please wait while we generate your quotation PDF...',
       })
+
+      // Create a modified profile object with selected images
+      const modifiedProfile = profile ? {
+        ...profile,
+        header_image_url: selectedImages.header !== 'none' ? selectedImages.header : null,
+        footer_image_url: selectedImages.footer !== 'none' ? selectedImages.footer : null,
+        signature_image_url: selectedImages.signature !== 'none' ? selectedImages.signature : null
+      } : undefined
+
+      // Generate PDF as Blob
+      const pdfBlob = await generatePDFBlob(quotation, customer, items, modifiedProfile)
+      const pdfFile = new File([pdfBlob], `quotation-${quotation.quotation_number}.pdf`, { type: 'application/pdf' })
+
+      // Try to share the PDF file using Web Share API
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+        await navigator.share({
+          files: [pdfFile],
+          title: `Quotation ${quotation.quotation_number}`,
+          text: `${quotation.title}\nAmount: ${formatCurrency(quotation.total_amount)}`,
+        })
+        
+        toast({
+          title: 'PDF Shared',
+          description: 'Quotation PDF shared successfully',
+        })
+      } else {
+        // Fallback: Download PDF and open WhatsApp with message
+        const url = URL.createObjectURL(pdfBlob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `quotation-${quotation.quotation_number}.pdf`
+        a.click()
+        URL.revokeObjectURL(url)
+
+        const message = `Quotation: ${quotation.quotation_number}\n\nTitle: ${quotation.title}\nAmount: ${formatCurrency(quotation.total_amount)}\n\nPDF has been downloaded. Please attach it manually to WhatsApp.`
+        const encodedMessage = encodeURIComponent(message)
+        const customerPhone = customer.phone ? customer.phone.replace(/[^0-9]/g, '') : ''
+        
+        const whatsappUrl = customerPhone 
+          ? `https://wa.me/${customerPhone}?text=${encodedMessage}`
+          : `https://wa.me/?text=${encodedMessage}`
+        
+        window.open(whatsappUrl, '_blank')
+
+        toast({
+          title: 'PDF Downloaded',
+          description: 'PDF downloaded. Opening WhatsApp - please attach the file manually.',
+        })
+      }
     } catch (error: any) {
       toast({
         title: 'Share Error',
-        description: error.message || 'Failed to share. Please try again.',
+        description: error.message || 'Failed to share PDF. Please try again.',
         variant: 'destructive',
       })
     }
