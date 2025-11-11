@@ -31,11 +31,8 @@ serve(async (req) => {
       `${index + 1}. ${item.description}${item.hsn_code ? ` (HSN: ${item.hsn_code})` : ''} - Qty: ${item.quantity} - Rate: ₹${item.unit_price.toLocaleString('en-IN')} - Amount: ₹${item.line_total.toLocaleString('en-IN')}`
     ).join('\n');
 
-    // Format scope of work if present
-    const scopeSection = quotation.scope_of_work ? `\n\n--- PAGE 2: SCOPE OF WORK ---\n${quotation.scope_of_work}` : '';
-
     // Create detailed prompt for the quotation image with consistent design template
-    const prompt = `Create a professional business quotation document image${quotation.scope_of_work ? ' (2 pages)' : ''} with the following exact details:
+    const prompt = `Create a professional single-page business quotation document image with the following exact details:
 
 ${headerImageUrl ? '--- USE PROVIDED HEADER IMAGE AT TOP ---' : `COMPANY INFORMATION (Top of document):
 Company Name: ${profile.company_name || "Company Name"}
@@ -78,9 +75,10 @@ Email: ${profile.company_email || "Email Address"}`}
 ${signatureImageUrl ? '--- USE PROVIDED SIGNATURE IMAGE AT BOTTOM RIGHT ---' : `SIGNATURE BLOCK (Bottom right corner):
 For ${profile.company_name || "Company Name"}
 [Authorized Signatory space]`}
-${scopeSection}
 
 Design Requirements:
+- CRITICAL: SINGLE PAGE LAYOUT ONLY - All content must fit on one A4 portrait page
+- CRITICAL: Compact and efficient space utilization - adjust font sizes and spacing to fit everything
 - CRITICAL: This design template must be CONSISTENT and IDENTICAL for all quotations
 - Professional and modern business document layout with fixed structure
 - Clean, well-organized sections with clear hierarchy
@@ -96,8 +94,9 @@ ${signatureImageUrl ? '- CRITICAL: Place ONLY the provided signature image at th
 - High quality, print-ready resolution (300 DPI minimum)
 - Consistent fonts: Headers in bold, body text in regular weight
 - Ultra high resolution
-${headerImageUrl || footerImageUrl || signatureImageUrl ? '\n- CRITICAL: The provided images contain all necessary header/footer/signature information - DO NOT add any overlapping text, headings, or labels. Simply place the images at their designated positions and build the quotation content between them.' : ''}
-${quotation.scope_of_work ? '\n- CRITICAL: The Scope of Work section MUST appear on a separate PAGE 2 with the same header and footer from page 1. Page 1 ends after the signature area.' : ''}`;
+- Layout structure (top to bottom): Header → "QUOTATION" title → Details (Quote#, Date) → Customer info → Items table → Financial summary → Terms & Signature side-by-side → Footer
+- Compact sections with minimal whitespace to fit single page
+${headerImageUrl || footerImageUrl || signatureImageUrl ? '- CRITICAL: The provided images contain all necessary header/footer/signature information - DO NOT add any overlapping text, headings, or labels. Simply place the images at their designated positions and build the quotation content between them.' : ''}`;
 
     console.log("Generating quotation image with Lovable AI...");
 
