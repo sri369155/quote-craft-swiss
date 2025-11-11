@@ -123,6 +123,21 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
     }
   }, [profile, open])
 
+  // Load saved customization settings from localStorage
+  useEffect(() => {
+    const savedSettings = localStorage.getItem('quotation-customization')
+    if (savedSettings) {
+      try {
+        const parsed = JSON.parse(savedSettings)
+        if (parsed.editableText) setEditableText(prev => ({ ...prev, ...parsed.editableText }))
+        if (parsed.spacing) setSpacing(prev => ({ ...prev, ...parsed.spacing }))
+        if (parsed.styleCustomization) setStyleCustomization(prev => ({ ...prev, ...parsed.styleCustomization }))
+      } catch (error) {
+        console.error('Error loading saved settings:', error)
+      }
+    }
+  }, [])
+
   useEffect(() => {
     if (quotationId && open) {
       loadQuotationData()
@@ -145,11 +160,42 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
   }, [profile, quotation])
 
   const updateEditableText = (field: string, value: string) => {
-    setEditableText(prev => ({ ...prev, [field]: value }))
+    const updated = { ...editableText, [field]: value }
+    setEditableText(updated)
+    
+    // Save to localStorage
+    const savedSettings = localStorage.getItem('quotation-customization')
+    const currentSettings = savedSettings ? JSON.parse(savedSettings) : {}
+    localStorage.setItem('quotation-customization', JSON.stringify({
+      ...currentSettings,
+      editableText: updated
+    }))
   }
 
   const updateSpacing = (field: string, value: number) => {
-    setSpacing(prev => ({ ...prev, [field]: value }))
+    const updated = { ...spacing, [field]: value }
+    setSpacing(updated)
+    
+    // Save to localStorage
+    const savedSettings = localStorage.getItem('quotation-customization')
+    const currentSettings = savedSettings ? JSON.parse(savedSettings) : {}
+    localStorage.setItem('quotation-customization', JSON.stringify({
+      ...currentSettings,
+      spacing: updated
+    }))
+  }
+
+  const updateStyleCustomization = (field: string, value: string) => {
+    const updated = { ...styleCustomization, [field]: value }
+    setStyleCustomization(updated)
+    
+    // Save to localStorage
+    const savedSettings = localStorage.getItem('quotation-customization')
+    const currentSettings = savedSettings ? JSON.parse(savedSettings) : {}
+    localStorage.setItem('quotation-customization', JSON.stringify({
+      ...currentSettings,
+      styleCustomization: updated
+    }))
   }
 
   const updateImagePreference = (field: string, value: boolean) => {
@@ -581,12 +627,12 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                     <input 
                       type="color" 
                       value={styleCustomization.titleColor}
-                      onChange={(e) => setStyleCustomization(prev => ({ ...prev, titleColor: e.target.value }))}
+                      onChange={(e) => updateStyleCustomization('titleColor', e.target.value)}
                       className="h-10 w-20 rounded border cursor-pointer"
                     />
                     <Input 
                       value={styleCustomization.titleColor}
-                      onChange={(e) => setStyleCustomization(prev => ({ ...prev, titleColor: e.target.value }))}
+                      onChange={(e) => updateStyleCustomization('titleColor', e.target.value)}
                       className="flex-1 h-10 text-xs font-mono"
                       placeholder="#000000"
                     />
@@ -599,12 +645,12 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                     <input 
                       type="color" 
                       value={styleCustomization.companyNameColor}
-                      onChange={(e) => setStyleCustomization(prev => ({ ...prev, companyNameColor: e.target.value }))}
+                      onChange={(e) => updateStyleCustomization('companyNameColor', e.target.value)}
                       className="h-10 w-20 rounded border cursor-pointer"
                     />
                     <Input 
                       value={styleCustomization.companyNameColor}
-                      onChange={(e) => setStyleCustomization(prev => ({ ...prev, companyNameColor: e.target.value }))}
+                      onChange={(e) => updateStyleCustomization('companyNameColor', e.target.value)}
                       className="flex-1 h-10 text-xs font-mono"
                       placeholder="#000000"
                     />
@@ -617,12 +663,12 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                     <input 
                       type="color" 
                       value={styleCustomization.tableBorderColor}
-                      onChange={(e) => setStyleCustomization(prev => ({ ...prev, tableBorderColor: e.target.value }))}
+                      onChange={(e) => updateStyleCustomization('tableBorderColor', e.target.value)}
                       className="h-10 w-20 rounded border cursor-pointer"
                     />
                     <Input 
                       value={styleCustomization.tableBorderColor}
-                      onChange={(e) => setStyleCustomization(prev => ({ ...prev, tableBorderColor: e.target.value }))}
+                      onChange={(e) => updateStyleCustomization('tableBorderColor', e.target.value)}
                       className="flex-1 h-10 text-xs font-mono"
                       placeholder="#d1d5db"
                     />
@@ -635,12 +681,12 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                     <input 
                       type="color" 
                       value={styleCustomization.tableHeaderBgColor}
-                      onChange={(e) => setStyleCustomization(prev => ({ ...prev, tableHeaderBgColor: e.target.value }))}
+                      onChange={(e) => updateStyleCustomization('tableHeaderBgColor', e.target.value)}
                       className="h-10 w-20 rounded border cursor-pointer"
                     />
                     <Input 
                       value={styleCustomization.tableHeaderBgColor}
-                      onChange={(e) => setStyleCustomization(prev => ({ ...prev, tableHeaderBgColor: e.target.value }))}
+                      onChange={(e) => updateStyleCustomization('tableHeaderBgColor', e.target.value)}
                       className="flex-1 h-10 text-xs font-mono"
                       placeholder="#f3f4f6"
                     />
@@ -653,12 +699,12 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                     <input 
                       type="color" 
                       value={styleCustomization.tableFooterBgColor}
-                      onChange={(e) => setStyleCustomization(prev => ({ ...prev, tableFooterBgColor: e.target.value }))}
+                      onChange={(e) => updateStyleCustomization('tableFooterBgColor', e.target.value)}
                       className="h-10 w-20 rounded border cursor-pointer"
                     />
                     <Input 
                       value={styleCustomization.tableFooterBgColor}
-                      onChange={(e) => setStyleCustomization(prev => ({ ...prev, tableFooterBgColor: e.target.value }))}
+                      onChange={(e) => updateStyleCustomization('tableFooterBgColor', e.target.value)}
                       className="flex-1 h-10 text-xs font-mono"
                       placeholder="#f3f4f6"
                     />
@@ -672,7 +718,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                     min="1"
                     max="5"
                     value={styleCustomization.tableBorderSize}
-                    onChange={(e) => setStyleCustomization(prev => ({ ...prev, tableBorderSize: e.target.value }))}
+                    onChange={(e) => updateStyleCustomization('tableBorderSize', e.target.value)}
                     className="h-10"
                   />
                 </div>
