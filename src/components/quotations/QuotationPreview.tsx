@@ -1228,7 +1228,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                   className="font-bold text-lg border-0 p-0 bg-transparent print:hidden"
                 />
                 <span className="hidden print:block">{editableText.totalText}</span>
-                <span>{Math.round(quotation.total_amount)}</span>
+                <span>{Math.round(quotation.total_amount).toFixed(2)}</span>
               </div>
             </div>
           </div>
