@@ -132,6 +132,8 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
         if (parsed.editableText) setEditableText(prev => ({ ...prev, ...parsed.editableText }))
         if (parsed.spacing) setSpacing(prev => ({ ...prev, ...parsed.spacing }))
         if (parsed.styleCustomization) setStyleCustomization(prev => ({ ...prev, ...parsed.styleCustomization }))
+        if (parsed.selectedImages) setSelectedImages(prev => ({ ...prev, ...parsed.selectedImages }))
+        if (parsed.imagePreferences) setImagePreferences(prev => ({ ...prev, ...parsed.imagePreferences }))
       } catch (error) {
         console.error('Error loading saved settings:', error)
       }
@@ -205,7 +207,29 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
       footer: profile?.footer_image_url,
       signature: profile?.signature_image_url
     })
-    setImagePreferences(prev => ({ ...prev, [field]: value }))
+    const updated = { ...imagePreferences, [field]: value }
+    setImagePreferences(updated)
+    
+    // Save to localStorage
+    const savedSettings = localStorage.getItem('quotation-customization')
+    const currentSettings = savedSettings ? JSON.parse(savedSettings) : {}
+    localStorage.setItem('quotation-customization', JSON.stringify({
+      ...currentSettings,
+      imagePreferences: updated
+    }))
+  }
+
+  const updateSelectedImage = (field: 'header' | 'footer' | 'signature', value: string) => {
+    const updated = { ...selectedImages, [field]: value }
+    setSelectedImages(updated)
+    
+    // Save to localStorage
+    const savedSettings = localStorage.getItem('quotation-customization')
+    const currentSettings = savedSettings ? JSON.parse(savedSettings) : {}
+    localStorage.setItem('quotation-customization', JSON.stringify({
+      ...currentSettings,
+      selectedImages: updated
+    }))
   }
 
   const loadQuotationData = async () => {
@@ -735,7 +759,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                 <label className="text-xs font-medium">Header Image</label>
                 <Select 
                   value={selectedImages.header} 
-                  onValueChange={(value) => setSelectedImages(prev => ({ ...prev, header: value }))}
+                  onValueChange={(value) => updateSelectedImage('header', value)}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="No header image" />
@@ -761,7 +785,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                 <label className="text-xs font-medium">Footer Image</label>
                 <Select 
                   value={selectedImages.footer} 
-                  onValueChange={(value) => setSelectedImages(prev => ({ ...prev, footer: value }))}
+                  onValueChange={(value) => updateSelectedImage('footer', value)}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="No footer image" />
@@ -787,7 +811,7 @@ export default function QuotationPreview({ quotationId, open, onClose }: Quotati
                 <label className="text-xs font-medium">Signature Image</label>
                 <Select 
                   value={selectedImages.signature} 
-                  onValueChange={(value) => setSelectedImages(prev => ({ ...prev, signature: value }))}
+                  onValueChange={(value) => updateSelectedImage('signature', value)}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="No signature image" />
