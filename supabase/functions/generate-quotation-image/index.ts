@@ -37,10 +37,10 @@ serve(async (req) => {
     // Create detailed prompt for the quotation image with consistent design template
     const prompt = `Create a professional business quotation document image${quotation.scope_of_work ? ' (2 pages)' : ''} with the following exact details:
 
-COMPANY INFORMATION (Top of document):
+${headerImageUrl ? '--- USE PROVIDED HEADER IMAGE AT TOP ---' : `COMPANY INFORMATION (Top of document):
 Company Name: ${profile.company_name || "Company Name"}
 Tagline: ${profile.company_slogan || "Your Business Tagline"}
-GST Number: ${profile.gst_number || "GST Number"}
+GST Number: ${profile.gst_number || "GST Number"}`}
 
 QUOTATION DETAILS:
 Quotation Number: ${quotation.quotation_number}
@@ -70,34 +70,34 @@ TERMS & CONDITIONS:
 - Prices are inclusive of GST
 - Delivery as per agreed timeline
 
-COMPANY FOOTER:
+${footerImageUrl ? '--- USE PROVIDED FOOTER IMAGE AT BOTTOM ---' : `COMPANY FOOTER:
 ${profile.company_address || "Company Address"}
 Phone: ${profile.company_phone || "Phone Number"}
-Email: ${profile.company_email || "Email Address"}
+Email: ${profile.company_email || "Email Address"}`}
 
-SIGNATURE BLOCK (Bottom right corner):
+${signatureImageUrl ? '--- USE PROVIDED SIGNATURE IMAGE AT BOTTOM RIGHT ---' : `SIGNATURE BLOCK (Bottom right corner):
 For ${profile.company_name || "Company Name"}
-[Authorized Signatory space]
+[Authorized Signatory space]`}
 ${scopeSection}
 
 Design Requirements:
 - CRITICAL: This design template must be CONSISTENT and IDENTICAL for all quotations
 - Professional and modern business document layout with fixed structure
 - Clean, well-organized sections with clear hierarchy
-${headerImageUrl ? '- IMPORTANT: Use the provided header image at the top of the document exactly as shown' : '- Company branding prominent at top with elegant logo space'}
+${headerImageUrl ? '- CRITICAL: Use ONLY the provided header image at the TOP of the document - DO NOT generate any additional company information or header text that would overlap with the image' : '- Company branding prominent at top with elegant logo space'}
 - Clear itemized list table with proper alignment and borders
 - Financial summary highlighted in a box and easy to read
 - Terms and conditions in smaller text at bottom
-${footerImageUrl ? '- IMPORTANT: Use the provided footer image at the bottom of the document exactly as shown' : '- Company footer with contact information centered'}
-${signatureImageUrl ? '- IMPORTANT: Place the provided signature image at the bottom right corner exactly as shown' : '- Signature block at bottom right corner with "For ' + (profile.company_name || "Company Name") + '" and space for authorized signatory'}
+${footerImageUrl ? '- CRITICAL: Use ONLY the provided footer image at the BOTTOM of the document - DO NOT generate any additional footer text or company information that would overlap with the image' : '- Company footer with contact information centered'}
+${signatureImageUrl ? '- CRITICAL: Place ONLY the provided signature image at the bottom right corner - DO NOT generate any signature block text or "For [Company]" text that would overlap with the image' : '- Signature block at bottom right corner with "For ' + (profile.company_name || "Company Name") + '" and space for authorized signatory'}
 - Indian Rupee (₹) currency formatting throughout
 - A4 size document format (portrait orientation)
 - Professional color scheme: Navy blue headers (#1e3a8a), light gray backgrounds (#f3f4f6), white content areas
 - High quality, print-ready resolution (300 DPI minimum)
 - Consistent fonts: Headers in bold, body text in regular weight
 - Ultra high resolution
-${headerImageUrl || footerImageUrl || signatureImageUrl ? '\n- CRITICAL: Incorporate the provided images seamlessly into the document maintaining their original quality and aspect ratio' : ''}
-${quotation.scope_of_work ? '\n- CRITICAL: The Scope of Work section MUST appear on a separate PAGE 2 with the same header and footer from page 1. Page 1 ends after the signature block.' : ''}`;
+${headerImageUrl || footerImageUrl || signatureImageUrl ? '\n- CRITICAL: The provided images contain all necessary header/footer/signature information - DO NOT add any overlapping text, headings, or labels. Simply place the images at their designated positions and build the quotation content between them.' : ''}
+${quotation.scope_of_work ? '\n- CRITICAL: The Scope of Work section MUST appear on a separate PAGE 2 with the same header and footer from page 1. Page 1 ends after the signature area.' : ''}`;
 
     console.log("Generating quotation image with Lovable AI...");
 
